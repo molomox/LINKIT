@@ -13,10 +13,18 @@ RUN apt-get update && apt-get install -y \
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier tous les fichiers source
+# Copier d'abord uniquement les fichiers de dépendances
+COPY Cargo.toml Cargo.lock ./
+
+# Créer un build factice pour cacher les dépendances
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+RUN cargo build --release
+RUN rm -rf src
+
+# Maintenant copier le vrai code source
 COPY . .
 
-# Compiler l'application en mode release
+# Compiler l'application réelle en mode release
 RUN cargo build --release
 
 # Étape 2 : Runtime - Image légère pour l'exécution
