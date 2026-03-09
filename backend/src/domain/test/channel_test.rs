@@ -23,6 +23,15 @@ impl MockChannelRepository {
         }
     }
 
+    fn create_test_channel(&self, channel_id: &str, server_id: &str, name: &str) -> Channel {
+        Channel {
+            channel_id: channel_id.to_string(),
+            server_id: server_id.to_string(),
+            name: name.to_string(),
+            create_at: "2024-01-01T00:00:00Z".to_string(),
+        }
+    }
+    
     fn add_channel(&self, channel: Channel) {
         self.channels.lock().unwrap().insert(channel.channel_id.clone(), channel);
     }

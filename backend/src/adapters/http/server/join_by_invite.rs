@@ -19,7 +19,7 @@ pub async fn join_server_by_invite_handler(
     Path(invite_code): Path<String>,
     Json(request): Json<JoinByInviteRequest>,
 ) -> Result<Json<Member>, ApiError> {
-    let result = tokio::task::spawn_blocking(move || {
+    let member = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;
         let repo2 = PostgresMemberRepo;
         let repo3 = PostgresRoleRepo;
@@ -30,15 +30,15 @@ pub async fn join_server_by_invite_handler(
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
     .map_err(|e| ApiError::BadRequest(format!("Server joining by invite failed: {}", e)))?;
     state.broadcast_to_server(
-        &result.server.server_id,
+        &member.server.server_id,
         WsMessage::MemberJoined{
-            user_id: result.user.user_id.clone(),
-            username: result.user.username.clone(),
-            server_id: result.server.server_id.clone(),
-            role_id: result.role.role_id.clone(),
-            role_name: result.role.role_name.clone(),
+            user_id: member.user.user_id.clone(),
+            username: member.user.username.clone(),
+            server_id: member.server.server_id.clone(),
+            role_id: member.role.role_id.clone(),
+            role_name: member.role.role_name.clone(),
         }
     ).await;
 
-    Ok(Json(result))
+    Ok(Json(member))
 }

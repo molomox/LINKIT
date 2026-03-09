@@ -32,6 +32,17 @@ impl MockServerRepository {
         }
     }
 
+    fn create_test_server(&self, server_id: &str, name: &str, password: &str) -> Server {
+        return Server {
+            server_id: server_id.to_string(),
+            name: name.to_string(),
+            invite_code: format!("invite-{}", server_id),
+            password: password.to_string(),
+            all_channels: Vec::new(),
+            create_at: "2024-01-01T00:00:00Z".to_string(),
+        };
+    }
+
     fn add_server(&self, server: Server) {
         self.servers.lock().unwrap().insert(server.server_id.clone(), server);
     }
@@ -95,6 +106,32 @@ impl MockMemberRepository {
         Self {
             members: Arc::new(Mutex::new(Vec::new())),
         }
+    }
+
+    fn create_test_member(&self, user_id: &str, server_id: &str) -> Member {
+        return Member {
+            user: User {
+                user_id: user_id.to_string(),
+                username: format!("User{}", user_id),
+                email: format!("user{}@example.com", user_id),
+                create_at: "2024-01-01T00:00:00Z".to_string(),
+                password: "password".to_string(),
+                token: None,
+            },
+            server: Server {
+                server_id: server_id.to_string(),
+                name: format!("Server{}", server_id),
+                invite_code: format!("invite-{}", server_id),
+                password: "".to_string(),
+                all_channels: Vec::new(),
+                create_at: "2024-01-01T00:00:00Z".to_string(),
+            },
+            role: Role {
+                role_id: "role-default".to_string(),
+                role_name: "Member".to_string(),
+            },
+            join_at: "2024-01-01T00:00:00Z".to_string(),
+        };
     }
 }
 
@@ -168,6 +205,13 @@ impl MockRoleRepository {
         repo
     }
 
+    fn create_test_role(&self, role_id: &str, role_name: &str) -> Role {
+        return Role {
+            role_id: role_id.to_string(),
+            role_name: role_name.to_string(),
+        };
+    }
+
     fn add_role(&self, role: Role) {
         self.roles.lock().unwrap().insert(role.role_id.clone(), role);
     }
@@ -232,7 +276,7 @@ fn test_create_server_empty_password() {
 #[test]
 fn test_get_server() {
     let repo = MockServerRepository::new();
-    let server = create_test_server("srv-1", "MyServer", "pass123");
+    let server = repo.create_test_server("srv-1", "MyServer", "pass123");
     repo.add_server(server);
 
     let use_case = GetServerDetails { repo: &repo };
@@ -267,7 +311,7 @@ fn test_get_server_none() {
 #[test]
 fn test_delete_server() {
     let repo = MockServerRepository::new();
-    let server = create_test_server("srv-1", "MyServer", "pass123");
+    let server = repo.create_test_server("srv-1", "MyServer", "pass123");
     repo.add_server(server);
 
     let use_case = DeleteServer { repo: &repo };
@@ -291,7 +335,7 @@ fn test_delete_server_empty() {
 #[test]
 fn test_update_server_name() {
     let repo = MockServerRepository::new();
-    let server = create_test_server("srv-1", "OldName", "pass123");
+    let server = repo.create_test_server("srv-1", "OldName", "pass123");
     repo.add_server(server);
 
     let use_case = UpdateServer { repo: &repo };
@@ -306,7 +350,7 @@ fn test_update_server_name() {
 #[test]
 fn test_update_server_password() {
     let repo = MockServerRepository::new();
-    let server = create_test_server("srv-1", "MyServer", "oldpass");
+    let server = repo.create_test_server("srv-1", "MyServer", "oldpass");
     repo.add_server(server);
 
     let use_case = UpdateServer { repo: &repo };
@@ -330,8 +374,8 @@ fn test_update_server_empty() {
 #[test]
 fn test_get_user_servers() {
     let repo = MockServerRepository::new();
-    repo.add_server(create_test_server("srv-1", "Server1", "pass1"));
-    repo.add_server(create_test_server("srv-2", "Server2", "pass2"));
+    repo.add_server(repo.create_test_server("srv-1", "Server1", "pass1"));
+    repo.add_server(repo.create_test_server("srv-2", "Server2", "pass2"));
 
     let use_case = ListUserServers { repo: &repo };
     let result = use_case.execute("user-1");
@@ -355,7 +399,7 @@ fn test_get_user_servers_empty() {
 #[test]
 fn test_get_server_by_user() {
     let repo = MockServerRepository::new();
-    repo.add_server(create_test_server("srv-1", "Server1", "pass1"));
+    repo.add_server(repo.create_test_server("srv-1", "Server1", "pass1"));
 
     let use_case = GetServerByUser { repo: &repo };
     let result = use_case.execute("user-1".to_string());
@@ -380,7 +424,7 @@ fn test_join_server() {
     let member_repo = MockMemberRepository::new();
     let role_repo = MockRoleRepository::new();
 
-    let server = create_test_server("srv-1", "MyServer", "password123");
+    let server = server_repo.create_test_server("srv-1", "MyServer", "password123");
     server_repo.add_server(server);
 
     let use_case = JoinServer {
@@ -408,7 +452,7 @@ fn test_join_server_wrong_password() {
     let member_repo = MockMemberRepository::new();
     let role_repo = MockRoleRepository::new();
 
-    let server = create_test_server("srv-1", "MyServer", "password123");
+    let server = server_repo.create_test_server("srv-1", "MyServer", "password123");
     server_repo.add_server(server);
 
     let use_case = JoinServer {
@@ -479,7 +523,7 @@ fn test_join_by_invite() {
     let member_repo = MockMemberRepository::new();
     let role_repo = MockRoleRepository::new();
 
-    let server = create_test_server("srv-1", "MyServer", "password123");
+    let server = server_repo.create_test_server("srv-1", "MyServer", "password123");
     server_repo.add_server(server);
 
     let use_case = JoinServerByInvite {
