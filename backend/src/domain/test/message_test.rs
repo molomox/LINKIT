@@ -19,7 +19,23 @@ impl MockMessageRepository {
             messages: Arc::new(Mutex::new(HashMap::new())),
         }
     }
-
+    
+    fn create_test_message(&self, message_id: &str, channel_id: &str, user_id: &str, content: &str) -> Message {
+        Message {
+            message_id: message_id.to_string(),
+            channel_id: channel_id.to_string(),
+            content: content.to_string(),
+            user: User {
+                user_id: user_id.to_string(),
+                username: format!("User {}", user_id),
+                email: format!("user{}@example.com", user_id),
+                create_at: "2024-01-01T00:00:00Z".to_string(),
+                password: "password".to_string(),
+                token: None,
+            },
+            create_at: "2024-01-01T00:00:00Z".to_string(),
+        }
+    }
     fn add_message(&self, message: Message) {
         self.messages.lock().unwrap().insert(message.message_id.clone(), message);
     }
@@ -100,9 +116,9 @@ fn test_send_message_empty() {
 fn test_list_message() {
     let repo = MockMessageRepository::new();
     
-    repo.add_message(create_test_message("msg-1", "channel-1", "user-1", "Hello"));
-    repo.add_message(create_test_message("msg-2", "channel-1", "user-2", "Hi"));
-    repo.add_message(create_test_message("msg-3", "channel-2", "user-1", "Other"));
+    repo.add_message(repo.create_test_message("msg-1", "channel-1", "user-1", "Hello"));
+    repo.add_message(repo.create_test_message("msg-2", "channel-1", "user-2", "Hi"));
+    repo.add_message(repo.create_test_message("msg-3", "channel-2", "user-1", "Other"));
 
     let use_case = ListMessage { repo: &repo };
     let result = use_case.execute("channel-1".to_string());
@@ -139,7 +155,7 @@ fn test_list_message_none() {
 #[test]
 fn test_delete_message() {
     let repo = MockMessageRepository::new();
-    let message = create_test_message("msg-1", "channel-1", "user-1", "Test");
+    let message = repo.create_test_message("msg-1", "channel-1", "user-1", "Test");
     repo.add_message(message);
 
     let use_case = DeleteMessage { repo: &repo };

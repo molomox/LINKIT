@@ -41,6 +41,17 @@ CREATE TABLE IF NOT EXISTS members (
     PRIMARY KEY (user_id, server_id)
 );
 
+CREATE TABLE IF NOT EXISTS bans (
+    ban_id VARCHAR(36) NOT NULL,
+    server_id VARCHAR(36) NOT NULL,
+    bannished_user_id VARCHAR(36) NOT NULL,
+    banned_by_user_id VARCHAR(36) NOT NULL,
+    expired_at VARCHAR(255) NULL,
+    reason TEXT NOT NULL,
+    create_at VARCHAR(255) NOT NULL,
+    PRIMARY KEY (ban_id)
+);
+
 CREATE TABLE IF NOT EXISTS servers (
     name VARCHAR(255) NOT NULL,
     server_id VARCHAR(36) PRIMARY KEY,

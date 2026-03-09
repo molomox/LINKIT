@@ -81,7 +81,7 @@ pub enum WsMessage {
         role_name: String,
     },
     #[serde(rename = "member_role_changed")]
-    MemberRoleChanged {
+    MemberRoleUpdated {
         user_id: String,
         username: String,
         server_id: String,

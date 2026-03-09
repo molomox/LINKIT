@@ -41,7 +41,7 @@ pub async fn update_members_handler(
 
         let user = user_repo.find_by_id(user_id_clone)?;
         let role = role_repo.find_by_id(role_id_clone)?;
-        Ok::<_, String>((user.usernamen role.role_name))
+        Ok::<_, String>((user.username, role.role_name))
     }).await
 
     if let Ok(Ok((username, role_name))) = member_info {
