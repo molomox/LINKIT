@@ -26,7 +26,7 @@ async fn main() {
 
     // 3. Assembler les routes
     let app = Router::new()
-        .merge(server_routes())
+        .merge(server_routes(ws_state.clone()))
         .merge(user_routes())
         .merge(channels_routes(ws_state.clone()))
         .merge(message_routes())

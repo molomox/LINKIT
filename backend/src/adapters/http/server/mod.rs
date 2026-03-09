@@ -9,3 +9,4 @@ pub mod leave_server;
 pub mod get_members;
 pub mod update_member;
 pub mod join_by_invite;
+pub mod kick_member;

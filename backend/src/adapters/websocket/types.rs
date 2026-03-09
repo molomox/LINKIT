@@ -19,6 +19,11 @@ pub enum IncomingWsMessage {
         username: String,
         channel_id: String,
     },
+    #[serde(rename = "identify")]
+    Identify {
+        user_id: String,
+        username: String,
+    },
     #[serde(rename = "ping")]
     Ping,
 }
@@ -87,6 +92,24 @@ pub enum WsMessage {
         server_id: String,
         role_id: String,
         role_name: String,
+    },
+    #[serde(rename = "member_kicked")]
+    MemberKicked {
+        user_id: String,
+        username: String,
+        server_id: String,
+    },
+    #[serde(rename = "user_online")]
+    UserOnline {
+        user_id: String,
+        username: String,
+        server_id: String,
+    },
+    #[serde(rename = "user_offline")]
+    UserOffline {
+        user_id: String,
+        username: String,
+        server_id: String,
     },
     #[serde(rename = "ping")]
     Ping,

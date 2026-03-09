@@ -5,11 +5,9 @@ use crate::domain::entities::member::Member;
 use crate::adapters::http::error::ApiError;
 use crate::domain::usecases::server::join_by_invite::JoinServerByInvite;
 use axum::Json;
-use axum::extract::Path;
+use axum::extract::{Path, State};
 use serde::Deserialize;
-use::axum::extract::State;
-use crate::adapters::http::server::state::AppState;
-use crate::adapters::http::websocket::WsMessage;
+use crate::adapters::websocket::{AppState, WsMessage};
 
 #[derive(Deserialize)]
 pub struct JoinByInviteRequest {
@@ -17,9 +15,9 @@ pub struct JoinByInviteRequest {
 }
 
 pub async fn join_server_by_invite_handler(
+    State(state): State<AppState>,
     Path(invite_code): Path<String>,
     Json(request): Json<JoinByInviteRequest>,
-    State(state): State<AppState>,
 ) -> Result<Json<Member>, ApiError> {
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;

@@ -25,10 +25,17 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
 
     // Récupérer le rôle de l'utilisateur actuel
     const getCurrentUserRole = (): string | null => {
+        if (typeof window === 'undefined') return null; // Vérification SSR
+        
         const currentUserId = sessionStorage.getItem('user_id');
         if (!currentUserId) return null;
         
         const currentMember = members.find(m => m.user_id === currentUserId);
+        console.log('👤 Current user:', {
+            userId: currentUserId,
+            member: currentMember,
+            roleId: currentMember?.role_id
+        });
         return currentMember?.role_id || null;
     };
 
@@ -45,28 +52,76 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
         return [];
     };
 
+    // Vérifier si l'utilisateur actuel peut kick un membre
+    const canKickMember = (targetMember: Member): boolean => {
+        const currentUserRoleId = getCurrentUserRole();
+        
+        console.log('🔍 canKickMember:', {
+            currentUserRoleId,
+            targetMemberRoleId: targetMember.role_id,
+            targetUsername: targetMember.username
+        });
+        
+        // Owner ne peut pas être kické
+        if (targetMember.role_id === 'role04') {
+            console.log('❌ Cannot kick Owner');
+            return false;
+        }
+        
+        // Owner peut kick tout le monde (sauf Owner)
+        if (currentUserRoleId === 'role04') {
+            console.log('✅ Owner can kick this member');
+            return true;
+        }
+        
+        // Admin peut kick Membre et Ban
+        if (currentUserRoleId === 'role03') {
+            const canKick = targetMember.role_id === 'role01' || targetMember.role_id === 'role02';
+            console.log('🔍 Admin can kick?', canKick);
+            return canKick;
+        }
+        
+        // Membre et Ban ne peuvent pas kick
+        console.log('❌ Current role cannot kick');
+        return false;
+    };
+
     const handleContextMenu = (e: React.MouseEvent, member: Member) => {
         e.preventDefault();
         
+        if (typeof window === 'undefined') return; // Vérification SSR
+        
         const currentUserRoleId = getCurrentUserRole();
         const availableRoles = getAvailableRoles(currentUserRoleId);
+        const canKick = canKickMember(member);
         
-        // Ne pas afficher le menu si l'utilisateur n'a pas les permissions
-        if (availableRoles.length === 0) {
+        console.log('🖱️ Context menu:', {
+            member: member.username,
+            currentUserRoleId,
+            availableRolesCount: availableRoles.length,
+            canKick
+        });
+        
+        // Ne pas afficher le menu si l'utilisateur n'a aucune permission (ni changer rôle, ni kick)
+        if (availableRoles.length === 0 && !canKick) {
+            console.log('❌ No permissions - menu not shown');
             return;
         }
         
         // Ne pas permettre de changer le rôle de soi-même
         const currentUserId = sessionStorage.getItem('user_id');
         if (member.user_id === currentUserId) {
+            console.log('❌ Cannot interact with self');
             return;
         }
         
-        // Ne pas permettre de changer le rôle d'un Owner
+        // Ne pas permettre d'interagir avec un Owner
         if (member.role_id === 'role04') {
+            console.log('❌ Cannot interact with Owner');
             return;
         }
         
+        console.log('✅ Showing context menu');
         setContextMenu({
             x: e.clientX,
             y: e.clientY,
@@ -96,6 +151,48 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
             } else {
                 console.error('❌ Erreur mise à jour rôle');
                 alert('Erreur lors de la mise à jour du rôle');
+            }
+        } catch (error) {
+            console.error('❌ Erreur:', error);
+            alert('Erreur réseau');
+        }
+    };
+
+    const handleKick = async () => {
+        if (!contextMenu) return;
+        if (typeof window === 'undefined') return; // Vérification SSR
+
+        // Confirmation
+        if (!confirm(`Êtes-vous sûr de vouloir expulser ${contextMenu.member.username} ?`)) {
+            return;
+        }
+
+        const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+        const kickerUserId = sessionStorage.getItem('user_id');
+
+        if (!kickerUserId) {
+            alert('Erreur: utilisateur non identifié');
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${apiBase}/servers/${serverId}/members/${contextMenu.member.user_id}/kick`,
+                {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kicker_user_id: kickerUserId }),
+                }
+            );
+
+            if (response.ok) {
+                console.log('✅ Membre expulsé !');
+                onMemberUpdate(); // Rafraîchir la liste des membres
+                setContextMenu(null);
+            } else {
+                const errorText = await response.text();
+                console.error('❌ Erreur expulsion:', errorText);
+                alert(`Erreur lors de l'expulsion: ${errorText}`);
             }
         } catch (error) {
             console.error('❌ Erreur réseau:', error);
@@ -177,32 +274,57 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
                         </div>
 
                         {/* Liste des rôles */}
-                        <div className="py-2">
-                            <p className="px-4 py-1 text-[10px] text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                                Assigner un rôle
-                            </p>
-                            {getAvailableRoles(getCurrentUserRole()).map((role) => (
-                                <button
-                                    key={role.id}
-                                    onClick={() => handleRoleChange(role.id)}
-                                    className="w-full px-4 py-2 text-left hover:bg-yellow-900/20 transition-colors flex items-center gap-2"
-                                    style={{ fontFamily: 'monospace' }}
-                                >
-                                    {/* Pastille de couleur */}
-                                    <div
-                                        className="w-3 h-3 rounded-full"
-                                        style={{ backgroundColor: role.color }}
-                                    />
-                                    <span className="text-sm" style={{ color: role.color }}>
-                                        {role.name}
-                                    </span>
-                                    {/* Checkmark si c'est le rôle actuel */}
-                                    {contextMenu.member.role_id === role.id && (
-                                        <span className="ml-auto text-yellow-400">✓</span>
-                                    )}
-                                </button>
-                            ))}
-                        </div>
+                        {getAvailableRoles(getCurrentUserRole()).length > 0 && (
+                            <div className="py-2">
+                                <p className="px-4 py-1 text-[10px] text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
+                                    Assigner un rôle
+                                </p>
+                                {getAvailableRoles(getCurrentUserRole()).map((role) => (
+                                    <button
+                                        key={role.id}
+                                        onClick={() => handleRoleChange(role.id)}
+                                        className="w-full px-4 py-2 text-left hover:bg-yellow-900/20 transition-colors flex items-center gap-2"
+                                        style={{ fontFamily: 'monospace' }}
+                                    >
+                                        {/* Pastille de couleur */}
+                                        <div
+                                            className="w-3 h-3 rounded-full"
+                                            style={{ backgroundColor: role.color }}
+                                        />
+                                        <span className="text-sm" style={{ color: role.color }}>
+                                            {role.name}
+                                        </span>
+                                        {/* Checkmark si c'est le rôle actuel */}
+                                        {contextMenu.member.role_id === role.id && (
+                                            <span className="ml-auto text-yellow-400">✓</span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Actions supplémentaires */}
+                        {canKickMember(contextMenu.member) && (
+                            <>
+                                {getAvailableRoles(getCurrentUserRole()).length > 0 && (
+                                    <div className="h-px bg-yellow-600 my-1" />
+                                )}
+                                <div className="py-2">
+                                    <p className="px-4 py-1 text-[10px] text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
+                                        Actions
+                                    </p>
+                                    <button
+                                        onClick={handleKick}
+                                        className="w-full px-4 py-2 text-left hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                                        style={{ fontFamily: 'monospace' }}
+                                    >
+                                        <span className="text-sm text-red-400">
+                                            👢 Expulser
+                                        </span>
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </>
             )}

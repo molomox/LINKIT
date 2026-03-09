@@ -55,6 +55,45 @@ impl MemberRepository for PostgresMemberRepo{
 
     }
 
+    fn get_by_user_and_server(&self, user_id: String, server_id: String) -> Result<Member, String> {
+        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+
+        let row = client.query_one(
+            "SELECT members.user_id,
+                members.role_id,
+                role_name,
+                members.server_id,
+                servers.name, 
+                servers.create_at,
+                join_at 
+                FROM members
+                JOIN roles ON members.role_id = roles.role_id
+                JOIN servers ON members.server_id = servers.server_id 
+                WHERE members.user_id = $1 AND members.server_id = $2",
+            &[&user_id, &server_id]
+        ).map_err(|e| e.to_string())?;
+        
+        let user = User{
+            user_id: row.get(0),
+            username: "".to_string(),
+            password: "".to_string(),
+            email: "".to_string(),
+            create_at: "".to_string(),
+            token: None
+        };
+        let role = Role{role_id: row.get(1), role_name: row.get(2)};
+        let server = Server{
+            server_id: row.get(3),
+            name: row.get(4),
+            password: "".to_string(),
+            create_at: row.get(5),
+            invite_code: "".to_string(),
+            all_channels: vec![]
+        };
+        let member = Member { user, server, role, join_at: row.get(6) };
+        Ok(member)
+    }
+
     fn update_member_role(&self, user_id: String, server_id: String, role_id: String)-> Result<String, String>{
         let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
 
