@@ -318,6 +318,42 @@ export default function ServerPage() {
             
             // Recharger la liste des membres pour mettre à jour les rôles
             loadMembers();
+        } else if (lastServerMessage.type === 'member_kicked') {
+            // Un membre a été kické
+            console.log('👢 Membre kické:', lastServerMessage.username);
+            
+            // Vérifier si c'est l'utilisateur actuel qui a été kické
+            const currentUserId = sessionStorage.getItem('user_id');
+            if (lastServerMessage.user_id === currentUserId) {
+                // L'utilisateur actuel a été kické, le rediriger
+                alert('Vous avez été expulsé de ce serveur');
+                router.push('/auth/me');
+            } else {
+                // Recharger la liste des membres
+                loadMembers();
+            }
+        } else if (lastServerMessage.type === 'user_online') {
+            // Un utilisateur s'est connecté
+            console.log('🟢 Utilisateur en ligne:', lastServerMessage.username);
+            
+            if (lastServerMessage.user_id) {
+                setOnlineMembers(prev => {
+                    const newSet = new Set(prev);
+                    newSet.add(lastServerMessage.user_id!);
+                    return newSet;
+                });
+            }
+        } else if (lastServerMessage.type === 'user_offline') {
+            // Un utilisateur s'est déconnecté
+            console.log('🔴 Utilisateur hors ligne:', lastServerMessage.username);
+            
+            if (lastServerMessage.user_id) {
+                setOnlineMembers(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(lastServerMessage.user_id!);
+                    return newSet;
+                });
+            }
         }
     }, [lastServerMessage, selectedChannel]);
 
@@ -359,17 +395,8 @@ export default function ServerPage() {
         } else if (lastMessage.type === 'user_joined') {
             console.log('👤 Utilisateur rejoint:', lastMessage.username);
 
-            // Ajouter un message système pour indiquer qu'un utilisateur a rejoint
-            const joinMsg: Message = {
-                message_id: `system-join-${Date.now()}-${lastMessage.user_id}`,
-                content: `${lastMessage.username} a rejoint le canal`,
-                user_id: 'system',
-                username: 'SYSTÈME',
-                create_at: new Date().toISOString(),
-            };
-
-            setMessages(prev => [...prev, joinMsg]);
-
+            // Ne plus afficher de message système - la gestion de présence est maintenant via user_online/user_offline
+            
             // Ajouter l'utilisateur aux membres en ligne
             if (lastMessage.user_id) {
                 setOnlineMembers(prev => {
@@ -736,13 +763,6 @@ export default function ServerPage() {
                 onDeleteConfirmNameChange={setDeleteConfirmName}
             />
 
-            {/* Grille cyber
-                    members={members} 
-                    onlineMembers={onlineMembers}
-                    serverId={serverId}
-                    onMemberUpdate={loadMembers}
-               
-            {/* ...existing code... */}
         </div>
     );
 }

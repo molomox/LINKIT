@@ -10,9 +10,10 @@ use crate::adapters::http::server::{
     leave_server::delete_member_handler as delete_member_handler,
     update_member::update_members_handler as update_members_handler,
     update_server::update_server_handler as update_server_handler,
-    join_by_invite::join_server_by_invite_handler as join_server_by_invite_handler
-    use crate::adapters::http::server::state::AppState;
+    join_by_invite::join_server_by_invite_handler as join_server_by_invite_handler,
+    kick_member::kick_member_handler as kick_member_handler
 };
+use crate::adapters::websocket::AppState;
 
 pub fn server_routes(state: AppState) -> Router {
     Router::new()
@@ -26,6 +27,7 @@ pub fn server_routes(state: AppState) -> Router {
         .route("/servers/:server_id/leave", delete(delete_member_handler))
         .route("/servers/:server_id/members", get(get_members_handler))
         .route("/servers/:server_id/members/:user_id", put(update_members_handler))
+        .route("/servers/:server_id/members/:user_id/kick", delete(kick_member_handler))
         
         .route("/invite/:invite_code", post(join_server_by_invite_handler))
         .with_state(state)

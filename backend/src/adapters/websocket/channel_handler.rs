@@ -105,6 +105,9 @@ async fn handle_text_message(
             } => {
                 broadcast_typing(tx, uid, uname, cid).await;
             }
+            _ => {
+                // Ignorer les autres types de messages (ex: Identify utilisé pour les WebSockets serveur)
+            }
         },
         Err(e) => {
             eprintln!("❌ Erreur parsing message WebSocket: {} - Message: {}", e, text);

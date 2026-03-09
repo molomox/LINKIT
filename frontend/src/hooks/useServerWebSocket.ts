@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export type ServerWsMessage = {
-    type: 'channel_created' | 'channel_updated' | 'channel_deleted' | 'member_joined' | 'member_role_changed' | 'ping' | 'pong';
+    type: 'channel_created' | 'channel_updated' | 'channel_deleted' | 'member_joined' | 'member_role_changed' | 'member_kicked' | 'user_online' | 'user_offline' | 'ping' | 'pong' | 'identify';
     channel_id?: string;
     name?: string;
     server_id?: string;
@@ -47,6 +47,20 @@ export const useServerWebSocket = (serverId: string | null) => {
                 console.log(`🟢 WebSocket connecté au serveur: ${currentServerId}`);
                 setStatus('connected');
                 reconnectAttemptsRef.current = 0;
+                
+                // Envoyer automatiquement un message d'identification
+                const userId = sessionStorage.getItem('user_id');
+                const username = sessionStorage.getItem('username');
+                
+                if (userId && username) {
+                    const identifyMsg = {
+                        type: 'identify',
+                        user_id: userId,
+                        username: username,
+                    };
+                    ws.send(JSON.stringify(identifyMsg));
+                    console.log('📤 Message d\'identification envoyé:', username);
+                }
             };
 
             ws.onmessage = (event) => {

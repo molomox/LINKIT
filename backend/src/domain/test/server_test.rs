@@ -113,6 +113,16 @@ impl MemberRepository for MockMemberRepository {
             .ok_or_else(|| "Member not found".to_string())
     }
 
+    fn get_by_user_and_server(&self, user_id: String, server_id: String) -> Result<Member, String> {
+        self.members
+            .lock()
+            .unwrap()
+            .iter()
+            .find(|m| m.user.user_id == user_id && m.server.server_id == server_id)
+            .cloned()
+            .ok_or_else(|| "Member not found".to_string())
+    }
+
     fn find_by_server_id(&self, server_id: String) -> Result<Vec<Member>, String> {
         let members: Vec<Member> = self
             .members
