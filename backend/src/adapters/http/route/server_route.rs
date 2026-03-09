@@ -11,9 +11,10 @@ use crate::adapters::http::server::{
     update_member::update_members_handler as update_members_handler,
     update_server::update_server_handler as update_server_handler,
     join_by_invite::join_server_by_invite_handler as join_server_by_invite_handler
+    use crate::adapters::http::server::state::AppState;
 };
 
-pub fn server_routes() -> Router {
+pub fn server_routes(state: AppState) -> Router {
     Router::new()
         .route("/servers", post(create_server_handler))
         .route("/servers", get(get_user_server_handler))
@@ -27,4 +28,5 @@ pub fn server_routes() -> Router {
         .route("/servers/:server_id/members/:user_id", put(update_members_handler))
         
         .route("/invite/:invite_code", post(join_server_by_invite_handler))
+        .with_state(state)
 }
