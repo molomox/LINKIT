@@ -1,0 +1,40 @@
+# .dockerignore Backend
+
+# Répertoires de build
+target/
+debug/
+release/
+
+# Logs
+*.log
+server.log
+
+# Fichiers de cache
+.cargo/
+**/.DS_Store
+
+# Documentation et fichiers de projet
+README.md
+*.md
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Fichiers temporaires
+*.tmp
+*.bak
+*.backup
+
+# Tests
+tests/
+benches/
+
+# CI/CD
+.github/
+.gitlab-ci.yml

@@ -1,0 +1,26 @@
+# Configuration pour Tarpaulin (coverage)
+# Fichier: backend/tarpaulin.toml
+
+[report]
+# Format de sortie : Html, Lcov, Xml, Json
+out = ["Html", "Lcov"]
+
+# Répertoire de sortie
+output-dir = "coverage"
+
+# Ligne de couverture minimum
+fail-under = 50
+
+[run]
+# Timeout par test (secondes)
+timeout = 300
+
+# Exécuter en mode release
+release = false
+
+# Suivre les tests
+follow-exec = true
+
+# Ignorer les panics
+ignore-panics = true
+

@@ -1,0 +1,60 @@
+# .dockerignore Frontend
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Cache
+.turbo/
+.cache/
+
+# Testing
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files (ils seront injectés via docker-compose ou kubernetes)
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Logs
+*.log
+
+# Misc
+.prettierrc
+.eslintrc*
+tsconfig.tsbuildinfo
+next-env.d.ts

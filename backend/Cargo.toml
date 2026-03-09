@@ -1,0 +1,21 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+postgres = "0.18"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.0", features = ["v4"] }
+chrono = "0.4"
+axum = { version = "0.7", features = ["ws"] }
+tokio = { version = "1", features = ["full"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors"] }
+jsonwebtoken = "9.2"
+axum-extra = { version = "0.9", features = ["typed-header"] }
+futures = "0.3"
+tokio-stream = "0.1"
+# Contrainte pour éviter les versions de time nécessitant edition2024
+time = "=0.3.36"

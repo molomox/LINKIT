@@ -1,0 +1,393 @@
+warning: unused import: `crate::domain::entities::message::Message`
+ --> src/domain/entities/channel.rs:1:5
+  |
+1 | use crate::domain::entities::message::Message;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `axum::Json`
+ --> src/domain/ports/server_repository.rs:2:5
+  |
+2 | use axum::Json;
+  |     ^^^^^^^^^^
+
+warning: unnecessary parentheses around type
+  --> src/domain/ports/server_repository.rs:10:58
+   |
+10 |     fn delete_server(&self, server_id: String) -> Result<(String), String>;
+   |                                                          ^      ^
+   |
+   = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+   |
+10 -     fn delete_server(&self, server_id: String) -> Result<(String), String>;
+10 +     fn delete_server(&self, server_id: String) -> Result<String , String>;
+   |
+
+warning: unused import: `crate::domain::entities::message::Message`
+ --> src/domain/usecases/message/delete_message.rs:1:5
+  |
+1 | use crate::domain::entities::message::Message;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/domain/usecases/server/update.rs:1:5
+  |
+1 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unnecessary parentheses around type
+  --> src/domain/usecases/server/delete.rs:11:16
+   |
+11 |     )-> Result<(String), String>{
+   |                ^      ^
+   |
+help: remove these parentheses
+   |
+11 -     )-> Result<(String), String>{
+11 +     )-> Result<String , String>{
+   |
+
+warning: unused import: `crate::domain::entities::member::Member`
+ --> src/domain/usecases/server/update_member.rs:2:5
+  |
+2 | use crate::domain::entities::member::Member;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `self`
+ --> src/domain/usecases/server/join.rs:4:37
+  |
+4 | use crate::domain::entities::role::{self, Role};
+  |                                     ^^^^
+
+warning: unused import: `std::any::Any`
+ --> src/domain/usecases/user/find_by_id.rs:1:5
+  |
+1 | use std::any::Any;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `axum::Json`
+ --> src/domain/usecases/user/find_by_id.rs:3:5
+  |
+3 | use axum::Json;
+  |     ^^^^^^^^^^
+
+warning: unused import: `axum::response::Response`
+ --> src/domain/usecases/user/find_by_id.rs:4:5
+  |
+4 | use axum::response::Response;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::entities::server::Server`
+ --> src/domain/usecases/user/find_by_id.rs:8:5
+  |
+8 | use crate::domain::entities::server::Server;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::db::postgres_server_repository::PostgresServerRepo`
+ --> src/adapters/http/server/leave_server.rs:2:5
+  |
+2 | use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::entities::member::Member`
+ --> src/adapters/http/server/leave_server.rs:3:5
+  |
+3 | use crate::domain::entities::member::Member;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `CreateServerResponse` and `JoinServerRequest`
+ --> src/adapters/http/server/leave_server.rs:5:47
+  |
+5 | use crate::adapters::http::server::response::{CreateServerResponse, JoinServerRequest};
+  |                                               ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::usecases::server::join::JoinServer`
+ --> src/adapters/http/server/leave_server.rs:6:5
+  |
+6 | use crate::domain::usecases::server::join::JoinServer;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::entities::member::Member`
+ --> src/adapters/http/server/update_member.rs:3:5
+  |
+3 | use crate::domain::entities::member::Member;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::usecases::server::list_member::ListServerMembers`
+ --> src/adapters/http/server/update_member.rs:5:5
+  |
+5 | use crate::domain::usecases::server::list_member::ListServerMembers;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `UserRequest`
+ --> src/adapters/http/user/login.rs:1:147
+  |
+1 | use crate::{adapters::{db::postgres_user_repository::PostgresUserRepo, http::{error::ApiError, user::response::{CreateUserResponse, LoginRequest, UserRequest}}}, domain::usecases::user::login::LoginUser};
+  |                                                                                                                                                   ^^^^^^^^^^^
+
+warning: unused import: `delete`
+ --> src/adapters/http/route/user_route.rs:1:30
+  |
+1 | use axum::{Router, routing::{delete, get, post}};
+  |                              ^^^^^^
+
+warning: unused import: `put`
+ --> src/adapters/http/route/message_route.rs:1:48
+  |
+1 | use axum::{Router, routing::{delete, get, post,put}};
+  |                                                ^^^
+
+warning: unused import: `crate::domain::usecases::channel::list_channel::ListServerChannel`
+ --> src/adapters/http/channel/create_channel.rs:5:5
+  |
+5 | use crate::domain::usecases::channel::list_channel::ListServerChannel;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::entities::channel::Channel`
+ --> src/adapters/http/channel/delete_channel.rs:2:5
+  |
+2 | use crate::domain::entities::channel::Channel;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::usecases::channel::create::CreateChannel`
+ --> src/adapters/http/channel/list_channel.rs:4:5
+  |
+4 | use crate::domain::usecases::channel::create::CreateChannel;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::adapters::http::server`
+ --> src/adapters/db/postgres_member_repository.rs:3:5
+  |
+3 | use crate::adapters::http::server;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::entities::member`
+ --> src/adapters/db/postgres_member_repository.rs:4:5
+  |
+4 | use crate::domain::entities::member;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `self`
+ --> src/adapters/db/postgres_member_repository.rs:6:37
+  |
+6 | use crate::domain::entities::role::{self, Role};
+  |                                     ^^^^
+
+warning: unused import: `self`
+ --> src/adapters/db/postgres_role_repository.rs:3:37
+  |
+3 | use crate::domain::entities::role::{self, Role};
+  |                                     ^^^^
+
+warning: unused import: `crate::domain::entities::message::Message`
+ --> src/adapters/db/postgres_channel_repository.rs:3:5
+  |
+3 | use crate::domain::entities::message::Message;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::entities::user::User`
+ --> src/adapters/db/postgres_channel_repository.rs:4:5
+  |
+4 | use crate::domain::entities::user::User;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::entities::message::Message`
+ --> src/adapters/db/postgres_user_repository.rs:3:5
+  |
+3 | use crate::domain::entities::message::Message;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::ports::message_repository::MessageRepository`
+ --> src/adapters/db/postgres_user_repository.rs:6:5
+  |
+6 | use crate::domain::ports::message_repository::MessageRepository;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::domain::ports::server_repository::ServerRepository`
+ --> src/domain/usecases/user/find_by_id.rs:7:5
+  |
+7 | use crate::domain::ports::server_repository::ServerRepository;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused variable: `e`
+  --> src/domain/usecases/channel/get.rs:18:17
+   |
+18 |             Err(e) => return Err("Channel not found".to_string()),
+   |                 ^ help: if this is intentional, prefix it with an underscore: `_e`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `e`
+  --> src/domain/usecases/channel/update.rs:20:17
+   |
+20 |             Err(e) => return Err("Channel not found".to_string()),
+   |                 ^ help: if this is intentional, prefix it with an underscore: `_e`
+
+warning: variable does not need to be mutable
+  --> src/adapters/db/postgres_channel_repository.rs:33:13
+   |
+33 |         let mut channel = Channel {
+   |             ----^^^^^^^
+   |             |
+   |             help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+  --> src/adapters/db/postgres_channel_repository.rs:54:17
+   |
+54 |             let mut channel = Channel {
+   |                 ----^^^^^^^
+   |                 |
+   |                 help: remove this `mut`
+
+warning: unused `Result` that must be used
+  --> src/domain/usecases/message/send_message.rs:50:9
+   |
+50 |         self.repo.save(message.clone());
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+   = note: `#[warn(unused_must_use)]` (part of `#[warn(unused)]`) on by default
+help: use `let _ = ...` to ignore the resulting value
+   |
+50 |         let _ = self.repo.save(message.clone());
+   |         +++++++
+
+warning: unused `Result` that must be used
+  --> src/domain/usecases/server/leave.rs:17:9
+   |
+17 |         self.repo.delete_member(user_id, server_id);
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+   |
+17 |         let _ = self.repo.delete_member(user_id, server_id);
+   |         +++++++
+
+warning: unused `Result` that must be used
+  --> src/domain/usecases/server/join.rs:54:9
+   |
+54 |         self.repo2.save(member.clone());
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+   |
+54 |         let _ = self.repo2.save(member.clone());
+   |         +++++++
+
+warning: unused `Result` that must be used
+  --> src/domain/usecases/server/join_by_invite.rs:53:9
+   |
+53 |         self.repo2.save(member.clone());
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+   |
+53 |         let _ = self.repo2.save(member.clone());
+   |         +++++++
+
+warning: unused `Result` that must be used
+  --> src/domain/usecases/user/create.rs:30:9
+   |
+30 |         self.repo.save(user.clone());
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+   |
+30 |         let _ = self.repo.save(user.clone());
+   |         +++++++
+
+warning: unused `Result` that must be used
+  --> src/domain/usecases/channel/create.rs:28:9
+   |
+28 |         self.repo.save(channel.clone());
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+   |
+28 |         let _ = self.repo.save(channel.clone());
+   |         +++++++
+
+warning: unused `Result` that must be used
+  --> src/domain/usecases/channel/update.rs:23:9
+   |
+23 |         self.repo.update(channel.clone());
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+   |
+23 |         let _ = self.repo.update(channel.clone());
+   |         +++++++
+
+warning: unused `Result` that must be used
+  --> src/adapters/db/postgres_message_repository.rs:13:9
+   |
+13 | /         client.execute(
+14 | |             "INSERT INTO messages (message_id,content, channel_id,user_id,create_at) VALUES ($1, $2, $3, $4,$5)",
+15 | |             &[&message.message_id, &message.content, &message.channel_id,&message.user.user_id, &message.create_at]
+16 | |         ).map_err(|e| e.to_string());
+   | |____________________________________^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+   |
+13 |         let _ = client.execute(
+   |         +++++++
+
+warning: unused `Result` that must be used
+  --> src/adapters/db/postgres_message_repository.rs:29:9
+   |
+29 | /         client.execute(
+30 | |             "UPDATE messages SET content = $2 WHERE message_id = $1",
+31 | |             &[&message.message_id, &message.content]
+32 | |         ).map_err(|e| e.to_string());
+   | |____________________________________^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+help: use `let _ = ...` to ignore the resulting value
+   |
+29 |         let _ = client.execute(
+   |         +++++++
+
+warning: `backend` (lib) generated 46 warnings (run `cargo fix --lib -p backend` to apply 36 suggestions)
+warning: `backend` (bin "backend") generated 46 warnings (46 duplicates)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running `target/debug/backend`
+🚀 Backend Rust lancé sur http://localhost:3000
+📋 Routes disponibles:
+  === USERS ===
+  POST   /auth/signup
+  POST   /user/login
+  POST   /auth/logout
+  GET    /me
+  === SERVERS ===
+  GET    /servers
+  POST   /servers
+  GET    /servers/:server_id
+  DELETE /servers/:server_id
+  PUT    /servers/:server_id
+  POST   /servers/:server_id/join
+  DELETE /servers/:server_id/leave
+  GET    /servers/:server_id/members
+  PUT    /servers/:server_id/members/:userId
+  === CHANNELS ===
+  POST   /servers/:server_id/channels
+  GET    /servers/:server_id/channels
+  GET    /channels/:channel_id
+  PUT    /channels/:channel_id
+  DELETE /channels/:channel_id
+  === MESSAGES ===
+  POST   /channels/:channel_id/messages
+  GET    /channels/:channel_id/messages
+  DELETE /messages/:message_id
+  === INVITATION ===
+  POST   /invite/:invite_code
