@@ -21,11 +21,52 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
         { id: 'role01', name: 'Ban', color: '#6d0101' },
         { id: 'role02', name: 'Membre', color: '#808080' },
         { id: 'role03', name: 'Admin', color: '#FFD700' },
-        { id: 'role04', name: 'Owner', color: '#ff0000' },
     ];
+
+    // Récupérer le rôle de l'utilisateur actuel
+    const getCurrentUserRole = (): string | null => {
+        const currentUserId = sessionStorage.getItem('user_id');
+        if (!currentUserId) return null;
+        
+        const currentMember = members.find(m => m.user_id === currentUserId);
+        return currentMember?.role_id || null;
+    };
+
+    // Filtrer les rôles disponibles selon les permissions
+    const getAvailableRoles = (currentUserRoleId: string | null) => {
+        if (currentUserRoleId === 'role04') {
+            // Owner peut assigner : Admin, Membre, Ban
+            return roleOptions;
+        } else if (currentUserRoleId === 'role03') {
+            // Admin peut assigner : Membre, Ban
+            return roleOptions.filter(r => r.id === 'role01' || r.id === 'role02');
+        }
+        // Membre et Ban ne peuvent rien assigner
+        return [];
+    };
 
     const handleContextMenu = (e: React.MouseEvent, member: Member) => {
         e.preventDefault();
+        
+        const currentUserRoleId = getCurrentUserRole();
+        const availableRoles = getAvailableRoles(currentUserRoleId);
+        
+        // Ne pas afficher le menu si l'utilisateur n'a pas les permissions
+        if (availableRoles.length === 0) {
+            return;
+        }
+        
+        // Ne pas permettre de changer le rôle de soi-même
+        const currentUserId = sessionStorage.getItem('user_id');
+        if (member.user_id === currentUserId) {
+            return;
+        }
+        
+        // Ne pas permettre de changer le rôle d'un Owner
+        if (member.role_id === 'role04') {
+            return;
+        }
+        
         setContextMenu({
             x: e.clientX,
             y: e.clientY,
@@ -140,7 +181,7 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
                             <p className="px-4 py-1 text-[10px] text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
                                 Assigner un rôle
                             </p>
-                            {roleOptions.map((role) => (
+                            {getAvailableRoles(getCurrentUserRole()).map((role) => (
                                 <button
                                     key={role.id}
                                     onClick={() => handleRoleChange(role.id)}

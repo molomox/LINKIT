@@ -306,6 +306,18 @@ export default function ServerPage() {
             }
 
             console.log('✅ Canal supprimé:', lastServerMessage.channel_id);
+        } else if (lastServerMessage.type === 'member_joined') {
+            // Un nouveau membre a rejoint le serveur
+            console.log('👤 Nouveau membre rejoint le serveur:', lastServerMessage.username);
+            
+            // Recharger la liste des membres pour inclure le nouveau membre
+            loadMembers();
+        } else if (lastServerMessage.type === 'member_role_changed') {
+            // Le rôle d'un membre a changé
+            console.log('🔄 Rôle de membre mis à jour:', lastServerMessage.username, '->', lastServerMessage.role_name);
+            
+            // Recharger la liste des membres pour mettre à jour les rôles
+            loadMembers();
         }
     }, [lastServerMessage, selectedChannel]);
 
