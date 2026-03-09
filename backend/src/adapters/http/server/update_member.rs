@@ -38,10 +38,17 @@ pub async fn update_members_handler(
         let user_repo = PostgresUserRepo;
         let role_repo = PostgresRoleRepo;
 
+<<<<<<< HEAD
         let user = user_repo.find_by_id(user_id_for_info)?;
         let role = role_repo.find_by_id(role_id_for_info)?;
         Ok::<_, String>((user.username, role.role_name))
     }).await;
+=======
+        let user = user_repo.find_by_id(user_id_clone)?;
+        let role = role_repo.find_by_id(role_id_clone)?;
+        Ok::<_, String>((user.username, role.role_name))
+    }).await
+>>>>>>> bac0b1f24867f2bd22606aad36925982b531e70e
 
     if let Ok(Ok((username, role_name))) = member_info {
         state.broadcast_to_server(
