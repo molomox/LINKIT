@@ -12,7 +12,7 @@ mod json_serialization_tests {
             "content": "Hello",
             "user_id": "user123",
             "username": "alice",
-            "channel_id": "ch456",
+            "channel_id": "ch456",es ty
             "server_id": "srv789"
         });
 
