@@ -77,6 +77,57 @@ export default function ServerPage() {
         }
     }, [selectedChannel, apiBase]);
 
+    const loadMembers = useCallback(async () => {
+        try {
+            const membersRes = await fetch(`${apiBase}/servers/${serverId}/members`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (membersRes.ok) {
+                const membersData: ApiMember[] = await membersRes.json();
+                console.log('📥 Membres bruts de l\'API:', membersData);
+
+                // Transformer les données de l'API vers le format Member
+                const transformedMembers: Member[] = membersData.map((m: any) => {
+                    console.log('🔵 Membre original complet:', JSON.stringify(m, null, 2));
+                    console.log('🔵 m.role =', m.role);
+                    console.log('🔵 m.role.role_id =', m.role ? m.role.role_id : 'role est null/undefined');
+                    console.log('🔵 m.role_id direct =', m.role_id);
+                    
+                    // Test explicite
+                    let roleId = 'role02'; // défaut
+                    if (m.role && typeof m.role === 'object' && m.role.role_id) {
+                        roleId = m.role.role_id;
+                        console.log('✅ role_id trouvé dans m.role:', roleId);
+                    } else if (m.role_id) {
+                        roleId = m.role_id;
+                        console.log('✅ role_id trouvé directement:', roleId);
+                    } else {
+                        console.log('❌ Aucun role_id trouvé, utilisation de la valeur par défaut');
+                    }
+                    
+                    const result = {
+                        user_id: (m.user && m.user.user_id) || m.user_id || '',
+                        username: (m.user && m.user.username) || m.username || 'Utilisateur inconnu',
+                        role_name: (m.role && m.role.role_name) || m.role_name || 'Membre',
+                        role_id: roleId,
+                        join_at: m.join_at || new Date().toISOString(),
+                    };
+                    
+                    console.log('🟢 Résultat transformation:', result);
+                    return result;
+                });
+
+                console.log('✅ Membres transformés:', transformedMembers);
+                console.log('🎯 AVANT setMembers - Premier membre role_id:', transformedMembers[0]?.role_id);
+                setMembers(transformedMembers);
+            }
+        } catch (error) {
+            console.error("Erreur chargement membres:", error);
+        }
+    }, [serverId, apiBase]);
+
     useEffect(() => {
         const loadServerData = async () => {
             try {
@@ -119,26 +170,7 @@ export default function ServerPage() {
                 }
 
                 // Charger les membres
-                const membersRes = await fetch(`${apiBase}/servers/${serverId}/members`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" },
-                });
-
-                if (membersRes.ok) {
-                    const membersData: ApiMember[] = await membersRes.json();
-                    console.log('📥 Membres bruts de l\'API:', membersData);
-
-                    // Transformer les données de l'API vers le format Member
-                    const transformedMembers: Member[] = membersData.map((m: ApiMember) => ({
-                        user_id: m.user?.user_id || m.user_id || '',
-                        username: m.user?.username || m.username || 'Utilisateur inconnu',
-                        role_name: m.role?.role_name || m.role_name || 'Membre',
-                        join_at: m.join_at || new Date().toISOString(),
-                    }));
-
-                    console.log('✅ Membres transformés:', transformedMembers);
-                    setMembers(transformedMembers);
-                }
+                await loadMembers();
 
                 setLoading(false);
             } catch (error) {
@@ -274,6 +306,18 @@ export default function ServerPage() {
             }
 
             console.log('✅ Canal supprimé:', lastServerMessage.channel_id);
+        } else if (lastServerMessage.type === 'member_joined') {
+            // Un nouveau membre a rejoint le serveur
+            console.log('👤 Nouveau membre rejoint le serveur:', lastServerMessage.username);
+            
+            // Recharger la liste des membres pour inclure le nouveau membre
+            loadMembers();
+        } else if (lastServerMessage.type === 'member_role_changed') {
+            // Le rôle d'un membre a changé
+            console.log('🔄 Rôle de membre mis à jour:', lastServerMessage.username, '->', lastServerMessage.role_name);
+            
+            // Recharger la liste des membres pour mettre à jour les rôles
+            loadMembers();
         }
     }, [lastServerMessage, selectedChannel]);
 
@@ -667,7 +711,12 @@ export default function ServerPage() {
                 </main>
 
                 {/* Sidebar droite - Membres */}
-                <MemberList members={members} onlineMembers={onlineMembers} />
+                <MemberList 
+                    members={members} 
+                    onlineMembers={onlineMembers}
+                    serverId={serverId}
+                    onMemberUpdate={loadMembers}
+                />
             </div>
 
             {/* Modals */}
@@ -687,7 +736,12 @@ export default function ServerPage() {
                 onDeleteConfirmNameChange={setDeleteConfirmName}
             />
 
-            {/* Grille cyberpunk en fond */}
+            {/* Grille cyber
+                    members={members} 
+                    onlineMembers={onlineMembers}
+                    serverId={serverId}
+                    onMemberUpdate={loadMembers}
+               
             {/* ...existing code... */}
         </div>
     );

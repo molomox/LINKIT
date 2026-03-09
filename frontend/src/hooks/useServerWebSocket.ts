@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export type ServerWsMessage = {
-    type: 'channel_created' | 'channel_updated' | 'channel_deleted' | 'ping' | 'pong';
+    type: 'channel_created' | 'channel_updated' | 'channel_deleted' | 'member_joined' | 'member_role_changed' | 'ping' | 'pong';
     channel_id?: string;
     name?: string;
     server_id?: string;
     create_at?: string;
+    user_id?: string;
+    username?: string;
+    role_id?: string;
+    role_name?: string;
 };
 
 export type ServerWebSocketStatus = 'connecting' | 'connected' | 'disconnected' | 'error';

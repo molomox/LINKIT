@@ -47,7 +47,17 @@ export default function RegisterPage() {
             if (!res.ok) {
                 const errText = await res.text();
                 console.error("🔴 Erreur backend:", errText);
-                setStatus(`Erreur: ${errText}`);
+                
+                // Messages d'erreur personnalisés
+                if (errText.includes("nom d'utilisateur est déjà pris")) {
+                    setStatus("❌ Ce nom d'utilisateur est déjà pris. Choisissez-en un autre.");
+                } else if (errText.includes("email est déjà utilisé")) {
+                    setStatus("❌ Cet email est déjà utilisé. Utilisez un autre email.");
+                } else if (errText.includes("existe déjà")) {
+                    setStatus("❌ Cet utilisateur existe déjà.");
+                } else {
+                    setStatus(`❌ Erreur: ${errText}`);
+                }
                 return;
             }
 
