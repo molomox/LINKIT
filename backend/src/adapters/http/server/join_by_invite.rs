@@ -7,6 +7,9 @@ use crate::domain::usecases::server::join_by_invite::JoinServerByInvite;
 use axum::Json;
 use axum::extract::Path;
 use serde::Deserialize;
+use::axum::extract::State;
+use crate::adapters::http::server::state::AppState;
+use crate::adapters::http::websocket::WsMessage;
 
 #[derive(Deserialize)]
 pub struct JoinByInviteRequest {
@@ -16,6 +19,7 @@ pub struct JoinByInviteRequest {
 pub async fn join_server_by_invite_handler(
     Path(invite_code): Path<String>,
     Json(request): Json<JoinByInviteRequest>,
+    State(state): State<AppState>,
 ) -> Result<Json<Member>, ApiError> {
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;
@@ -27,6 +31,16 @@ pub async fn join_server_by_invite_handler(
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
     .map_err(|e| ApiError::BadRequest(format!("Server joining by invite failed: {}", e)))?;
+    state.broadcast_to_server(
+        &result.server.server_id,
+        WsMessage::MemberJoined{
+            user_id: result.user.user_id.clone(),
+            username: result.user.username.clone(),
+            server_id: result.server.server_id.clone(),
+            role_id: result.role.role_id.clone(),
+            role_name: result.role.role_name.clone(),
+        }
+    ).await;
 
     Ok(Json(result))
 }
