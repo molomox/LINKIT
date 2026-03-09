@@ -25,6 +25,7 @@ export type Member = {
     username: string;
     role_name: string;
     join_at: string;
+    role_id: string;
 };
 
 export type ApiMember = {
@@ -34,6 +35,7 @@ export type ApiMember = {
         email: string;
     };
     role?: {
+        role_id: string;
         role_name: string;
         permissions?: string[];
     };
@@ -41,6 +43,7 @@ export type ApiMember = {
     username?: string;
     role_name?: string;
     join_at?: string;
+    role_id?: string;
 };
 
 export type Server = {
