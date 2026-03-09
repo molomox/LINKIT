@@ -1,7 +1,9 @@
 # .dockerignore Backend
 
 # Répertoires de build
+target
 target/
+**/target
 debug/
 release/
 
