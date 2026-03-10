@@ -436,6 +436,24 @@ export default function ServerPage() {
                     });
                 }, 3000);
             }
+        } else if (lastMessage.type === 'message_updated') {
+            // Un message a été modifié
+            console.log('✏️ Message mis à jour:', lastMessage.message_id);
+            
+            setMessages(prevMessages =>
+                prevMessages.map(msg =>
+                    msg.message_id === lastMessage.message_id
+                        ? { ...msg, content: lastMessage.content || msg.content }
+                        : msg
+                )
+            );
+        } else if (lastMessage.type === 'message_deleted') {
+            // Un message a été supprimé
+            console.log('🗑️ Message supprimé:', lastMessage.message_id);
+            
+            setMessages(prevMessages =>
+                prevMessages.filter(msg => msg.message_id !== lastMessage.message_id)
+            );
         }
     }, [lastMessage]);
 
@@ -589,14 +607,8 @@ export default function ServerPage() {
         }
     };
 
-    const handleDeleteMessage = async (messageId: string, messageUserId: string) => {
+    const handleDeleteMessage = async (messageId: string) => {
         const currentUserId = sessionStorage.getItem("user_id");
-
-        // Vérifier que l'utilisateur est bien le propriétaire du message
-        if (currentUserId !== messageUserId) {
-            alert("Vous ne pouvez supprimer que vos propres messages !");
-            return;
-        }
 
         if (!confirm("Voulez-vous vraiment supprimer ce message ?")) {
             return;
@@ -606,12 +618,12 @@ export default function ServerPage() {
             const res = await fetch(`${apiBase}/messages/${messageId}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: currentUserId }),
             });
 
             if (res.ok) {
                 console.log("✅ Message supprimé");
-                // Retirer le message de la liste locale
-                setMessages(prev => prev.filter(m => m.message_id !== messageId));
+                // Le message sera retiré via WebSocket
             } else {
                 const errorText = await res.text();
                 console.error("❌ Erreur suppression:", errorText);
@@ -620,6 +632,33 @@ export default function ServerPage() {
         } catch (error) {
             console.error("❌ Erreur réseau:", error);
             alert("Erreur réseau lors de la suppression");
+        }
+    };
+
+    const handleUpdateMessage = async (messageId: string, newContent: string) => {
+        const currentUserId = sessionStorage.getItem("user_id");
+
+        try {
+            const res = await fetch(`${apiBase}/messages/${messageId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    content: newContent,
+                    user_id: currentUserId,
+                }),
+            });
+
+            if (res.ok) {
+                console.log("✅ Message mis à jour");
+                // Le message sera mis à jour via WebSocket
+            } else {
+                const errorText = await res.text();
+                console.error("❌ Erreur mise à jour:", errorText);
+                alert(`Erreur: ${errorText}`);
+            }
+        } catch (error) {
+            console.error("❌ Erreur réseau:", error);
+            alert("Erreur réseau lors de la mise à jour");
         }
     };
 
@@ -699,7 +738,9 @@ export default function ServerPage() {
                 {/* Chat principal */}
                 <main className="flex-1 flex flex-col bg-black/40">
                     {/* Messages */}
-                    <div className="flex-1 overflow-y-auto scrollbar-thin p-4">
+                    <div className="currentUserRole={getCurrentUserRole()}
+                                    onDelete={handleDeleteMessage}
+                                    onUpdate={handleUpdato scrollbar-thin p-4">
                         {messages.length === 0 ? (
                             <div className="flex items-center justify-center h-full">
                                 <div className="text-center">
@@ -717,7 +758,9 @@ export default function ServerPage() {
                                     key={message.message_id}
                                     message={message}
                                     currentUserId={sessionStorage.getItem("user_id")}
+                                    currentUserRole={getCurrentUserRole()}
                                     onDelete={handleDeleteMessage}
+                                    onUpdate={handleUpdateMessage}
                                 />
                             ))
                         )}
