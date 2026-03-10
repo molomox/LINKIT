@@ -39,20 +39,7 @@ impl<'a> UpdateMessage<'a>{
             return Ok((channel_id, updated_message.message_id, username));
         }
 
-        // 5. Sinon, vérifier les rôles (Owner ou Admin)
-        let editor_member = self.member_repo
-            .get_by_user_and_server(editor_user_id.clone(), server_id.clone())
-            .map_err(|_| "Vous n'êtes pas membre de ce serveur".to_string())?;
-
-        let author_member = self.member_repo
-            .get_by_user_and_server(author_user_id.clone(), server_id.clone())
-            .map_err(|_| "Auteur introuvable".to_string())?;
-
-
-        // 6. Mettre à jour le message
-        message.content = content;
-        let updated_message = self.message_repo.update(message)?;
-
-        Ok((channel_id, updated_message.message_id, username))
+        // 5. Sinon, seul le propriétaire peut modifier son message
+        Err("Vous ne pouvez modifier que vos propres messages".to_string())
     }
 }

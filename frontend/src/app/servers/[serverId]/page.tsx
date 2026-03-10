@@ -573,6 +573,8 @@ export default function ServerPage() {
     };
 
     const getCurrentUserRole = (): string | null => {
+        if (typeof window === 'undefined') return null;
+        
         const userId = sessionStorage.getItem("user_id");
         if (!userId) return null;
 
@@ -580,8 +582,9 @@ export default function ServerPage() {
         return member?.role_name || null;
     };
 
-    const isOwner = getCurrentUserRole() === "Owner";
-    const canLeave = ["membre", "Admin"].includes(getCurrentUserRole() || "");
+    const currentUserRole = getCurrentUserRole();
+    const isOwner = currentUserRole === "Owner";
+    const canLeave = ["membre", "Admin"].includes(currentUserRole || "");
 
     const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewMessage(e.target.value);
@@ -738,9 +741,7 @@ export default function ServerPage() {
                 {/* Chat principal */}
                 <main className="flex-1 flex flex-col bg-black/40">
                     {/* Messages */}
-                    <div className="currentUserRole={getCurrentUserRole()}
-                                    onDelete={handleDeleteMessage}
-                                    onUpdate={handleUpdato scrollbar-thin p-4">
+                    <div className="flex-1 overflow-auto scrollbar-thin p-4">
                         {messages.length === 0 ? (
                             <div className="flex items-center justify-center h-full">
                                 <div className="text-center">
@@ -757,8 +758,8 @@ export default function ServerPage() {
                                 <MessageItem
                                     key={message.message_id}
                                     message={message}
-                                    currentUserId={sessionStorage.getItem("user_id")}
-                                    currentUserRole={getCurrentUserRole()}
+                                    currentUserId={typeof window !== 'undefined' ? sessionStorage.getItem("user_id") : null}
+                                    currentUserRole={currentUserRole}
                                     onDelete={handleDeleteMessage}
                                     onUpdate={handleUpdateMessage}
                                 />

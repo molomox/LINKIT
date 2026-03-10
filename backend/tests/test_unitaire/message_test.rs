@@ -79,6 +79,15 @@ impl MessageRepository for MockMessageRepository {
             Err("Message not found".to_string())
         }
     }
+
+    fn find_by_id(&self, message_id: String) -> Result<Message, String> {
+        self.messages
+            .lock()
+            .unwrap()
+            .get(&message_id)
+            .cloned()
+            .ok_or_else(|| "Message not found".to_string())
+    }
 }
 struct MockUserRepository {
     users: Arc<Mutex<HashMap<String, User>>>,

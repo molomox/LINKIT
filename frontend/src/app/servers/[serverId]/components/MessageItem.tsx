@@ -36,8 +36,8 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
     const isOwnMessage = message.user_id === currentUserId;
     const isSystemMessage = message.user_id === 'system';
     
-    // Permissions : Owner peut tout, Admin peut éditer/supprimer Membre, chacun peut éditer/supprimer ses messages
-    const canEdit = isOwnMessage || currentUserRole === 'Owner' || currentUserRole === 'Admin';
+    // Permissions : Seul le propriétaire peut éditer son message, Owner/Admin peuvent supprimer
+    const canEdit = isOwnMessage;
     const canDelete = isOwnMessage || currentUserRole === 'Owner' || currentUserRole === 'Admin';
     
     const handleSaveEdit = () => {
@@ -67,31 +67,23 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
         );
     }
 
-    // Message normal<div className="ml-auto flex gap-1 opacity-0 group-hover:opacity-100">
-                            {canEdit && !isEditing && (
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    className="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400/50 hover:bg-blue-400/10 transition-all"
-                                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%)" }}
-                                    title="Éditer ce message"
-                                >
-                                    ✏️ Éditer
-                                </button>
-                            )}
-                            {canDelete && !isEditing && (
-                                <button
-                                    onClick={() => onDelete(message.message_id)}
-                                    className="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400/50 hover:bg-red-400/10 transition-all"
-                                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%)" }}
-                                    title="Supprimer ce message"
-                                >
-                                    🗑️ Supprimer
-                                </button>
-                            )}
-                        </div>
+    // Message normal
+    return (
+        <div className="group p-3 hover:bg-yellow-400/5 transition-colors border-l-2 border-transparent hover:border-yellow-400/50">
+            <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2 mb-1">
+                        <span className="text-yellow-400 font-semibold text-sm" style={{ fontFamily: 'monospace' }}>
+                            {message.username || "Utilisateur"}
+                            {isOwnMessage && " (vous)"}
+                        </span>
+                        <span className="text-gray-600 text-xs" style={{ fontFamily: 'monospace' }}>
+                            {formatDate(message.create_at)}
+                        </span>
                     </div>
+                    
                     {isEditing ? (
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-center mt-2">
                             <input
                                 type="text"
                                 value={editContent}
@@ -123,26 +115,30 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
                         <p className="text-gray-300 text-sm leading-relaxed" style={{ fontFamily: 'monospace' }}>
                             {message.content}
                         </p>
-                    )}    {message.username || "Utilisateur"}
-                            {isOwnMessage && " (vous)"}
-                        </span>
-                        <span className="text-gray-600 text-xs" style={{ fontFamily: 'monospace' }}>
-                            {formatDate(message.create_at)}
-                        </span>
-                        {isOwnMessage && (
-                            <button
-                                onClick={() => onDelete(message.message_id, message.user_id)}
-                                className="ml-auto opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400/50 hover:bg-red-400/10 transition-all"
-                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%)" }}
-                                title="Supprimer ce message"
-                            >
-                                🗑️ Supprimer
-                            </button>
-                        )}
-                    </div>
-                    <p className="text-gray-300 text-sm leading-relaxed" style={{ fontFamily: 'monospace' }}>
-                        {message.content}
-                    </p>
+                    )}
+                </div>
+
+                <div className="ml-auto flex gap-1 opacity-0 group-hover:opacity-100">
+                    {canEdit && !isEditing && (
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400/50 hover:bg-blue-400/10 transition-all"
+                            style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%)" }}
+                            title="Éditer ce message"
+                        >
+                            ✏️ Éditer
+                        </button>
+                    )}
+                    {canDelete && !isEditing && (
+                        <button
+                            onClick={() => onDelete(message.message_id)}
+                            className="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400/50 hover:bg-red-400/10 transition-all"
+                            style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%)" }}
+                            title="Supprimer ce message"
+                        >
+                            🗑️ Supprimer
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

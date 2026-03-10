@@ -29,7 +29,7 @@ async fn main() {
         .merge(server_routes(ws_state.clone()))
         .merge(user_routes())
         .merge(channels_routes(ws_state.clone()))
-        .merge(message_routes())
+        .merge(message_routes(ws_state.clone()))
         .merge(websocket_routes(ws_state))
         .fallback(|| async {
             (axum::http::StatusCode::NOT_FOUND, "Route non trouvée dans Axum")

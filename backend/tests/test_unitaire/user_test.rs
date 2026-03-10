@@ -121,6 +121,18 @@ impl MessageRepository for MockMessageRepository {
             Err("Message not found".to_string())
         }
     }
+
+    fn find_by_id(&self, message_id: String) -> Result<Message, String> {
+        if self.should_fail || self.fail_on_operation.as_deref() == Some("find_by_id") {
+            return Err("Database error while fetching".to_string());
+        }
+        self.messages
+            .lock()
+            .unwrap()
+            .get(&message_id)
+            .cloned()
+            .ok_or_else(|| "Message not found".to_string())
+    }
 }
 
 #[test]
