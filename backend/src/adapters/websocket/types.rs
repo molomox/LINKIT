@@ -41,6 +41,19 @@ pub enum WsMessage {
         channel_id: String,
         create_at: String,
     },
+    #[serde(rename = "message_updated")]
+    MessageUpdated {
+        message_id: String,
+        content: String,
+        user_id: String,
+        username: String,
+        channel_id: String,
+    },
+    #[serde(rename = "message_deleted")]
+    MessageDeleted {
+        message_id: String,
+        channel_id: String,
+    },
     #[serde(rename = "user_joined")]
     UserJoined {
         user_id: String,
