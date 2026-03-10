@@ -1,6 +1,7 @@
 use crate::domain::entities::message::Message;
 use crate::domain::entities::user::User;
 use crate::domain::ports::message_repository::MessageRepository;
+use crate::domain::ports::user_repository::UserRepository;
 use crate::domain::usecases::message::{
     send_message::SendMessage,
     delete_message::DeleteMessage,
@@ -11,15 +12,17 @@ use std::sync::{Arc, Mutex};
 
 struct MockMessageRepository {
     messages: Arc<Mutex<HashMap<String, Message>>>,
+    users: Arc<Mutex<HashMap<String, User>>>,
 }
 
 impl MockMessageRepository {
     fn new() -> Self {
         Self {
             messages: Arc::new(Mutex::new(HashMap::new())),
+            users: Arc::new(Mutex::new(HashMap::new())),
         }
     }
-    
+
     fn create_test_message(&self, message_id: &str, channel_id: &str, user_id: &str, content: &str) -> Message {
         Message {
             message_id: message_id.to_string(),
@@ -77,11 +80,85 @@ impl MessageRepository for MockMessageRepository {
         }
     }
 }
+struct MockUserRepository {
+    users: Arc<Mutex<HashMap<String, User>>>,
+}
+impl MockUserRepository {
+    fn new() -> Self {
+        Self {
+            users: Arc::new(Mutex::new(HashMap::new())),
+        }
+    }
+
+    fn create_test_user(&self, user_id: &str) -> User {
+        User {
+            user_id: user_id.to_string(),
+            username: format!("User {}", user_id),
+            email: format!("user{}@example.com", user_id),
+            password: "password".to_string(),
+            create_at: "2024-01-01T00:00:00Z".to_string(),
+            token: None,
+        }
+    }
+}
+
+impl UserRepository for MockUserRepository {
+    fn save(&self, user: User) -> Result<User, String> {
+        self.users.lock().unwrap().insert(user.user_id.clone(), user.clone());
+        Ok(user)
+    }
+    fn find_by_id(&self, user_id: std::string::String) -> Result<User, String> {
+        let users = self.users.lock().unwrap();
+        users.get(&user_id).cloned().ok_or_else(|| "User not found".to_string())
+    }
+    fn find_by_username(&self, username: std::string::String) -> Result<User, String> {
+        let users = self.users.lock().unwrap();
+        users.values().find(|u| u.username == username).cloned().ok_or_else(|| "User not found".to_string())
+    }   
+    fn find_by_email(&self, email: std::string::String) -> Result<User, String> {
+        let users = self.users.lock().unwrap();
+        users.values().find(|u| u.email == email).cloned().ok_or_else(|| "User not found".to_string())
+    }
+    fn delete(&self, user_id: std::string::String) -> Result<String, std::string::String> {
+        self.users
+            .lock()
+            .unwrap()
+            .remove(&user_id)
+            .map(|_| user_id.to_string())
+            .ok_or_else(|| "User not found".to_string())
+    }
+    fn update(&self, user: User) -> Result<User, std::string::String> {
+        let mut users = self.users.lock().unwrap();
+        if users.contains_key(&user.user_id) {
+            users.insert(user.user_id.clone(), user.clone());
+            Ok(user)
+        } else {
+            Err("User not found".to_string())
+        }
+    }
+    fn exist (&self, user_id: std::string::String) -> Result<bool, std::string::String> {
+        let users = self.users.lock().unwrap();
+        Ok(users.contains_key(&user_id))
+    }
+    fn update_token(&self, user_id: std::string::String, token: Option<String>) -> Result<(), std::string::String> {
+        let mut users = self.users.lock().unwrap();
+        if let Some(user) = users.get_mut(&user_id) {
+            user.token = token.clone();
+            Ok(())
+        } else {
+            Err("User not found".to_string())
+        }
+    }
+}
+
 
 #[test]
 fn test_send_message() {
     let repo = MockMessageRepository::new();
-    let use_case = SendMessage { repo: &repo };
+    let repo_user = MockUserRepository::new(); 
+    repo_user.save(repo_user.create_test_user("user-1"));
+
+    let use_case = SendMessage { repo_message: &repo, repo_user: &repo_user };
 
     let result = use_case.execute(
         "channel-1".to_string(),
@@ -100,7 +177,8 @@ fn test_send_message() {
 #[test]
 fn test_send_message_empty() {
     let repo = MockMessageRepository::new();
-    let use_case = SendMessage { repo: &repo };
+    let repo_user = MockUserRepository::new(); 
+    let use_case = SendMessage { repo_message: &repo, repo_user: &repo_user };
 
     let result = use_case.execute(
         "".to_string(),

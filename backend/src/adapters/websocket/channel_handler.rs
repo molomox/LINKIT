@@ -163,11 +163,13 @@ async fn handle_new_message(
         let user_id = user_id.clone();
         move || {
             use crate::adapters::db::postgres_message_repository::PostgresMessageRepo;
+            use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
             use crate::domain::usecases::message::send_message::SendMessage;
 
             let repo = PostgresMessageRepo;
-            let usecase = SendMessage { repo: &repo };
-            usecase.execute(channel_id, user_id, content)
+            let repo_user = PostgresUserRepo;
+            let use_case = SendMessage { repo_message: &repo, repo_user: &repo_user };
+            use_case.execute(channel_id, user_id, content)
         }
     })
     .await;
