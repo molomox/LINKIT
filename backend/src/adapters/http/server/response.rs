@@ -26,3 +26,11 @@ pub struct CreateServerResponse{
     pub server_id: String,
     pub name: String,
 }
+
+
+#[derive(Deserialize)]
+pub struct BanMemberRequest {
+    pub banner_user_id: String, //Celui qui ban 
+    pub reason : String, 
+    pub expirate_at : String 
+}
