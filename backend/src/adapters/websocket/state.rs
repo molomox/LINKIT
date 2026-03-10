@@ -30,4 +30,13 @@ impl AppState {
             }
         }
     }
+
+    pub async fn broadcast_to_channel(&self, channel_id: &str, message: WsMessage){
+        let clients = self.clients.read().await;
+        if let Some(tx) = clients.get(channel_id) {
+            if let Ok(json) = serde_json::to_string(&message) {
+                let _ = tx.send(json);
+            }
+        }
+    }
 }

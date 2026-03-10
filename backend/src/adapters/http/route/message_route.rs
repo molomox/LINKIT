@@ -2,7 +2,7 @@ use axum::{Router, routing::{delete, get, post, put}};
 
 use crate::adapters::http::message::{create_message::create_message_handler as create_message_handler, 
     get_message_list::get_message_list_handler as get_message_list_handler,
-    delete_message::delete_message_handler as delete_message_handler,
+    delete_message::delete_message_handler as delete_message_handler
     update_message::update_message_handler as update_message_handler
 };
 
