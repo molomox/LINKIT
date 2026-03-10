@@ -1,10 +1,15 @@
+use crate::domain::entities::user::User;
+use crate::domain::entities::server::Server;
 use serde ::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
 #[derive(Debug)]
 pub struct Ban{
-    pub user_id: String,
-    pub server_id: String,
+    pub ban_id: String,
+    pub bannished_user_id: User,
+    pub server_id: Server,
+    pub banned_by_user_id: User,
     pub reason: String,
-    pub create_at: String
+    pub create_at: String,
+    pub expired_at: Option<String>,
 }
