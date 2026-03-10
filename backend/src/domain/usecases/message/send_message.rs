@@ -1,5 +1,6 @@
 use crate::domain::entities::message::Message;
 use crate::domain::ports::message_repository::MessageRepository;
+use crate::domain::ports::user_repository::UserRepository;
 use uuid::Uuid;
 use chrono::Utc;
 use crate::domain::entities::user::User;
@@ -8,7 +9,8 @@ use postgres::NoTls;
 use crate::adapters::http::constants::DB_URL;
 
 pub struct SendMessage<'a> {
-    pub repo: &'a dyn MessageRepository,
+    pub repo_message: &'a dyn MessageRepository,
+    pub repo_user: &'a dyn UserRepository,
 }
 
 impl<'a> SendMessage<'a> {
@@ -30,11 +32,8 @@ impl<'a> SendMessage<'a> {
         }
 
         // Récupérer le username depuis la base de données
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
-        let username = client
-            .query_one("SELECT username FROM users WHERE user_id = $1", &[&user_id])
-            .map(|row| row.get::<_, String>(0))
-            .unwrap_or_else(|_| "Utilisateur inconnu".to_string());
+        let user = self.repo_user.find_by_id(user_id.clone())
+        .map_err(|e| format!("Erreur lors de la récupération de l'utilisateur: {}", e))?;
 
         // Génération de l'ID et du timestamp
         let message_id = Uuid::new_v4().to_string();
@@ -46,7 +45,7 @@ impl<'a> SendMessage<'a> {
             channel_id,
             user: User {
                 user_id,
-                username, // ← Username récupéré de la DB !
+                username: user.username,
                 email: "".to_string(),
                 password: "".to_string(),
                 create_at: "".to_string(),
@@ -57,7 +56,7 @@ impl<'a> SendMessage<'a> {
         };
 
         // Sauvegarder en base de données et retourner le résultat
-        self.repo.save(message)
+        self.repo_message.save(message)
     }
 }
 

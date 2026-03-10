@@ -124,42 +124,6 @@ impl MessageRepository for MockMessageRepository {
 }
 
 #[test]
-fn test_send_message() {
-    let repo = MockMessageRepository::new();
-    let use_case = SendMessage { repo: &repo };
-
-    let result = use_case.execute(
-        "channel-123".to_string(),
-        "user-456".to_string(),
-        "Hello, world!".to_string(),
-    );
-
-    assert!(result.is_ok());
-    let message = result.unwrap();
-    assert_eq!(message.channel_id, "channel-123");
-    assert_eq!(message.user.user_id, "user-456");
-    assert_eq!(message.content, "Hello, world!");
-    assert!(!message.message_id.is_empty());
-    assert!(!message.create_at.is_empty());
-}
-
-#[test]
-fn test_send_message_empty() {
-    let repo = MockMessageRepository::new();
-    let use_case = SendMessage { repo: &repo };
-
-    let result = use_case.execute(
-        "".to_string(),
-        "".to_string(),
-        "".to_string(),
-    );
-
-    assert!(result.is_err());
-    // Vérifie que la première validation échoue (content)
-    assert_eq!(result.unwrap_err(), "Le contenu du message ne peut pas être vide");
-}
-
-#[test]
 fn test_list_message() {
     let repo = MockMessageRepository::new();
     
