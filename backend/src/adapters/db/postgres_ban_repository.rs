@@ -43,13 +43,13 @@ impl BanRepository for PostgresBanRepo{
         Ok(ban)
     }
     fn update_ban(&self, user_id: String, server_id: String, reason: String, expired_at: String,) -> Result<String,String>{
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string()).unwrap();
-        client.execute("UPDATE bans SET reason = $3, expired_at = $4 WHERE bannished_user_id = $1 AND server_id = $2", &[&user_id, &server_id, &reason, &expired_at]).unwrap();
+        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        client.execute("UPDATE bans SET reason = $3, expired_at = $4 WHERE bannished_user_id = $1 AND server_id = $2", &[&user_id, &server_id, &reason, &expired_at]).map_err(|e| e.to_string())?;
         Ok(user_id)
     }
     fn deban(&self, user_id: String, server_id: String) -> Result<String, String> {
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string()).unwrap();
-        client.execute("DELETE FROM bans WHERE bannished_user_id = $1 AND server_id = $2", &[&user_id, &server_id]).unwrap();
+        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        client.execute("DELETE FROM bans WHERE bannished_user_id = $1 AND server_id = $2", &[&user_id, &server_id]).map_err(|e| e.to_string())?;
         Ok(())
     }
 }

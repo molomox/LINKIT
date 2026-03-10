@@ -4,6 +4,7 @@ pub mod channel;
 pub mod member;
 pub mod role;
 pub mod server;
+pub mod ban;
 
 // Re-export des entités pour faciliter l'utilisation
 pub use message::Message;
@@ -12,3 +13,4 @@ pub use channel::Channel;
 pub use member::Member;
 pub use role::Role;
 pub use server::Server;
+pub use ban::Ban;
