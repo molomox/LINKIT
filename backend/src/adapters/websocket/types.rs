@@ -99,6 +99,13 @@ pub enum WsMessage {
         username: String,
         server_id: String,
     },
+    #[serde(rename = "member_banned")]
+    MemberBanned{
+        user_id: String,
+        username: String,
+        server_id: String,
+        reason: String,
+    },
     #[serde(rename = "user_online")]
     UserOnline {
         user_id: String,
