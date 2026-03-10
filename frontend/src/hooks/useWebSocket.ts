@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export type WsMessage = {
-    type: 'new_message' | 'user_joined' | 'user_left' | 'typing' | 'ping' | 'pong';
+    type: 'new_message' | 'user_joined' | 'user_left' | 'typing' | 'message_updated' | 'message_deleted' | 'ping' | 'pong';
     message_id?: string;
     content?: string;
     user_id?: string;
