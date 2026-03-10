@@ -8,7 +8,7 @@ use axum::extract::{Path, State};
 use axum::Json;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize)]  
 pub struct KickMemberRequest {
     pub kicker_user_id: String, // Celui qui kick
 }
