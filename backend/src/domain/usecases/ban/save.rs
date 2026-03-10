@@ -71,6 +71,9 @@ impl<'a> CreateBan<'a>{
         };
 
         self.repo.save(ban)
+
+        member_repo.change_role(target_user_id_clone.clone(), server_id_clone.clone(), "role01".to_string())
+            .map_err(|e| format!("Echec du changement de role: {}", e))?;
     }
 }
 

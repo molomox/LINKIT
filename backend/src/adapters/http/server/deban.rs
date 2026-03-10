@@ -3,34 +3,27 @@ use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
 use crate::domain::ports::ban_repository::BanRepository;
 use crate::domain::ports::member_repository::MemberRepository;
 use crate::domain::ports::user_repository::UserRepository;
-use crate::domain::usecases::ban::save::CreateBan;
+use crate::domain::usecases::ban::deban::Deban;
 use axum::extract::{Path, State};
 use crate::adapters::http::error::ApiError;
 use crate::adapters::websocket::{AppState, WsMessage};
-use crate::adapters::http::server::response::BanMemberRequest;
 use axum::Json;
 use serde::Deserialize;
 use crate::domain::entities::ban::Ban;
 use chrono::Utc;
 
 
-pub async fn ban_member_handler(
+pub async fn deban_member_handler(
     State(state): State<AppState>,
-    Path((server_id, target_user_id)):Path<(String, String)>,
-    Json(payload): Json<BanMemberRequest>,
+    Path((server_id, target_user_id)):Path<(String, String)>
 ) ->  Result<Json<(String)>, ApiError> {
-    let banner_user_id = payload.banner_user_id.clone();
-    let reason = payload.reason.clone();
-    let expirate_at = payload.expirate_at.clone();
     let target_user_id_clone = target_user_id.clone();
     let server_id_clone = server_id.clone();
 
     tokio::task::spawn_blocking(move || {
         let repo = BanRepository,
-        let member_repo = MemberRepository;
-        let user_repo = UserRepository;
-        let usecase = CreateBan{repo,member_repo,user_repo};
-        usecase.execute(target_user_id_clone,server_id_clone,reason,banner_user_id,expired_at)
+        let usecase = Deban{repo};
+        usecase.execute(target_user_id_clone,server_id_clone)
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?

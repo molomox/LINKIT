@@ -6,10 +6,10 @@ use serde ::{Deserialize, Serialize};
 #[derive(Debug)]
 pub struct Ban{
     pub ban_id: String,
-    pub bannished_user_id: User,
-    pub server_id: Server,
-    pub banned_by_user_id: User,
+    pub bannished_user_id: String,
+    pub server_id: String,
+    pub banned_by_user_id: String,
     pub reason: String,
     pub create_at: String,
-    pub expired_at: Option<String>,
+    pub expired_at: String,
 }
