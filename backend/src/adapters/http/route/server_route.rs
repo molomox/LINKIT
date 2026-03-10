@@ -29,11 +29,11 @@ pub fn server_routes(state: AppState) -> Router {
         .route("/servers/:server_id/members/:user_id", put(update_members_handler))
 
         .route("/servers/:server_id/members/:user_id/kick", delete(kick_member_handler))
-        .route("/servers/:server_id/members/:user_id/ban", post(join_server_by_invite_handler))
-        .route("/servers/:server_id/members/:user_id/deban", delete(join_server_by_invite_handler))
-        .route("/servers/:server_id/members/:user_id/update_ban", put(join_server_by_invite_handler))
-        .route("/servers/:server_id/members/:user_id/get_ban", get(join_server_by_invite_handler))
-        
+        .route("/servers/:server_id/members/:user_id/ban", post(ban_member_handler))
+        .route("/servers/:server_id/members/:user_id/deban", delete(deban_member_handler))
+        .route("/servers/:server_id/members/:user_id/update_ban", put(update_ban_handler))
+        .route("/servers/:server_id/members/:user_id/get_ban", get(get_ban_handler))
+
         .route("/invite/:invite_code", post(join_server_by_invite_handler))
         .with_state(state)
 }
