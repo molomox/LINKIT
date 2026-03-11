@@ -17,7 +17,8 @@ impl<'a> UserServer<'a>{
         if bannished_user_id.is_empty() || server_id.is_empty(){
             return Err("Veuillez entrer les parametres necessaires".to_string());
         }
-        return self.repo.find_by_user_and_server(bannished_user_id, server_id).is_err() {return  Err("id introuvable".to_string());} ;
+        self.repo.find_by_user_and_server(bannished_user_id, server_id)
+            .map_err(|_| "id introuvable".to_string())
     }
 }
 

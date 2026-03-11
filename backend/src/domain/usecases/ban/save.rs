@@ -8,8 +8,8 @@ use chrono::Utc;
 
 pub struct CreateBan<'a>{
     pub repo: &'a dyn BanRepository,
-    pub member_repo: &'a dyn MemberRepository;
-    pub user_repo: &'a dyn UserRepository;
+    pub member_repo: &'a dyn MemberRepository,
+    pub user_repo: &'a dyn UserRepository,
 }
 
 impl<'a> CreateBan<'a>{
@@ -28,14 +28,14 @@ impl<'a> CreateBan<'a>{
         // Checks Permissions de ban
 
         //Recuperer la personne qui ban
-        let banner_member = member_repo
-            .get_by_user_and_server(banner_user_id.clone(), server_id_clone.clone())
-            .map_err(|e| format!("Utilisateur Non trouver:  {}", e))?;
+        let banner_member = self.member_repo
+            .get_by_user_and_server(banned_by_user_id.clone(), server_id.clone())
+            .map_err(|e| format!("Utilisateur Non trouver:  {}", e))?;
 
 
         //Recuperer la personne bannie
-        let target_member = member_repo
-            .get_by_user_and_server(target_user_id_clone.clone(), server_id_clone.clone())
+        let target_member = self.member_repo
+            .get_by_user_and_server(bannished_user_id.clone(), server_id.clone())
             .map_err(|e| format! ("Utilisateur Non trouver: {}",e ))?;
 
         // Verifier que le banner est soit Owner (role04) soit Admin (role03)
@@ -54,8 +54,8 @@ impl<'a> CreateBan<'a>{
         }
 
         // Recuperer le username de la personne bannie 
-        let target_user = user_repo
-            .find_by_id(target_user_id_clone.clone())
+        let target_user = self.user_repo
+            .find_by_id(bannished_user_id.clone())
             .map_err(|e| format!("Utilisateur Non trouver: {}", e))?;
 
         let ban_id= Uuid::new_v4().to_string();
@@ -70,10 +70,12 @@ impl<'a> CreateBan<'a>{
             expired_at,
         };
 
-        self.repo.save(ban)
+        self.repo.save(ban.clone())?;
 
-        member_repo.change_role(target_user_id_clone.clone(), server_id_clone.clone(), "role01".to_string())
+        self.member_repo.update_member_role(ban.bannished_user_id.clone(), ban.server_id.clone(), "role01".to_string())
             .map_err(|e| format!("Echec du changement de role: {}", e))?;
+        
+        Ok(ban)
     }
 }
 

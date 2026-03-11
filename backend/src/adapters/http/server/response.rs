@@ -31,12 +31,12 @@ pub struct CreateServerResponse{
 pub struct BanMemberRequest {
     pub banner_user_id: String, //Celui qui ban 
     pub reason : String, 
-    pub expirate_at : String 
+    pub expired_at : String 
 }
 
 #[derive(Deserialize)]
 pub struct UpdateBanMemberRequest {
     pub reason : String, 
-    pub expirate_at : String 
+    pub expired_at : String 
 }
 

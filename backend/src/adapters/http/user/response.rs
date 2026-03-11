@@ -20,4 +20,5 @@ pub struct CreateUserResponse{
     pub username: String,
     pub email: String,
     pub create_at: String,
+    pub token: Option<String>,
 }

@@ -13,12 +13,6 @@ use axum::Json;
 use serde::Deserialize;
 use crate::domain::entities::ban::Ban;
 use chrono::Utc;
-#[derive(Deserialize)]
-pub struct BanMemberRequest {
-    pub banner_user_id: String,
-    pub reason: String,
-    pub expired_at: String,
-}
 
 pub async fn ban_member_handler(
     State(state): State<AppState>,
@@ -35,14 +29,18 @@ pub async fn ban_member_handler(
         let repo = PostgresBanRepo;
         let member_repo = PostgresMemberRepo;
         let user_repo = PostgresUserRepo;
-        let usecase = CreateBan{&repo,&member_repo,&user_repo};
+        let usecase = CreateBan{
+            repo: &repo,
+            member_repo: &member_repo,
+            user_repo: &user_repo,
+        };
         usecase.execute(target_user_id_clone,server_id_clone,reason,banner_user_id,expired_at)
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
     .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
     
-    Ok(Json("le membre a été bannis"));
-};
+    Ok(Json("le membre a été bannis".to_string()))
+}
 
 

@@ -19,15 +19,15 @@ impl<'a> UpdateBan<'a>{
         if bannished_user_id.is_empty() || server_id.is_empty()|| reason.is_empty() || expired_at.is_empty() {
             return Err("Veuillez entrer les parametres necessaires".to_string());
         }
-        Ban ban = self.repo.find_by_user_and_server(bannished_user_id.clone(), server_id.clone())
+        let mut ban = self.repo.find_by_user_and_server(bannished_user_id.clone(), server_id.clone())
             .map_err(|e| format!("List ban failed: {}", e))?;
         if reason != ""{
             ban.reason = reason;
         }
         if expired_at != ""   {
-            ban.expired_at = expired_at;
+            ban.expired_at = expired_at.clone();
         }
-        self.repo.update(ban.clone())
+        self.repo.update_ban(bannished_user_id.clone(), server_id.clone(), ban.reason.clone(), ban.expired_at.clone())
             .map_err(|e| format!("Save ban failed: {}", e))?;
         return Ok(ban);
     }

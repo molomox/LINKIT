@@ -41,6 +41,7 @@ pub async fn create_user_handler(
         username: result.username,
         email: result.email,
         create_at: result.create_at,
+        token: None,
     };
 
     Ok(Json(response))
