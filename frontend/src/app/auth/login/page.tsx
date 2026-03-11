@@ -7,6 +7,7 @@ type LoginResponse = {
     user_id: string,
     email: string,
     create_at: string,
+    token?: string,
 }
 
 export default function LoginPage() {
@@ -65,6 +66,7 @@ export default function LoginPage() {
             sessionStorage.setItem("user_id", data.user_id);
             sessionStorage.setItem("username", data.username);
             sessionStorage.setItem("email", data.email);
+            sessionStorage.setItem("token", data.token || "");
 
             setResult(data);
             setStatus("Connexion réussie ! Redirection...");

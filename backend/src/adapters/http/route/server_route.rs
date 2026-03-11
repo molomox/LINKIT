@@ -11,7 +11,11 @@ use crate::adapters::http::server::{
     update_member::update_members_handler as update_members_handler,
     update_server::update_server_handler as update_server_handler,
     join_by_invite::join_server_by_invite_handler as join_server_by_invite_handler,
-    kick_member::kick_member_handler as kick_member_handler
+    kick_member::kick_member_handler as kick_member_handler,
+    ban_member::ban_member_handler as ban_member_handler,
+    deban::deban_member_handler as deban_member_handler,
+    update_ban_member::update_ban_handler as update_ban_handler,
+    find_ban_by_id::get_ban_handler as get_ban_handler
 };
 use crate::adapters::websocket::AppState;
 

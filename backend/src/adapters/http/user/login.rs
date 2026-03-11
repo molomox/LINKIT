@@ -17,6 +17,7 @@ pub async fn login_user_handler(
         username: result.username,
         email: result.email,
         create_at: result.create_at,
+        token: result.token,
     };
     Ok(Json(response))
 }

@@ -33,39 +33,9 @@ export default function DashboardPage() {
 
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
-    const loadServers = async (userId: string) => {
-        console.log("🔵 Chargement des serveurs pour user_id:", userId);
-        try {
-            // Utiliser une requête GET sans body, ou POST avec les bonnes données
-            // Note: Le backend utilise GET mais fetch GET ne peut pas avoir de body
-            // On va utiliser les headers pour passer l'userId
-            const serversRes = await fetch(`${apiBase}/servers?user_id=${userId}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            console.log("🔵 Status serveurs:", serversRes.status);
-
-            if (serversRes.ok) {
-                const serversData = await serversRes.json();
-                console.log("✅ Serveurs chargés:", serversData);
-                setServers(serversData.map((server: ServerApiResponse) => ({
-                    id: server.server_id,
-                    name: server.name,
-                    memberCount: 0,
-                })));
-            } else {
-                const errorText = await serversRes.text();
-                console.error("🔴 Erreur chargement serveurs:", errorText);
-                setServers([]);
-            }
-        } catch (error) {
-            console.error("🔴 Erreur réseau serveurs:", error);
-            setServers([]);
-        }
-    };
-
     useEffect(() => {
+        let isMounted = true;
+
         const loadUserData = async () => {
             try {
                 // Récupérer l'user_id du sessionStorage
@@ -86,6 +56,8 @@ export default function DashboardPage() {
                     },
                 });
 
+                if (!isMounted) return;
+
                 if (userRes.ok) {
                     const userData = await userRes.json();
                     setUser({
@@ -105,17 +77,46 @@ export default function DashboardPage() {
                 }
 
                 // Charger les serveurs
-                await loadServers(userId);
+                console.log("🔵 [MOUNT] Chargement des serveurs pour user_id:", userId);
+                const serversRes = await fetch(`${apiBase}/servers?user_id=${userId}`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                if (!isMounted) return;
+
+                console.log("🔵 Status serveurs:", serversRes.status);
+
+                if (serversRes.ok) {
+                    const serversData = await serversRes.json();
+                    console.log("✅ Serveurs chargés:", serversData);
+                    setServers(serversData.map((server: ServerApiResponse) => ({
+                        id: server.server_id,
+                        name: server.name,
+                        memberCount: 0,
+                    })));
+                } else {
+                    const errorText = await serversRes.text();
+                    console.error("🔴 Erreur chargement serveurs:", errorText);
+                    setServers([]);
+                }
 
                 setLoading(false);
             } catch (error) {
                 console.error("Erreur lors du chargement:", error);
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
         loadUserData();
-    }, [apiBase, router, loadServers]);
+
+        return () => {
+            isMounted = false;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
