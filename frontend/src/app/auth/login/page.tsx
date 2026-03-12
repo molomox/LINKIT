@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 type LoginResponse = {
     username: string,
@@ -12,6 +13,7 @@ type LoginResponse = {
 
 export default function LoginPage() {
     const router = useRouter();
+    const { t } = useTranslation();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState<string | null>(null);
@@ -29,7 +31,7 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setStatus("Connexion en cours...");
+        setStatus(t.auth.loading);
         setResult(null);
 
         console.log("🔵 Envoi de la requête à:", `${apiBase}/user/login`);
@@ -50,11 +52,11 @@ export default function LoginPage() {
 
                 // Message d'erreur plus explicite
                 if (errText.includes("User not found")) {
-                    setStatus("❌ Utilisateur introuvable. Créez d'abord un compte !");
+                    setStatus(`❌ ${t.auth.invalidCredentials}`);
                 } else if (errText.includes("Wrong password")) {
-                    setStatus("❌ Mot de passe incorrect.");
+                    setStatus(`❌ ${t.auth.invalidCredentials}`);
                 } else {
-                    setStatus(`Erreur: ${errText}`);
+                    setStatus(`${t.error.generic}: ${errText}`);
                 }
                 return;
             }
@@ -69,12 +71,12 @@ export default function LoginPage() {
             sessionStorage.setItem("token", data.token || "");
 
             setResult(data);
-            setStatus("Connexion réussie ! Redirection...");
+            setStatus(t.auth.loginSuccess);
             setUsername("");
             setPassword("");
         } catch (error) {
             console.error("🔴 Erreur réseau:", error);
-            setStatus(`Erreur réseau: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+            setStatus(t.error.network.replace('{message}', error instanceof Error ? error.message : 'Unknown'));
         }
     };
 
@@ -137,7 +139,7 @@ export default function LoginPage() {
                                 letterSpacing: '0.05em'
                             }}
                         >
-                            LOGIN
+                            {t.auth.login}
                         </h1>
                         <div className="flex items-center justify-center gap-2 mb-2">
                             <div className="h-px w-8 bg-gradient-to-r from-transparent to-red-500" />
@@ -165,7 +167,7 @@ export default function LoginPage() {
                                     color: '#FFD700',
                                 }}
                             >
-                                USERNAME
+                                {t.auth.username}
                             </label>
                             <input
                                 id="username"
@@ -174,7 +176,7 @@ export default function LoginPage() {
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
                                 className="w-full px-4 py-3 border-l-4 bg-black/70 text-yellow-300 placeholder-gray-600 focus:border-l-yellow-400 focus:bg-black outline-none transition-all"
-                                placeholder="Enter username"
+                                placeholder={t.auth.username}
                                 style={{
                                     fontFamily: 'monospace',
                                     borderLeft: '4px solid #FFD700',
@@ -194,7 +196,7 @@ export default function LoginPage() {
                                     color: '#FFD700',
                                 }}
                             >
-                                PASSWORD
+                                {t.auth.password}
                             </label>
                             <input
                                 id="password"
@@ -226,7 +228,7 @@ export default function LoginPage() {
                                 clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
                             }}
                         >
-                            &gt;&gt; LOGIN &lt;&lt;
+                            {t.auth.loginButton}
                         </button>
                     </form>
 
@@ -244,7 +246,7 @@ export default function LoginPage() {
 
                     {result && (
                         <div className="mt-4 p-4 bg-yellow-950/30 border-l-4 border-yellow-400" style={{ fontFamily: 'monospace' }}>
-                            <h3 className="font-black text-yellow-400 mb-2 text-center uppercase text-sm tracking-wider">ACCESS GRANTED</h3>
+                            <h3 className="font-black text-yellow-400 mb-2 text-center uppercase text-sm tracking-wider">{t.auth.loginSuccess}</h3>
                             <div className="text-xs text-yellow-300 space-y-1 text-center">
                                 <p>User: <strong className="text-yellow-400">{result.username}</strong></p>
                                 <p className="text-gray-500">Redirecting...</p>
@@ -253,9 +255,9 @@ export default function LoginPage() {
                     )}
 
                     <div className="mt-6 text-center text-xs text-gray-500 font-bold uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                        Need an account?{" "}
+                        {t.auth.noAccount}{" "}
                         <a href="/register" className="text-yellow-400 hover:text-yellow-300 underline">
-                            Register
+                            {t.auth.createOne}
                         </a>
                     </div>
 

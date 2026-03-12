@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "@/i18n";
 import { RegisterResponse } from "./register.controller";
 
 type RegisterFormProps = {
@@ -28,6 +29,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     onSubmit,
     onNavigateToLogin,
 }) => {
+    const { t } = useTranslation();
+    
     return (
         <div className="relative flex items-center justify-center min-h-screen overflow-hidden" style={{ background: '#0a0a0a' }}>
             <style dangerouslySetInnerHTML={{
@@ -88,7 +91,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                             letterSpacing: '0.05em'
                         }}
                     >
-                        REGISTER
+                        {t.auth.signup}
                     </h1>
                     <div className="flex items-center justify-center gap-2 mb-2">
                         <div className="h-px w-8 bg-gradient-to-r from-transparent to-red-500" />
@@ -116,7 +119,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                                 color: '#FFD700',
                             }}
                         >
-                            USERNAME
+                            {t.auth.username}
                         </label>
                         <input
                             id="username"
@@ -126,7 +129,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                             required
                             disabled={isLoading}
                             className="w-full px-4 py-3 border-l-4 bg-black/70 text-yellow-300 placeholder-gray-600 focus:border-l-yellow-400 focus:bg-black outline-none transition-all disabled:opacity-50"
-                            placeholder="Enter username"
+                            placeholder={t.auth.username}
                             style={{
                                 fontFamily: 'monospace',
                                 borderLeft: '4px solid #FFD700',
@@ -146,7 +149,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                                 color: '#FFD700',
                             }}
                         >
-                            EMAIL
+                            {t.auth.email}
                         </label>
                         <input
                             id="email"
@@ -176,7 +179,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                                 color: '#FFD700',
                             }}
                         >
-                            PASSWORD
+                            {t.auth.password}
                         </label>
                         <input
                             id="password"
@@ -210,7 +213,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                             clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
                         }}
                     >
-                        {isLoading ? "LOADING..." : ">> REGISTER <<"}
+                        {isLoading ? t.common.loading : t.auth.signupButton}
                     </button>
                 </form>
 
@@ -228,21 +231,21 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
                 {result && (
                     <div className="mt-4 p-4 bg-yellow-950/30 border-l-4 border-yellow-400" style={{ fontFamily: 'monospace' }}>
-                        <h3 className="font-black text-yellow-400 mb-2 text-center uppercase text-sm tracking-wider">ACCESS GRANTED</h3>
+                        <h3 className="font-black text-yellow-400 mb-2 text-center uppercase text-sm tracking-wider">{t.auth.signupSuccess}</h3>
                         <div className="text-xs text-yellow-300 space-y-1 text-center">
                             <p>User: <strong className="text-yellow-400">{result.username}</strong></p>
-                            <p className="text-gray-500">Redirecting...</p>
+                            <p className="text-gray-500">{t.common.loading}</p>
                         </div>
                     </div>
                 )}
 
                 <div className="mt-6 text-center text-xs text-gray-500 font-bold uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                    Already registered?{" "}
+                    {t.auth.haveAccount}{" "}
                     <button
                         onClick={onNavigateToLogin}
                         className="text-yellow-400 hover:text-yellow-300 underline cursor-pointer"
                     >
-                        Login
+                        {t.auth.login}
                     </button>
                 </div>
 

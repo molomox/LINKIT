@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 import type { Server, Channel } from "../../../types";
 import type { WebSocketStatus } from "@/hooks/useWebSocket";
 
@@ -27,6 +28,7 @@ export default function ServerHeader({
     onShowDeleteModal,
 }: ServerHeaderProps) {
     const router = useRouter();
+    const { t } = useTranslation();
 
     return (
         <header className="border-b-2 border-yellow-400/30 bg-black/80 backdrop-blur-sm p-4 flex items-center justify-between">
@@ -36,11 +38,11 @@ export default function ServerHeader({
                     className="px-3 py-1 border-2 border-yellow-400/50 text-yellow-400 font-bold uppercase text-xs hover:bg-yellow-400 hover:text-black transition-all"
                     style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
                 >
-                    ← RETOUR
+                    {t.nav.back}
                 </button>
                 <div>
                     <h1 className="text-2xl font-black text-yellow-400 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                        {server?.name || "Serveur"}
+                        {server?.name || t.server.defaultName}
                     </h1>
                 </div>
             </div>
@@ -56,10 +58,10 @@ export default function ServerHeader({
                         'bg-gray-600'
                     }`} />
                     <span className="text-xs text-gray-400" style={{ fontFamily: 'monospace' }}>
-                        {wsStatus === 'connected' ? 'LIVE' :
-                         wsStatus === 'connecting' ? 'CONNECTING...' :
-                         wsStatus === 'error' ? 'ERROR' :
-                         'OFFLINE'}
+                        {wsStatus === 'connected' ? t.websocket.connected :
+                         wsStatus === 'connecting' ? t.websocket.connecting :
+                         wsStatus === 'error' ? t.websocket.error :
+                         t.websocket.disconnected}
                     </span>
                 </div>
                 <div className="text-yellow-400/70 text-sm" style={{ fontFamily: 'monospace' }}>
@@ -69,9 +71,9 @@ export default function ServerHeader({
                     onClick={onCopyInvite}
                     className="px-3 py-1 border-2 border-yellow-400/50 text-yellow-400 font-bold uppercase text-xs hover:bg-yellow-400 hover:text-black transition-all"
                     style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
-                    title="Copier le lien d'invitation"
+                    title={t.server.copyInviteTooltip}
                 >
-                    {copied ? "✓ COPIÉ" : "🔗 INVITER"}
+                    {copied ? t.server.inviteCopied : t.server.copyInvite}
                 </button>
 
                 {/* Bouton Quitter (pour membres et admins) */}
@@ -80,9 +82,9 @@ export default function ServerHeader({
                         onClick={onShowLeaveModal}
                         className="px-3 py-1 border-2 border-orange-400/50 text-orange-400 font-bold uppercase text-xs hover:bg-orange-400 hover:text-black transition-all"
                         style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
-                        title="Quitter le serveur"
+                        title={t.server.leaveTooltip}
                     >
-                        👋 QUITTER
+                        {t.server.quitButton}
                     </button>
                 )}
 
@@ -92,9 +94,9 @@ export default function ServerHeader({
                         onClick={onShowDeleteModal}
                         className="px-3 py-1 border-2 border-red-400/50 text-red-400 font-bold uppercase text-xs hover:bg-red-400 hover:text-black transition-all"
                         style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
-                        title="Supprimer le serveur"
+                        title={t.server.deleteTooltip}
                     >
-                        🗑️ SUPPRIMER
+                        {t.server.deleteButtonShort}
                     </button>
                 )}
             </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import type { Member } from "../../../types";
 import { getRoleColor } from "@/utils/roleColors";
 
@@ -8,6 +9,7 @@ interface MemberItemProps {
 }
 
 export default function MemberItem({ member, isOnline, onContextMenu }: MemberItemProps) {
+    const { t } = useTranslation();
     const couleur = getRoleColor(member.role_id);
 
     return (
@@ -44,7 +46,7 @@ export default function MemberItem({ member, isOnline, onContextMenu }: MemberIt
                             className="px-1.5 py-0.5 text-[9px] font-bold bg-red-900/50 text-red-400 border border-red-500 rounded uppercase tracking-wider"
                             style={{ fontFamily: 'monospace' }}
                         >
-                            BANNI
+                            {t.role.banned}
                         </span>
                     )}
                 </div>

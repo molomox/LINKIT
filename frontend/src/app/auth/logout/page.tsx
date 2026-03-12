@@ -1,10 +1,12 @@
     "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 export default function LogoutPage() {
     const router = useRouter();
-    const [status, setStatus] = useState<string>("Déconnexion en cours...");
+    const { t } = useTranslation();
+    const [status, setStatus] = useState<string>(t.auth.logout);
 
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -27,14 +29,14 @@ export default function LogoutPage() {
                 sessionStorage.removeItem("email");
                 sessionStorage.removeItem("token");
 
-                setStatus("Déconnexion réussie ! Redirection...");
+                setStatus(t.auth.logoutSuccess);
 
                 // Rediriger vers la page de login après 1 seconde
                 setTimeout(() => {
                     router.push("/auth/login");
                 }, 1000);
             } catch (error) {
-                console.error("Erreur lors de la déconnexion:", error);
+                console.error(t.error.generic, error);
 
                 // Même en cas d'erreur, nettoyer le sessionStorage
                 sessionStorage.removeItem("user_id");
@@ -42,7 +44,7 @@ export default function LogoutPage() {
                 sessionStorage.removeItem("email");
                 sessionStorage.removeItem("token");
 
-                setStatus("Déconnexion effectuée. Redirection...");
+                setStatus(t.auth.logoutComplete);
                 setTimeout(() => {
                     router.push("/auth/login");
                 }, 1000);
@@ -101,7 +103,7 @@ export default function LogoutPage() {
                         textShadow: '0 0 10px rgba(255, 215, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3)',
                         fontFamily: 'monospace'
                     }}>
-                    DÉCONNEXION
+                    {t.auth.logoutTitle}
                 </h1>
 
                 <p className="text-xl mb-8"

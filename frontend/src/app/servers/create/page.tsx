@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 type CreateServerResponse = {
     server_id: string;
@@ -10,6 +11,7 @@ type CreateServerResponse = {
 
 export default function CreateServerPage() {
     const router = useRouter();
+    const { t } = useTranslation();
     const [serverName, setServerName] = useState("");
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState<string | null>(null);
@@ -19,12 +21,12 @@ export default function CreateServerPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setStatus("Creating server...");
+        setStatus(t.common.loading);
         setLoading(true);
 
         const userId = sessionStorage.getItem("user_id");
         if (!userId) {
-            setStatus("Error: Not logged in");
+            setStatus(t.error.unauthorized);
             setLoading(false);
             return;
         }
@@ -47,21 +49,21 @@ export default function CreateServerPage() {
             if (!res.ok) {
                 const errText = await res.text();
                 console.error("🔴 Error:", errText);
-                setStatus(`Error: ${errText}`);
+                setStatus(`${t.error.generic}: ${errText}`);
                 setLoading(false);
                 return;
             }
 
             const data = (await res.json()) as CreateServerResponse;
             console.log("✅ Server created:", data);
-            setStatus("Server created! Redirecting...");
+            setStatus(t.server.created);
 
             setTimeout(() => {
                 router.push("/auth/me");
             }, 1500);
         } catch (error) {
             console.error("🔴 Network error:", error);
-            setStatus(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            setStatus(t.error.network.replace('{message}', error instanceof Error ? error.message : 'Unknown'));
             setLoading(false);
         }
     };
@@ -118,7 +120,7 @@ export default function CreateServerPage() {
                     className="mb-6 text-yellow-400 hover:text-yellow-300 font-bold text-xs uppercase flex items-center gap-2"
                     style={{ fontFamily: 'monospace' }}
                 >
-                    <span>&lt;&lt;</span> BACK TO DASHBOARD
+                    <span>&lt;&lt;</span> {t.nav.back}
                 </button>
 
                 {/* Header */}
@@ -135,7 +137,7 @@ export default function CreateServerPage() {
                             letterSpacing: '0.05em'
                         }}
                     >
-                        CREATE
+                        {t.server.create}
                     </h1>
                     <div className="flex items-center justify-center gap-2 mb-2">
                         <div className="h-px w-8 bg-gradient-to-r from-transparent to-red-500" />
@@ -164,7 +166,7 @@ export default function CreateServerPage() {
                                 color: '#FFD700',
                             }}
                         >
-                            SERVER NAME
+                            {t.server.name}
                         </label>
                         <input
                             id="serverName"
@@ -193,7 +195,7 @@ export default function CreateServerPage() {
                                 color: '#FFD700',
                             }}
                         >
-                            PASSWORD (OPTIONAL)
+                            {t.server.password}
                         </label>
                         <input
                             id="password"
@@ -211,7 +213,7 @@ export default function CreateServerPage() {
                             }}
                         />
                         <p className="mt-2 text-xs text-gray-500" style={{ fontFamily: 'monospace' }}>
-                            Leave empty for public server
+                            {t.server.password}
                         </p>
                     </div>
 
@@ -228,7 +230,7 @@ export default function CreateServerPage() {
                             clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
                         }}
                     >
-                        {loading ? "CREATING..." : "&gt;&gt; CREATE SERVER &lt;&lt;"}
+                        {loading ? t.common.loading : t.server.createButton}
                     </button>
                 </form>
 

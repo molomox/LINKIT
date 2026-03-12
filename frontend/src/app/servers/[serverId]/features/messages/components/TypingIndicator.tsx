@@ -1,10 +1,13 @@
 "use client";
+import { useTranslation } from "@/i18n";
 
 type TypingIndicatorProps = {
     typingUsers: Set<string>;
 };
 
 export default function TypingIndicator({ typingUsers }: TypingIndicatorProps) {
+    const { t } = useTranslation();
+    
     if (typingUsers.size === 0) return null;
 
     return (
@@ -16,7 +19,10 @@ export default function TypingIndicator({ typingUsers }: TypingIndicatorProps) {
                     <span className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
                 <span className="text-yellow-400/70 text-xs" style={{ fontFamily: 'monospace' }}>
-                    {Array.from(typingUsers).join(', ')} {typingUsers.size > 1 ? 'sont' : 'est'} en train d'écrire...
+                    {typingUsers.size > 1 
+                        ? t.message.typingMultiple.replace('{users}', Array.from(typingUsers).join(', '))
+                        : t.message.typing.replace('{users}', Array.from(typingUsers).join(', '))
+                    }
                 </span>
             </div>
         </div>

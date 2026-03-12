@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useTranslation } from "@/i18n";
 import { useWebSocket, type WsMessage } from "@/hooks/useWebSocket";
 import { useServerWebSocket } from "@/hooks/useServerWebSocket";
 import type { Message } from "./types";
@@ -24,6 +25,7 @@ import * as messageActions from "./utils/messageActions";
 export default function ServerPage() {
     const router = useRouter();
     const params = useParams();
+    const { t } = useTranslation();
     const serverId = params.serverId as string;
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -123,7 +125,7 @@ export default function ServerPage() {
         setSending(true);
         try {
             const userId = sessionStorage.getItem("user_id");
-            const username = sessionStorage.getItem("username") || "Utilisateur";
+            const username = sessionStorage.getItem("username") || "User";
 
             if (isConnected) {
                 const wsMessage: WsMessage = {
@@ -153,7 +155,7 @@ export default function ServerPage() {
                 }
             }
         } catch (error) {
-            console.error("Erreur envoi message:", error);
+            console.error(t.error.network, error);
         } finally {
             setSending(false);
         }
@@ -164,7 +166,7 @@ export default function ServerPage() {
 
         if (isConnected && selectedChannel) {
             const userId = sessionStorage.getItem("user_id");
-            const username = sessionStorage.getItem("username") || "Utilisateur";
+            const username = sessionStorage.getItem("username") || "User";
 
             if (typingTimeoutRef.current) {
                 clearTimeout(typingTimeoutRef.current);
@@ -206,7 +208,7 @@ export default function ServerPage() {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (error) {
-            console.error("Erreur lors de la copie:", error);
+            console.error(t.error.generic, error);
         }
     };
 
@@ -225,7 +227,7 @@ export default function ServerPage() {
 
     const handleDeleteServer = async () => {
         if (deleteConfirmName !== server?.name) {
-            alert("Le nom du serveur ne correspond pas.");
+            alert(t.server.deleteNameMismatch);
             return;
         }
         setActionLoading(true);
@@ -233,7 +235,7 @@ export default function ServerPage() {
             await serverActions.deleteServer(serverId, apiBase);
             router.push("/auth/me");
         } catch (error) {
-            alert(`Erreur: ${error}`);
+            alert(`${t.error.generic}: ${error}`);
         } finally {
             setActionLoading(false);
             setShowDeleteModal(false);
@@ -247,7 +249,7 @@ export default function ServerPage() {
             await messageActions.deleteMessage(messageId, apiBase);
             setMessages((prev) => prev.filter(m => m.message_id !== messageId));
         } catch (error) {
-            alert(`Erreur: ${error}`);
+            alert(`${t.error.generic}: ${error}`);
         }
     };
 
@@ -260,7 +262,7 @@ export default function ServerPage() {
                 )
             );
         } catch (error) {
-            alert(`Erreur: ${error}`);
+            alert(`${t.error.generic}: ${error}`);
         }
     };
 
@@ -269,7 +271,7 @@ export default function ServerPage() {
         try {
             const token = sessionStorage.getItem('token');
             if (!token) {
-                alert('Vous devez être connecté pour supprimer un channel');
+                alert(t.error.unauthorized);
                 return;
             }
 
@@ -282,15 +284,15 @@ export default function ServerPage() {
 
             if (!res.ok) {
                 const errText = await res.text();
-                alert(`Erreur lors de la suppression : ${errText}`);
+                alert(`${t.error.deleteFailed}: ${errText}`);
                 return;
             }
 
             console.log(`✅ Channel #${channelName} supprimé avec succès`);
             // Le WebSocket mettra à jour automatiquement la liste des channels via useServerEvents
         } catch (error) {
-            console.error('Erreur:', error);
-            alert('Erreur lors de la suppression du channel');
+            console.error(t.error.generic, error);
+            alert(t.error.deleteFailed.replace('{message}', 'channel'));
         }
     };
 
@@ -299,7 +301,7 @@ export default function ServerPage() {
             <div className="flex items-center justify-center min-h-screen" style={{ background: '#0a0a0a' }}>
                 <div className="text-center">
                     <div className="text-yellow-400 text-2xl font-black mb-4" style={{ fontFamily: 'monospace' }}>
-                        CHARGEMENT...
+                        {t.common.loading}
                     </div>
                     <div className="w-64 h-1 bg-gray-800 overflow-hidden">
                         <div className="h-full bg-yellow-400 animate-pulse" style={{ width: '50%' }}></div>
@@ -376,10 +378,10 @@ export default function ServerPage() {
                             <div className="flex items-center justify-center h-full">
                                 <div className="text-center">
                                     <div className="text-yellow-400/50 text-xl font-bold mb-2" style={{ fontFamily: 'monospace' }}>
-                                        Aucun message
+                                        {t.message.noMessages}
                                     </div>
                                     <p className="text-gray-600 text-sm" style={{ fontFamily: 'monospace' }}>
-                                        Soyez le premier à écrire !
+                                        {t.message.firstMessage}
                                     </p>
                                 </div>
                             </div>

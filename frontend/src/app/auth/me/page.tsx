@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 type UserProfile = {
     username: string;
@@ -25,6 +26,7 @@ type ServerApiResponse = {
 
 export default function DashboardPage() {
     const router = useRouter();
+    const { t } = useTranslation();
     const [user, setUser] = useState<UserProfile | null>(null);
     const [servers, setServers] = useState<Server[]>([]);
     const [loading, setLoading] = useState(true);
@@ -162,7 +164,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-center min-h-screen" style={{ background: '#0a0a0a' }}>
                 <div className="text-center">
                     <div className="text-yellow-400 text-2xl font-black mb-4" style={{ fontFamily: 'monospace' }}>
-                        LOADING...
+                        {t.common.loading}
                     </div>
                     <div className="w-64 h-1 bg-gray-800 overflow-hidden">
                         <div className="h-full bg-yellow-400 animate-pulse" style={{ width: '50%' }}></div>
@@ -221,21 +223,21 @@ export default function DashboardPage() {
                                 className="px-4 py-2 border-2 border-yellow-400 text-yellow-400 font-bold uppercase text-xs tracking-wider hover:bg-yellow-400 hover:text-black transition-all"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                             >
-                                + CREATE SERVER
+                                {t.server.createButton}
                             </button>
                             <button
                                 onClick={() => setShowJoinModal(true)}
                                 className="px-4 py-2 border-2 border-green-400 text-green-400 font-bold uppercase text-xs tracking-wider hover:bg-green-400 hover:text-black transition-all"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                             >
-                                JOIN SERVER
+                                {t.server.joinButton}
                             </button>
                             <button
                                 onClick={handleLogout}
                                 className="px-4 py-2 border-2 border-red-500 text-red-500 font-bold uppercase text-xs tracking-wider hover:bg-red-500 hover:text-black transition-all"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                             >
-                                &gt;&gt; LOGOUT
+                                {t.auth.logoutButton}
                             </button>
                         </div>
                     </div>
@@ -250,7 +252,7 @@ export default function DashboardPage() {
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-1 h-6 bg-yellow-400"></div>
                                     <h2 className="text-2xl font-black text-yellow-400 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                                        YOUR SERVERS
+                                        {t.dashboard.serversTitle}
                                     </h2>
                                 </div>
                                 <div className="h-px bg-gradient-to-r from-yellow-400 via-yellow-400/50 to-transparent"></div>
@@ -261,14 +263,14 @@ export default function DashboardPage() {
                                     style={{ clipPath: "polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px))" }}
                                 >
                                     <div className="text-gray-500 font-bold uppercase text-sm mb-4" style={{ fontFamily: 'monospace' }}>
-                                        NO SERVERS FOUND
+                                        {t.dashboard.noServers}
                                     </div>
                                     <button
                                         onClick={handleCreateServer}
                                         className="px-6 py-3 border-2 border-yellow-400 text-yellow-400 font-black uppercase hover:bg-yellow-400 hover:text-black transition-all"
                                         style={{ fontFamily: 'monospace' }}
                                     >
-                                        + CREATE SERVER
+                                        {t.server.createButton}
                                     </button>
                                 </div>
                             ) : (
@@ -295,7 +297,7 @@ export default function DashboardPage() {
                                                 {server.name}
                                             </h3>
                                             <div className="text-xs text-gray-500 font-bold uppercase" style={{ fontFamily: 'monospace' }}>
-                                                {server.memberCount} MEMBERS
+                                                {server.memberCount} {t.member.members}
                                             </div>
                                         </div>
                                     ))}
@@ -309,7 +311,7 @@ export default function DashboardPage() {
                                         <div className="text-center">
                                             <div className="text-4xl text-gray-700 mb-2 font-black">+</div>
                                             <div className="text-xs text-gray-600 font-bold uppercase" style={{ fontFamily: 'monospace' }}>
-                                                ADD SERVER
+                                                {t.server.addServer}
                                             </div>
                                         </div>
                                     </div>
@@ -332,7 +334,7 @@ export default function DashboardPage() {
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-1 h-4 bg-yellow-400"></div>
                                         <h3 className="text-xs font-black text-yellow-400 uppercase tracking-widest" style={{ fontFamily: 'monospace' }}>
-                                            USER PROFILE
+                                            {t.dashboard.profile}
                                         </h3>
                                     </div>
                                 </div>
@@ -356,7 +358,7 @@ export default function DashboardPage() {
                                     {/* Username */}
                                     <div className="mb-4">
                                         <div className="text-xs text-gray-500 font-bold uppercase mb-1 tracking-wider" style={{ fontFamily: 'monospace' }}>
-                                            USERNAME
+                                            {t.auth.username}
                                         </div>
                                         <div className="text-yellow-300 font-black text-lg uppercase tracking-wide" style={{ fontFamily: 'monospace' }}>
                                             {user?.username}
@@ -366,7 +368,7 @@ export default function DashboardPage() {
                                     {/* Email */}
                                     <div className="mb-4">
                                         <div className="text-xs text-gray-500 font-bold uppercase mb-1 tracking-wider" style={{ fontFamily: 'monospace' }}>
-                                            EMAIL
+                                            {t.auth.email}
                                         </div>
                                         <div className="text-yellow-300/80 font-bold text-sm break-all" style={{ fontFamily: 'monospace' }}>
                                             {user?.email}
@@ -377,7 +379,7 @@ export default function DashboardPage() {
                                     {/* Member Since */}
                                     <div className="mb-6">
                                         <div className="text-xs text-gray-500 font-bold uppercase mb-1 tracking-wider" style={{ fontFamily: 'monospace' }}>
-                                            MEMBER SINCE
+                                            {t.dashboard.memberSince}
                                         </div>
                                         <div className="text-yellow-300/80 font-bold text-sm" style={{ fontFamily: 'monospace' }}>
                                             {user?.create_at && formatDate(user.create_at)}
@@ -394,7 +396,7 @@ export default function DashboardPage() {
                                                 {servers.length}
                                             </div>
                                             <div className="text-xs text-gray-500 font-bold uppercase" style={{ fontFamily: 'monospace' }}>
-                                                SERVERS
+                                                {t.server.servers}
                                             </div>
                                         </div>
                                     </div>
@@ -426,14 +428,14 @@ export default function DashboardPage() {
                                 <div className="flex items-center gap-2 mb-4">
                                     <div className="w-1 h-6 bg-green-400"></div>
                                     <h2 className="text-2xl font-black text-green-400 uppercase" style={{ fontFamily: 'monospace' }}>
-                                        JOIN SERVER
+                                        {t.server.join}
                                     </h2>
                                 </div>
                                 <div className="h-px bg-green-400/30"></div>
                             </div>
 
                             <p className="text-gray-400 text-sm mb-6" style={{ fontFamily: 'monospace' }}>
-                                Enter an invite link to join a server
+                                {t.server.enterInvite}
                             </p>
 
                             <input
@@ -457,7 +459,7 @@ export default function DashboardPage() {
                                     className="flex-1 py-3 border-2 border-green-400 bg-green-400 text-black font-black uppercase text-xs hover:bg-green-500 hover:border-green-500 transition-all"
                                     style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                                 >
-                                    JOIN
+                                    {t.server.joinButton}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -467,7 +469,7 @@ export default function DashboardPage() {
                                     className="flex-1 py-3 border-2 border-gray-600 text-gray-400 font-black uppercase text-xs hover:bg-gray-600 hover:text-white transition-all"
                                     style={{ fontFamily: 'monospace' }}
                                 >
-                                    CANCEL
+                                    {t.common.cancel}
                                 </button>
                             </div>
                         </div>

@@ -1,10 +1,12 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslation } from "@/i18n";
 
 export default function InvitePage() {
     const params = useParams();
     const router = useRouter();
+    const { t } = useTranslation();
     const inviteCode = params.inviteCode as string;
 
     const [joining, setJoining] = useState(false);
@@ -40,7 +42,7 @@ export default function InvitePage() {
             // Rediriger vers le serveur rejoint
             router.push(`/servers/${data.server.server_id}`);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Erreur réseau");
+            setError(err instanceof Error ? err.message : t.error.network.replace('{message}', 'Unknown'));
             setJoining(false);
         }
     };
@@ -78,17 +80,17 @@ export default function InvitePage() {
                         </div>
                         <h1 className="text-3xl font-black text-yellow-400 uppercase tracking-wider mb-2"
                             style={{ fontFamily: 'monospace' }}>
-                            INVITATION
+                            {t.server.join}
                         </h1>
                         <div className="w-16 h-1 bg-yellow-400 mx-auto mb-4"></div>
                         <p className="text-gray-400 text-sm" style={{ fontFamily: 'monospace' }}>
-                            Vous avez été invité à rejoindre un serveur
+                            {t.server.enterInvite}
                         </p>
                     </div>
 
                     <div className="mb-6 p-4 bg-yellow-400/10 border-l-4 border-yellow-400">
                         <div className="text-xs text-gray-500 uppercase tracking-wider mb-1" style={{ fontFamily: 'monospace' }}>
-                            CODE D&apos;INVITATION
+                            {t.server.inviteCode}
                         </div>
                         <div className="text-yellow-400 font-bold break-all" style={{ fontFamily: 'monospace' }}>
                             {inviteCode}
@@ -115,7 +117,7 @@ export default function InvitePage() {
                             clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
                         }}
                     >
-                        {joining ? "CONNEXION..." : ">> REJOINDRE LE SERVEUR <<"}
+                        {joining ? t.common.loading : t.server.joinButton}
                     </button>
 
                     <div className="mt-6 text-center">
@@ -124,7 +126,7 @@ export default function InvitePage() {
                             className="text-gray-500 text-xs uppercase hover:text-yellow-400 transition-colors"
                             style={{ fontFamily: 'monospace' }}
                         >
-                            ← Retour au dashboard
+                            ← {t.nav.back}
                         </button>
                     </div>
                 </div>
