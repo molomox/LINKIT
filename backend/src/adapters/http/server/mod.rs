@@ -14,3 +14,4 @@ pub mod ban_member;
 pub mod deban;
 pub mod update_ban_member;
 pub mod find_ban_by_id;
+pub mod cleanup_expired_bans;

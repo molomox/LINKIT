@@ -18,18 +18,44 @@ pub async fn deban_member_handler(
     Path((server_id, target_user_id)):Path<(String, String)>
 ) ->  Result<Json<(String)>, ApiError> {
     let target_user_id_clone = target_user_id.clone();
+    let target_user_id_for_username = target_user_id.clone();
     let server_id_clone = server_id.clone();
 
     tokio::task::spawn_blocking(move || {
         let repo = crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
-        let usecase = Deban{repo: &repo};
+        let member_repo = PostgresMemberRepo;
+        let usecase = Deban{
+            repo: &repo,
+            member_repo: &member_repo,
+        };
         usecase.execute(target_user_id_clone,server_id_clone)
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
-    .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
+    .map_err(|e| ApiError::BadRequest(format!("Failed to deban member: {}", e)))?;
     
-    Ok(Json("le membre a été bannis".to_string()))
+    // Broadcaster l'événement member_role_changed pour mettre à jour l'interface
+    let username = tokio::task::spawn_blocking(move || {
+        let user_repo = PostgresUserRepo;
+        user_repo.find_by_id(target_user_id_for_username)
+            .map(|user| user.username)
+            .unwrap_or_else(|_| "Utilisateur".to_string())
+    })
+    .await
+    .unwrap_or_else(|_| "Utilisateur".to_string());
+
+    state.broadcast_to_server(
+        &server_id,
+        WsMessage::MemberRoleChanged {
+            user_id: target_user_id,
+            username,
+            role_id: "role02".to_string(),
+            role_name: "Membre".to_string(),
+            server_id: server_id.clone(),
+        },
+    ).await;
+    
+    Ok(Json("Le membre a été débanni".to_string()))
 }
 
 

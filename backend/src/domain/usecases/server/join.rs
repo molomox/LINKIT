@@ -1,15 +1,17 @@
 use crate::domain::ports::member_repository::MemberRepository;
 use crate::domain::ports::role_repository::RoleRepository;
 use crate::domain::ports::server_repository::ServerRepository;
+use crate::domain::ports::ban_repository::BanRepository;
 use crate::domain::entities::role::{self, Role};
 use crate::domain::entities::member::Member;
-use chrono::Utc;
+use chrono::{Utc, DateTime};
 use crate::domain::entities::user::User;
 
 pub struct JoinServer<'a>{
     pub repo: &'a dyn ServerRepository,
     pub repo2: &'a dyn MemberRepository,
     pub repo3: &'a dyn RoleRepository,
+    pub ban_repo: &'a dyn BanRepository,
 }
 
 impl<'a> JoinServer<'a> {
@@ -34,6 +36,35 @@ impl<'a> JoinServer<'a> {
         if server.password != password{
             return Err("Mauvais mot de passe".to_string());
         }
+
+        // Vérifier si l'utilisateur est banni
+        match self.ban_repo.find_by_user_and_server(user_id.clone(), server_id.clone()) {
+            Ok(ban) => {
+                // Vérifier si le ban est actif (pas expiré)
+                if let Ok(expired_at) = DateTime::parse_from_rfc3339(&ban.expired_at) {
+                    let now = Utc::now();
+                    if expired_at.with_timezone(&Utc) > now {
+                        // Ban toujours actif
+                        return Err(format!(
+                            "Vous êtes banni de ce serveur jusqu'au {}. Raison: {}",
+                            expired_at.format("%d/%m/%Y %H:%M"),
+                            ban.reason
+                        ));
+                    } else {
+                        // Ban expiré, le supprimer automatiquement
+                        println!("🔓 Ban expiré détecté lors du rejoin, suppression automatique...");
+                        if let Err(e) = self.ban_repo.deban(user_id.clone(), server_id.clone()) {
+                            eprintln!("⚠️ Échec suppression ban expiré: {}", e);
+                        }
+                        // Continuer le processus de join
+                    }
+                }
+            },
+            Err(_) => {
+                // Pas de ban trouvé, on peut continuer
+            }
+        }
+
         let join_at = Utc::now().to_string();
         let member = Member{
             user: User{

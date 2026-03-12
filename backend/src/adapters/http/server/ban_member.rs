@@ -25,7 +25,7 @@ pub async fn ban_member_handler(
     let target_user_id_clone = target_user_id.clone();
     let server_id_clone = server_id.clone();
 
-    tokio::task::spawn_blocking(move || {
+    let ban = tokio::task::spawn_blocking(move || {
         let repo = PostgresBanRepo;
         let member_repo = PostgresMemberRepo;
         let user_repo = PostgresUserRepo;
@@ -38,7 +38,28 @@ pub async fn ban_member_handler(
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
-    .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
+    .map_err(|e| ApiError::BadRequest(format!("Failed to ban member: {}", e)))?;
+
+    // Récupérer le username de l'utilisateur banni
+    let username = tokio::task::spawn_blocking(move || {
+        let user_repo = PostgresUserRepo;
+        user_repo.find_by_id(target_user_id.clone())
+            .map(|user| user.username)
+            .unwrap_or_else(|_| "Utilisateur".to_string())
+    })
+    .await
+    .unwrap_or_else(|_| "Utilisateur".to_string());
+
+    // Broadcaster le bannissement à tous les membres du serveur
+    state.broadcast_to_server(
+        &server_id,
+        WsMessage::MemberBanned {
+            user_id: ban.bannished_user_id.clone(),
+            username,
+            server_id: server_id.clone(),
+            reason: ban.reason.clone(),
+        },
+    ).await;
     
     Ok(Json("le membre a été bannis".to_string()))
 }
