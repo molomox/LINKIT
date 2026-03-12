@@ -36,6 +36,7 @@ services:
       - app-network
     volumes:
     - pgadmin_data:/var/lib/pgadmin
+    
   # Backend Rust
   backend:
     container_name: linkyt-backend
@@ -64,6 +65,30 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+  # # Backend Rust
+  # backend:
+  #   container_name: linkyt-backend
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     # Configuration de la base de données
+  #     - DATABASE_URL=postgres://postgres:postgres@db:5432/mydb
+  #     - RUST_LOG=info
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   networks:
+  #     - app-network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "nc", "-z", "localhost", "3000"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
 
   # Frontend Next.js
   frontend:
