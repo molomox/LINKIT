@@ -19,22 +19,22 @@ pub async fn update_ban_member_handler(
     State(state): State<AppState>,
     Path((server_id, target_user_id)):Path<(String, String)>,
     Json(payload): Json<UpdateBanMemberRequest>,
-) ->  Result<Json<String>, ApiError> {
+) ->  Result<Json<Ban>, ApiError> {
     let reason = payload.reason.clone();
-    let expirate_at = payload.expirate_at.clone();
+    let expired_at = payload.expired_at.clone();
     let target_user_id_clone = target_user_id.clone();
     let server_id_clone = server_id.clone();
 
-    tokio::task::spawn_blocking(move || {
+    let ban = tokio::task::spawn_blocking(move || {
         let repo = PostgresBanRepo;
         let usecase = UpdateBan{repo: &repo};
-        usecase.execute(target_user_id_clone,server_id_clone,reason,expirate_at)
+        usecase.execute(target_user_id_clone,server_id_clone,reason,expired_at)
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
     .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
     
-    return Ok(Json("le membre a été bannis".to_string()));
+    return Ok(Json(ban));
 }
 
 
