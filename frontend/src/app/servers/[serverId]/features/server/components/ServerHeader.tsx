@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import type { Server, Channel } from "../../../types";
 import type { WebSocketStatus } from "@/hooks/useWebSocket";
 
@@ -57,16 +58,11 @@ export default function ServerHeader({
                         wsStatus === 'error' ? 'bg-red-400' :
                         'bg-gray-600'
                     }`} />
-                    <span className="text-xs text-gray-400" style={{ fontFamily: 'monospace' }}>
-                        {wsStatus === 'connected' ? t.websocket.connected :
-                         wsStatus === 'connecting' ? t.websocket.connecting :
-                         wsStatus === 'error' ? t.websocket.error :
-                         t.websocket.disconnected}
-                    </span>
                 </div>
                 <div className="text-yellow-400/70 text-sm" style={{ fontFamily: 'monospace' }}>
                     {selectedChannel ? `# ${selectedChannel.name}` : ""}
                 </div>
+                <LanguageSwitcher />
                 <button
                     onClick={onCopyInvite}
                     className="px-3 py-1 border-2 border-yellow-400/50 text-yellow-400 font-bold uppercase text-xs hover:bg-yellow-400 hover:text-black transition-all"

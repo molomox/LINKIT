@@ -2,12 +2,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
-
-type CreateChannelResponse = {
-    channel_id: string;
-    name: string;
-    server_id: string;
-};
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function CreateChannelPage() {
     const params = useParams();
@@ -17,7 +12,6 @@ export default function CreateChannelPage() {
 
     const [name, setName] = useState("");
     const [status, setStatus] = useState<string | null>(null);
-    const [result, setResult] = useState<CreateChannelResponse | null>(null);
     const [loading, setLoading] = useState(false);
 
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
@@ -25,7 +19,6 @@ export default function CreateChannelPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus(null);
-        setResult(null);
         setLoading(true);
 
         try {
@@ -42,8 +35,6 @@ export default function CreateChannelPage() {
                 return;
             }
 
-            const data = (await res.json()) as CreateChannelResponse;
-            setResult(data);
             setStatus(t.channel.created);
             setName("");
 
@@ -60,6 +51,11 @@ export default function CreateChannelPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0a' }}>
+            {/* Sélecteur de langue */}
+            <div className="fixed top-4 right-4 z-50">
+                <LanguageSwitcher />
+            </div>
+            
             <style dangerouslySetInnerHTML={{
                 __html: `
                     @keyframes glitch {
@@ -158,29 +154,6 @@ export default function CreateChannelPage() {
                             </p>
                         </div>
 
-                        {/* Détails du résultat */}
-                        {result && (
-                            <div className="border-2 border-green-400 bg-green-400/10 p-4"
-                                style={{ clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}>
-                                <div className="text-green-400 font-bold mb-3 uppercase text-sm" style={{ fontFamily: 'monospace' }}>
-                                    <span className="text-green-400">▶</span> {t.channel.created}
-                                </div>
-                                <div className="space-y-2 text-sm" style={{ fontFamily: 'monospace' }}>
-                                    <div className="flex gap-2">
-                                        <span className="text-gray-500">ID:</span>
-                                        <span className="text-green-400">{result.channel_id}</span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <span className="text-gray-500">NOM:</span>
-                                        <span className="text-green-400">#{result.name}</span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <span className="text-gray-500">SERVEUR:</span>
-                                        <span className="text-green-400">{result.server_id}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
 
                         {/* Boutons d'action */}
                         <div className="flex gap-4 pt-4">

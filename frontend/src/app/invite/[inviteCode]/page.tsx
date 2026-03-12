@@ -2,6 +2,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function InvitePage() {
     const params = useParams();
@@ -49,6 +50,11 @@ export default function InvitePage() {
 
     return (
         <div className="relative flex items-center justify-center min-h-screen overflow-hidden" style={{ background: '#0a0a0a' }}>
+            {/* Sélecteur de langue */}
+            <div className="fixed top-4 right-4 z-50">
+                <LanguageSwitcher />
+            </div>
+            
             <style dangerouslySetInnerHTML={{
                 __html: `
                     @keyframes glitch {
