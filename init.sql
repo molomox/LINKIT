@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS messages (
     content TEXT NOT NULL,
     channel_id VARCHAR(36) NOT NULL,
     user_id VARCHAR(36) NOT NULL,
-    create_at VARCHAR(255) NOT NULL 
+    create_at VARCHAR(255) NOT NULL,
+    IS_GIF BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS roles (
@@ -60,6 +61,29 @@ CREATE TABLE IF NOT EXISTS servers (
     invite_code VARCHAR(36) NOT NULL UNIQUE
 );
 
+CREATE TABLE IF NOT EXISTS reaction (
+    reaction_id int PRIMARY KEY,
+    emoji VARCHAR(36) NOT NULL,
+    nom_reaction VARCHAR(36) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS reagi (
+    reaction_id int NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    message_id VARCHAR(36) NOT NULL
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (message_id) REFERENCES messages(message_id)
+    FOREIGN KEY (reaction_id) REFERENCES reaction(reaction_id)
+);
+
+CREATE TABLE IF NOT EXISTS channel_dm (
+    channel_id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    user2_id VARCHAR(36) NOT NULL
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user2_id) REFERENCES users(user_id)
+);
+
 INSERT INTO servers (name, server_id, password, create_at, invite_code) VALUES
 ('Alice', 'ag5y8iplo04rf3c', 'alice_password', '2023-01-01', 'INVITE-ALICE-2023'),
 ('Bob', 'po90kE34scz1bnH87', 'bob_password', '2023-01-01', 'INVITE-BOB-2023');
@@ -82,9 +106,17 @@ INSERT INTO members (user_id, server_id, role_id,join_at) VALUES
 ('idnum01', 'po90kE34scz1bnH87', 'role04', '2023-01-01'),
 ('idnum01', 'ag5y8iplo04rf3c', 'role02', '2023-01-01');
 
-INSERT INTO messages (message_id, content, channel_id, user_id, create_at) VALUES
-('message1', 'hello world', 'channel1','idnum01', '2023-01-01'),
-('message2', 'hello world 2', 'channel1','idnum01', '2023-01-01');
+INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GIF) VALUES
+('message1', 'hello world', 'channel1','idnum01', '2023-01-01',false),
+('message2', 'hello world 2', 'channel1','idnum01', '2023-01-01',false),
+('message3', 'hello world 3', 'channel1','idnum01', '2023-01-01',false),
+('message4', 'hello world 4', 'channel1','idnum01', '2023-01-01',false),
+('message5', 'hello world 5', 'channel1','idnum01', '2023-01-01',false),
+('message6', 'hello world 6', 'channel1','idnum01', '2023-01-01',false),
+('message7', 'hello world 7', 'channel1','idnum01', '2023-01-01',false),
+('message8', 'hello world 8', 'channel1','idnum01', '2023-01-01',false),
+('message9', 'hello world 9', 'channel1','idnum01', '2023-01-01',false),
+('message10', 'hello world 10', 'channel1','idnum01', '2023-01-01',false);
 
 -- Vue pour récupérer les messages avec les informations des utilisateurs (PostgreSQL)
 CREATE OR REPLACE VIEW view_messages AS
