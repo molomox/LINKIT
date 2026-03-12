@@ -8,8 +8,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: mydb
-    ports:
-      - "5123:5432"
+    expose:
+      - "5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -21,6 +21,21 @@ services:
       timeout: 5s
       retries: 5
 
+  # PGAdmin
+  pgadmin:
+    container_name: mypgadmin
+    image: dpage/pgadmin4
+    ports:
+    - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: SuperSecret
+    depends_on:
+      - db
+    networks:
+      - app-network
+    volumes:
+    - pgadmin_data:/var/lib/pgadmin
   # Backend Rust
   backend:
     container_name: linkyt-backend
@@ -76,5 +91,7 @@ networks:
     driver: bridge
 
 volumes:
+  pgadmin_data:
+    driver: local
   pgdata:
     driver: local
