@@ -8,6 +8,7 @@ use crate::domain::usecases::ban::save::CreateBan;
 use axum::extract::{Path, State};
 use crate::adapters::http::error::ApiError;
 use crate::adapters::websocket::{AppState, WsMessage};
+use crate::adapters::http::server::response::BanMemberRequest as OtherBanMemberRequest;
 use crate::adapters::http::server::response::BanMemberRequest;
 use axum::Json;
 use serde::Deserialize;
