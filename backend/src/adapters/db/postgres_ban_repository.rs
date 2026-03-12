@@ -76,6 +76,6 @@ impl BanRepository for PostgresBanRepo{
     fn deban(&self, user_id: String, server_id: String) -> Result<String, String> {
         let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
         client.execute("DELETE FROM bans WHERE bannished_user_id = $1 AND server_id = $2", &[&user_id, &server_id]).map_err(|e| e.to_string())?;
-        Ok(user_id)
+        Ok("deban successful".to_string())
     }
 }
