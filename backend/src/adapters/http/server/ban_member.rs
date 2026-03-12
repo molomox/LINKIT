@@ -8,7 +8,7 @@ use crate::domain::usecases::ban::save::CreateBan;
 use axum::extract::{Path, State};
 use crate::adapters::http::error::ApiError;
 use crate::adapters::websocket::{AppState, WsMessage};
-use crate::adapters::http::server::response::BanMemberRequest;
+use crate::adapters::http::server::response::BanMemberRequest as OtherBanMemberRequest;
 use axum::Json;
 use serde::Deserialize;
 use crate::domain::entities::ban::Ban;
@@ -18,23 +18,26 @@ pub async fn ban_member_handler(
     State(state): State<AppState>,
     Path((server_id, target_user_id)):Path<(String, String)>,
     Json(payload): Json<BanMemberRequest>,
-) ->  Result<Json<(String)>, ApiError> {
-    let banner_user_id = payload.banner_user_id.clone();
-    let reason = payload.reason.clone();
-    let expired_at = payload.expired_at.clone();
-    let target_user_id_clone = target_user_id.clone();
+) ->  Result<Json<Ban>, ApiError> {
+    let banner_user_id = payload.banner_user_id;
+    let reason = payload.reason;
+    let expired_at = payload.expired_at;
+    let expired_at_clone = expired_at.clone();
+    let banner_user_id_clone = banner_user_id.clone();
+    let reason_clone = reason.clone();
     let server_id_clone = server_id.clone();
+    let target_user_id_clone = target_user_id.clone();
 
     let ban = tokio::task::spawn_blocking(move || {
         let repo = PostgresBanRepo;
         let member_repo = PostgresMemberRepo;
         let user_repo = PostgresUserRepo;
         let usecase = CreateBan{
-            repo: &repo,
-            member_repo: &member_repo,
-            user_repo: &user_repo,
+            repo: repo:&repo,
+            member_repo: member_repo:&member_repo,
+            user_repo: user_repo:&user_repo,
         };
-        usecase.execute(target_user_id_clone,server_id_clone,reason,banner_user_id,expired_at)
+        usecase.execute(target_user_id_clone,server_id_clone,reason_clone,banner_user_id_clone,expired_at_clone)
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
