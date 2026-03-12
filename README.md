@@ -8,6 +8,35 @@ POC DB : https://docs.google.com/document/d/1pOV15IExMksgI6ahP3ud8PW_Hh4x59o8UUh
 ---
 ## 🚀 Démarrage Rapide
 
+### Configuration des Variables d'Environnement
+
+**⚠️ OBLIGATOIRE** : Le projet nécessite un fichier `.env` pour fonctionner. Un fichier `.env` par défaut est déjà créé à la racine.
+
+**🔐 SÉCURITÉ IMPORTANTE :**
+- Le code ne contient **AUCUNE valeur par défaut** pour les secrets
+- Sans JWT_SECRET configuré, **le serveur refuse de démarrer**
+- Sans fichier `.env`, docker-compose échouera
+
+**Pour la production, CHANGEZ OBLIGATOIREMENT :**
+
+1. **Générer un JWT_SECRET sécurisé :**
+   ```bash
+   openssl rand -base64 64
+   ```
+
+2. **Modifier le fichier `.env` à la racine du projet :**
+   - `JWT_SECRET` : Remplacez par la clé générée ci-dessus (OBLIGATOIRE)
+   - `POSTGRES_PASSWORD` : Utilisez un mot de passe fort
+   - `POSTGRES_USER` : Changez le nom d'utilisateur par défaut
+   - `POSTGRES_DB` : Changez le nom de la base de données
+
+**Vérification de sécurité :**
+```bash
+# Le serveur affichera au démarrage :
+# 🔐 JWT_SECRET configuré ✓
+# Si vous voyez ce message, votre configuration est OK
+```
+
 ### Option 1 : Script Automatique (Recommandé)
 ```bash
 docker-compose up

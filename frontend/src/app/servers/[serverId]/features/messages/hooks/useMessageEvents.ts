@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Message } from "../types";
+import type { Message } from "../../../types";
 import type { WsMessage } from "@/hooks/useWebSocket";
 
 interface UseMessageEventsProps {

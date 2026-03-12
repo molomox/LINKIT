@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import type { Member, ApiMember } from "../types";
+import type { Member, ApiMember } from "../../../types";
 
 interface UseMembersProps {
     serverId: string;

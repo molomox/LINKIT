@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Server, Channel } from "../types";
+import type { Server, Channel } from "../../../types";
 
 interface UseServerDataProps {
     serverId: string;

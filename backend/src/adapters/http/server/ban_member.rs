@@ -8,7 +8,7 @@ use crate::domain::usecases::ban::save::CreateBan;
 use axum::extract::{Path, State};
 use crate::adapters::http::error::ApiError;
 use crate::adapters::websocket::{AppState, WsMessage};
-use crate::adapters::http::server::response::BanMemberRequest as OtherBanMemberRequest;
+use crate::adapters::http::server::response::BanMemberRequest;
 use axum::Json;
 use serde::Deserialize;
 use crate::domain::entities::ban::Ban;
@@ -33,9 +33,9 @@ pub async fn ban_member_handler(
         let member_repo = PostgresMemberRepo;
         let user_repo = PostgresUserRepo;
         let usecase = CreateBan{
-            repo: repo:&repo,
-            member_repo: member_repo:&member_repo,
-            user_repo: user_repo:&user_repo,
+            repo: &repo,
+            member_repo: &member_repo,
+            user_repo: &user_repo,
         };
         usecase.execute(target_user_id_clone,server_id_clone,reason_clone,banner_user_id_clone,expired_at_clone)
     })
@@ -64,7 +64,7 @@ pub async fn ban_member_handler(
         },
     ).await;
     
-    Ok(Json("le membre a été bannis".to_string()))
+    Ok(Json(ban))
 }
 
 

@@ -1,5 +1,5 @@
 "use client";
-import type { Channel } from "../types";
+import type { Channel } from "../../../types";
 
 type MessageInputProps = {
     newMessage: string;

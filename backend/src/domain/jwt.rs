@@ -4,10 +4,17 @@ use chrono::{Utc, Duration};
 use std::env;
 
 fn get_jwt_secret() -> String {
-    env::var("JWT_SECRET").unwrap_or_else(|_| {
-        eprintln!("⚠️  WARNING: JWT_SECRET non défini, utilisation d'un secret par défaut (DÉVELOPPEMENT UNIQUEMENT)");
-        "dev_secret_change_me_in_production".to_string()
-    })
+    env::var("JWT_SECRET").expect(
+        "❌ ERREUR CRITIQUE : JWT_SECRET n'est pas défini dans les variables d'environnement!\n\
+         Le serveur ne peut pas démarrer sans cette variable.\n\
+         \n\
+         Solution :\n\
+         1. Créez un fichier .env dans backend/ ou à la racine\n\
+         2. Ajoutez : JWT_SECRET=votre_clé_secrète_ici\n\
+         3. Générez une clé sécurisée avec : openssl rand -base64 64\n\
+         \n\
+         Pour Docker : Vérifiez que le fichier .env existe à la racine du projet."
+    )
 }
 
 #[derive(Debug, Serialize, Deserialize)]

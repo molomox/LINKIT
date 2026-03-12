@@ -14,7 +14,7 @@ use crate::adapters::http::server::{
     kick_member::kick_member_handler as kick_member_handler,
     ban_member::ban_member_handler as ban_member_handler,
     deban::deban_member_handler as deban_member_handler,
-    update_ban_member::update_ban_handler as update_ban_handler,
+    update_ban_member::update_ban_member_handler as update_ban_handler,
     find_ban_by_id::get_ban_handler as get_ban_handler,
     cleanup_expired_bans::cleanup_expired_bans_handler as cleanup_expired_bans_handler
 };

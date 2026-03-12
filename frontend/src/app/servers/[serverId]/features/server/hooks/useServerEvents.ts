@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { Channel, Member } from "../types";
+import type { Channel, Member } from "../../../types";
 import type { ServerWsMessage } from "@/hooks/useServerWebSocket";
 
 interface UseServerEventsProps {
