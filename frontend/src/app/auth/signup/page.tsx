@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 type RegisterResponse = {
     username: string,
@@ -11,6 +12,7 @@ type RegisterResponse = {
 
 export default function RegisterPage() {
     const router = useRouter();
+    const { t } = useTranslation();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -29,7 +31,7 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setStatus("Enregistrement en cours...");
+        setStatus(t.auth.loading);
         setResult(null);
 
         console.log("🔵 Envoi de la requête à:", `${apiBase}/auth/signup`);
@@ -49,14 +51,12 @@ export default function RegisterPage() {
                 console.error("🔴 Erreur backend:", errText);
                 
                 // Messages d'erreur personnalisés
-                if (errText.includes("nom d'utilisateur est déjà pris")) {
-                    setStatus("❌ Ce nom d'utilisateur est déjà pris. Choisissez-en un autre.");
+                if (errText.includes("nom d'utilisateur est déjà pris") || errText.includes("existe déjà")) {
+                    setStatus(`❌ ${t.auth.userExists}`);
                 } else if (errText.includes("email est déjà utilisé")) {
-                    setStatus("❌ Cet email est déjà utilisé. Utilisez un autre email.");
-                } else if (errText.includes("existe déjà")) {
-                    setStatus("❌ Cet utilisateur existe déjà.");
+                    setStatus(`❌ ${t.auth.emailExists}`);
                 } else {
-                    setStatus(`❌ Erreur: ${errText}`);
+                    setStatus(`❌ ${t.error.generic}: ${errText}`);
                 }
                 return;
             }
@@ -64,13 +64,13 @@ export default function RegisterPage() {
             const data = (await res.json()) as RegisterResponse;
             console.log("✅ Utilisateur créé:", data);
             setResult(data);
-            setStatus("Inscription réussie ! Redirection...");
+            setStatus(t.auth.signupSuccess);
             setUsername("");
             setEmail("");
             setPassword("");
         } catch (error) {
             console.error("🔴 Erreur réseau:", error);
-            setStatus(`Erreur réseau: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+            setStatus(t.error.network.replace('{message}', error instanceof Error ? error.message : 'Unknown'));
         }
     };
 
@@ -135,7 +135,7 @@ export default function RegisterPage() {
                                 letterSpacing: '0.05em'
                             }}
                         >
-                            REGISTER
+                            {t.auth.signup}
                         </h1>
                         <div className="flex items-center justify-center gap-2 mb-2">
                             <div className="h-px w-8 bg-gradient-to-r from-transparent to-red-500" />
@@ -163,7 +163,7 @@ export default function RegisterPage() {
                                     color: '#FFD700',
                                 }}
                             >
-                                USERNAME
+                                {t.auth.username}
                             </label>
                             <input
                                 id="username"
@@ -172,7 +172,7 @@ export default function RegisterPage() {
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
                                 className="w-full px-4 py-3 border-l-4 bg-black/70 text-yellow-300 placeholder-gray-600 focus:border-l-yellow-400 focus:bg-black outline-none transition-all"
-                                placeholder="Enter username"
+                                placeholder={t.auth.username}
                                 style={{
                                     fontFamily: 'monospace',
                                     borderLeft: '4px solid #FFD700',
@@ -192,7 +192,7 @@ export default function RegisterPage() {
                                     color: '#FFD700',
                                 }}
                             >
-                                EMAIL
+                                {t.auth.email}
                             </label>
                             <input
                                 id="email"
@@ -221,7 +221,7 @@ export default function RegisterPage() {
                                     color: '#FFD700',
                                 }}
                             >
-                                PASSWORD
+                                {t.auth.password}
                             </label>
                             <input
                                 id="password"
@@ -253,7 +253,7 @@ export default function RegisterPage() {
                                 clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
                             }}
                         >
-                            &gt;&gt; REGISTER &lt;&lt;
+                            {t.auth.signupButton}
                         </button>
                     </form>
 
@@ -271,7 +271,7 @@ export default function RegisterPage() {
 
                     {result && (
                         <div className="mt-4 p-4 bg-yellow-950/30 border-l-4 border-yellow-400" style={{ fontFamily: 'monospace' }}>
-                            <h3 className="font-black text-yellow-400 mb-2 text-center uppercase text-sm tracking-wider">ACCESS GRANTED</h3>
+                            <h3 className="font-black text-yellow-400 mb-2 text-center uppercase text-sm tracking-wider">{t.auth.signupSuccess}</h3>
                             <div className="text-xs text-yellow-300 space-y-1 text-center">
                                 <p>User: <strong className="text-yellow-400">{result.username}</strong></p>
                                 <p className="text-gray-500">Redirecting...</p>
@@ -280,9 +280,9 @@ export default function RegisterPage() {
                     )}
 
                     <div className="mt-6 text-center text-xs text-gray-500 font-bold uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                        Already registered?{" "}
+                        {t.auth.haveAccount}{" "}
                         <a href="/auth/login" className="text-yellow-400 hover:text-yellow-300 underline">
-                            Login
+                            {t.auth.login}
                         </a>
                     </div>
 

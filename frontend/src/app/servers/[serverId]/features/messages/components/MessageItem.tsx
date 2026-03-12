@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTranslation } from "@/i18n";
 import type { Message } from "../../../types";
 
 type MessageItemProps = {
@@ -10,7 +11,7 @@ type MessageItemProps = {
     onUpdate: (messageId: string, newContent: string) => void;
 };
 
-function formatDate(dateString: string) {
+function formatDate(dateString: string, t: any) {
     try {
         const date = new Date(dateString);
         const now = new Date();
@@ -19,10 +20,10 @@ function formatDate(dateString: string) {
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
 
-        if (diffMins < 1) return "à l'instant";
-        if (diffMins < 60) return `il y a ${diffMins} min`;
-        if (diffHours < 24) return `il y a ${diffHours}h`;
-        if (diffDays < 7) return `il y a ${diffDays}j`;
+        if (diffMins < 1) return t.message.justNow;
+        if (diffMins < 60) return t.message.minutesAgo.replace('{minutes}', diffMins.toString());
+        if (diffHours < 24) return t.message.hoursAgo.replace('{hours}', diffHours.toString());
+        if (diffDays < 7) return t.message.daysAgo.replace('{days}', diffDays.toString());
         return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
     } catch {
         return dateString;
@@ -30,6 +31,7 @@ function formatDate(dateString: string) {
 }
 
 export default function MessageItem({ message, currentUserId, currentUserRole, onDelete, onUpdate }: MessageItemProps) {
+    const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(message.content);
     
@@ -74,11 +76,11 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
                 <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
                         <span className="text-yellow-400 font-semibold text-sm" style={{ fontFamily: 'monospace' }}>
-                            {message.username || "Utilisateur"}
-                            {isOwnMessage && " (vous)"}
+                            {message.username || t.message.defaultUser}
+                            {isOwnMessage && t.member.you}
                         </span>
                         <span className="text-gray-600 text-xs" style={{ fontFamily: 'monospace' }}>
-                            {formatDate(message.create_at)}
+                            {formatDate(message.create_at, t)}
                         </span>
                     </div>
                     
@@ -101,14 +103,14 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
                                 className="text-green-400 hover:text-green-300 text-xs px-2 py-1 border border-green-400/50 hover:bg-green-400/10"
                                 style={{ fontFamily: 'monospace' }}
                             >
-                                ✓ Save
+                                {t.message.saveEdit}
                             </button>
                             <button
                                 onClick={handleCancelEdit}
                                 className="text-gray-400 hover:text-gray-300 text-xs px-2 py-1 border border-gray-400/50 hover:bg-gray-400/10"
                                 style={{ fontFamily: 'monospace' }}
                             >
-                                ✕ Cancel
+                                {t.message.cancelEdit}
                             </button>
                         </div>
                     ) : (
@@ -124,9 +126,9 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
                             onClick={() => setIsEditing(true)}
                             className="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400/50 hover:bg-blue-400/10 transition-all"
                             style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%)" }}
-                            title="Éditer ce message"
+                            title={t.message.editTooltip}
                         >
-                            ✏️ Éditer
+                            {t.message.editAction}
                         </button>
                     )}
                     {canDelete && !isEditing && (
@@ -134,9 +136,9 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
                             onClick={() => onDelete(message.message_id)}
                             className="text-red-400 hover:text-red-300 text-xs px-2 py-1 border border-red-400/50 hover:bg-red-400/10 transition-all"
                             style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%)" }}
-                            title="Supprimer ce message"
+                            title={t.message.deleteTooltip}
                         >
-                            🗑️ Supprimer
+                            {t.message.deleteAction}
                         </button>
                     )}
                 </div>

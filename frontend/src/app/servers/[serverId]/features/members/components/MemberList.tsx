@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/i18n";
 import type { Member } from "../../../types";
 import { useMemberPermissions } from "../hooks/useMemberPermissions";
 import { useBanState } from "../hooks/useBanState";
@@ -16,6 +17,7 @@ type MemberListProps = {
 };
 
 export default function MemberList({ members, onlineMembers, serverId, onMemberUpdate }: MemberListProps) {
+    const { t } = useTranslation();
     const [contextMenu, setContextMenu] = useState<{
         x: number;
         y: number;
@@ -135,13 +137,13 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
         <aside className="w-60 border-l-2 border-yellow-400/30 bg-black/60">
             <div className="p-4 border-b-2 border-yellow-400/30">
                 <h2 className="text-yellow-400 font-bold uppercase text-sm tracking-wider" style={{ fontFamily: 'monospace' }}>
-                    MEMBRES ({members.length})
+                    {t.member.members} {t.member.count.replace('{count}', members.length.toString())}
                 </h2>
             </div>
             <div className="overflow-y-auto scrollbar-thin p-4 space-y-3">
                 {members.length === 0 ? (
                     <div className="text-gray-600 text-sm" style={{ fontFamily: 'monospace' }}>
-                        Aucun membre
+                        {t.member.noMembers}
                     </div>
                 ) : (
                     members.map((member) => (

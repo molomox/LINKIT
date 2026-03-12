@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import type { Member } from "../../../types";
 
 interface BanModalProps {
@@ -41,6 +42,8 @@ export default function BanModal({
     onSubmit,
     onClose,
 }: BanModalProps) {
+    const { t } = useTranslation();
+    
     return (
         <>
             {/* Overlay */}
@@ -62,7 +65,7 @@ export default function BanModal({
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-red-600">
                     <h3 className="text-red-400 font-bold text-lg uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                        {isEditMode ? '✏️ MODIFIER LE BAN DE' : '🔨 BANNIR'} {banTarget.username}
+                        {isEditMode ? `${t.ban.editTitle} ${banTarget.username}` : `${t.ban.createTitle} ${banTarget.username}`}
                     </h3>
                 </div>
 
@@ -71,12 +74,12 @@ export default function BanModal({
                     {/* Raison */}
                     <div>
                         <label className="block text-yellow-400 text-sm font-bold mb-2" style={{ fontFamily: 'monospace' }}>
-                            Raison du bannissement *
+                            {t.ban.reasonLabel}
                         </label>
                         <textarea
                             value={banReason}
                             onChange={(e) => setBanReason(e.target.value)}
-                            placeholder="Ex: Spam, comportement toxique, violation des règles..."
+                            placeholder={t.ban.reasonPlaceholder}
                             className="w-full px-3 py-2 bg-black/60 border-2 border-yellow-600 text-gray-300 rounded focus:outline-none focus:border-yellow-400 resize-none"
                             style={{ fontFamily: 'monospace' }}
                             rows={4}
@@ -97,19 +100,19 @@ export default function BanModal({
                             className="text-red-400 font-bold cursor-pointer select-none"
                             style={{ fontFamily: 'monospace' }}
                         >
-                            ⚠️ BANNISSEMENT PERMANENT
+                            {t.ban.permanentLabel}
                         </label>
                     </div>
 
                     {/* Durée */}
                     <div>
                         <label className="block text-yellow-400 text-sm font-bold mb-2" style={{ fontFamily: 'monospace' }}>
-                            Durée du bannissement {!isPermanentBan && '*'}
+                            {t.ban.durationLabel} {!isPermanentBan && t.ban.durationRequired}
                         </label>
                         <div className="grid grid-cols-5 gap-2">
                             {/* Mois */}
                             <div>
-                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>Mois</label>
+                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>{t.ban.months}</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -123,7 +126,7 @@ export default function BanModal({
                             </div>
                             {/* Jours */}
                             <div>
-                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>Jours</label>
+                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>{t.ban.days}</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -137,7 +140,7 @@ export default function BanModal({
                             </div>
                             {/* Heures */}
                             <div>
-                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>Heures</label>
+                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>{t.ban.hours}</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -151,7 +154,7 @@ export default function BanModal({
                             </div>
                             {/* Minutes */}
                             <div>
-                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>Min</label>
+                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>{t.ban.minutes}</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -165,7 +168,7 @@ export default function BanModal({
                             </div>
                             {/* Secondes */}
                             <div>
-                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>Sec</label>
+                                <label className="block text-gray-400 text-xs mb-1" style={{ fontFamily: 'monospace' }}>{t.ban.seconds}</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -180,12 +183,12 @@ export default function BanModal({
                         </div>
                         {!isPermanentBan && (
                             <p className="text-gray-500 text-xs mt-2" style={{ fontFamily: 'monospace' }}>
-                                💡 Spécifiez au moins une durée pour le bannissement
+                                {t.ban.durationHint}
                             </p>
                         )}
                         {isPermanentBan && (
                             <p className="text-red-400 text-xs mt-2 font-bold" style={{ fontFamily: 'monospace' }}>
-                                ⚠️ Le bannissement sera PERMANENT (100 ans)
+                                {t.ban.permanentWarning}
                             </p>
                         )}
                     </div>
@@ -198,14 +201,14 @@ export default function BanModal({
                         className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
                         style={{ fontFamily: 'monospace' }}
                     >
-                        Annuler
+                        {t.common.cancel}
                     </button>
                     <button
                         onClick={onSubmit}
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors font-bold"
                         style={{ fontFamily: 'monospace' }}
                     >
-                        {isEditMode ? '✏️ MODIFIER' : '🔨 BANNIR'}
+                        {isEditMode ? t.ban.editButton : t.ban.createButton}
                     </button>
                 </div>
             </div>

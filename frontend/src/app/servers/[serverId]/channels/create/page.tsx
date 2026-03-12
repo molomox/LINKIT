@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 type CreateChannelResponse = {
     channel_id: string;
@@ -11,6 +12,7 @@ type CreateChannelResponse = {
 export default function CreateChannelPage() {
     const params = useParams();
     const router = useRouter();
+    const { t } = useTranslation();
     const serverId = params.serverId as string;
 
     const [name, setName] = useState("");
@@ -35,14 +37,14 @@ export default function CreateChannelPage() {
 
             if (!res.ok) {
                 const errText = await res.text();
-                setStatus(`Erreur: ${errText}`);
+                setStatus(`${t.error.generic}: ${errText}`);
                 setLoading(false);
                 return;
             }
 
             const data = (await res.json()) as CreateChannelResponse;
             setResult(data);
-            setStatus("✓ Channel créé avec succès !");
+            setStatus(t.channel.created);
             setName("");
 
             // Rediriger vers le serveur après 2 secondes
@@ -50,7 +52,7 @@ export default function CreateChannelPage() {
                 router.push(`/servers/${serverId}`);
             }, 2000);
         } catch (error) {
-            setStatus(`Erreur réseau: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+            setStatus(t.error.network.replace('{message}', error instanceof Error ? error.message : 'Unknown'));
         } finally {
             setLoading(false);
         }
@@ -100,7 +102,7 @@ export default function CreateChannelPage() {
                     <div className="flex items-center gap-3 mb-2">
                         <div className="w-1 h-12 bg-yellow-400"></div>
                         <h1 className="text-4xl font-black text-yellow-400 uppercase tracking-tight" style={{ fontFamily: 'monospace' }}>
-                            CRÉER UN CHANNEL
+                            {t.channel.create}
                         </h1>
                     </div>
                     <p className="text-gray-500 ml-4" style={{ fontFamily: 'monospace' }}>
@@ -120,13 +122,13 @@ export default function CreateChannelPage() {
                         {/* Messages de statut */}
                         {status && (
                             <div className={`border-2 p-4 ${
-                                status.includes("Erreur") 
+                                status.includes(t.error.generic) 
                                     ? "border-red-500 bg-red-500/10" 
                                     : "border-green-400 bg-green-400/10"
                             }`}
                                 style={{ clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}>
                                 <p className={`font-bold ${
-                                    status.includes("Erreur") ? "text-red-500" : "text-green-400"
+                                    status.includes(t.error.generic) ? "text-red-500" : "text-green-400"
                                 }`} style={{ fontFamily: 'monospace' }}>
                                     {status}
                                 </p>
@@ -136,7 +138,7 @@ export default function CreateChannelPage() {
                         {/* Nom du channel */}
                         <div className="space-y-3">
                             <label className="block text-yellow-400 font-bold uppercase text-sm tracking-wider" style={{ fontFamily: 'monospace' }}>
-                                <span className="text-yellow-400">◢</span> Nom du Channel *
+                                <span className="text-yellow-400">◢</span> {t.channel.name}
                             </label>
                             <div className="border-2 border-yellow-400/50 bg-black/50 p-4 focus-within:border-yellow-400 transition-all"
                                 style={{ clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}>
@@ -144,7 +146,7 @@ export default function CreateChannelPage() {
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    placeholder="general"
+                                    placeholder={t.channel.placeholder}
                                     className="w-full bg-transparent text-yellow-400 outline-none text-lg"
                                     style={{ fontFamily: 'monospace' }}
                                     required
@@ -152,7 +154,7 @@ export default function CreateChannelPage() {
                                 />
                             </div>
                             <p className="text-gray-600 text-xs ml-2" style={{ fontFamily: 'monospace' }}>
-                                Caractères autorisés : a-z, 0-9, tirets et underscores
+                                {t.channel.allowedChars}
                             </p>
                         </div>
 
@@ -161,7 +163,7 @@ export default function CreateChannelPage() {
                             <div className="border-2 border-green-400 bg-green-400/10 p-4"
                                 style={{ clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}>
                                 <div className="text-green-400 font-bold mb-3 uppercase text-sm" style={{ fontFamily: 'monospace' }}>
-                                    <span className="text-green-400">▶</span> CHANNEL CRÉÉ
+                                    <span className="text-green-400">▶</span> {t.channel.created}
                                 </div>
                                 <div className="space-y-2 text-sm" style={{ fontFamily: 'monospace' }}>
                                     <div className="flex gap-2">
@@ -188,7 +190,7 @@ export default function CreateChannelPage() {
                                 className="flex-1 px-6 py-4 border-2 border-yellow-400 bg-yellow-400 text-black font-bold uppercase text-sm tracking-wider hover:bg-yellow-500 hover:border-yellow-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}
                             >
-                                {loading ? "◢◣ CRÉATION..." : "▶ CRÉER CHANNEL"}
+                                {loading ? t.common.loading : t.channel.createButton}
                             </button>
 
                             <button
@@ -198,7 +200,7 @@ export default function CreateChannelPage() {
                                 className="flex-1 px-6 py-4 border-2 border-red-500 text-red-500 font-bold uppercase text-sm tracking-wider hover:bg-red-500 hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}
                             >
-                                ← ANNULER
+                                ← {t.common.cancel}
                             </button>
                         </div>
                     </form>
@@ -208,7 +210,7 @@ export default function CreateChannelPage() {
                 <div className="mt-6 border-2 border-yellow-400/30 bg-yellow-400/5 p-4"
                     style={{ clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}>
                     <p className="text-yellow-400/70 text-sm" style={{ fontFamily: 'monospace' }}>
-                        <span className="text-yellow-400 font-bold">⚠ Note:</span> Le channel sera visible par tous les membres du serveur.
+                        <span className="text-yellow-400 font-bold">⚠ {t.channel.note}</span> {t.channel.noteText}
                     </p>
                 </div>
             </div>

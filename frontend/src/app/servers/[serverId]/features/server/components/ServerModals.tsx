@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from "@/i18n";
 import type { Server } from "../../../types";
 
 type ServerModalsProps = {
@@ -26,6 +27,8 @@ export default function ServerModals({
     onDeleteServer,
     onDeleteConfirmNameChange,
 }: ServerModalsProps) {
+    const { t } = useTranslation();
+    
     return (
         <>
             {/* Modal de confirmation pour quitter le serveur */}
@@ -37,13 +40,13 @@ export default function ServerModals({
                         onClick={(e) => e.stopPropagation()}
                     >
                         <h2 className="text-2xl font-black text-orange-400 uppercase mb-4" style={{ fontFamily: 'monospace' }}>
-                            ⚠️ QUITTER LE SERVEUR
+                            {t.server.leaveTitle}
                         </h2>
                         <p className="text-gray-400 mb-6" style={{ fontFamily: 'monospace' }}>
-                            Êtes-vous sûr de vouloir quitter <span className="text-yellow-400 font-bold">{server?.name}</span> ?
+                            {t.server.leaveConfirm.replace('{serverName}', server?.name || '')}
                         </p>
                         <p className="text-gray-600 text-sm mb-6" style={{ fontFamily: 'monospace' }}>
-                            Vous ne pourrez plus accéder aux messages et canaux de ce serveur.
+                            {t.server.leaveWarningDetail}
                         </p>
                         <div className="flex gap-3">
                             <button
@@ -52,7 +55,7 @@ export default function ServerModals({
                                 className="flex-1 px-4 py-2 border-2 border-gray-500 text-gray-400 font-bold uppercase text-sm hover:bg-gray-500 hover:text-black transition-all disabled:opacity-50"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                             >
-                                Annuler
+                                {t.common.cancel}
                             </button>
                             <button
                                 onClick={onLeaveServer}
@@ -60,7 +63,7 @@ export default function ServerModals({
                                 className="flex-1 px-4 py-2 border-2 border-orange-400 bg-orange-400 text-black font-bold uppercase text-sm hover:bg-orange-500 hover:border-orange-500 transition-all disabled:opacity-50"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                             >
-                                {actionLoading ? "..." : "Quitter"}
+                                {actionLoading ? t.common.loading : t.server.leaveButton}
                             </button>
                         </div>
                     </div>
@@ -76,18 +79,18 @@ export default function ServerModals({
                         onClick={(e) => e.stopPropagation()}
                     >
                         <h2 className="text-2xl font-black text-red-400 uppercase mb-4" style={{ fontFamily: 'monospace' }}>
-                            🗑️ SUPPRIMER LE SERVEUR
+                            {t.server.deleteTitle}
                         </h2>
                         <p className="text-gray-400 mb-4" style={{ fontFamily: 'monospace' }}>
-                            Cette action est <span className="text-red-400 font-bold">IRRÉVERSIBLE</span> !
+                            {t.server.deleteIrreversible}
                         </p>
                         <p className="text-gray-600 text-sm mb-6" style={{ fontFamily: 'monospace' }}>
-                            Tous les canaux, messages et membres seront définitivement supprimés.
+                            {t.server.deleteWarningDetail}
                         </p>
 
                         <div className="mb-6">
                             <label className="block text-yellow-400 font-bold uppercase text-sm mb-2" style={{ fontFamily: 'monospace' }}>
-                                Tapez le nom du serveur pour confirmer :
+                                {t.server.deleteConfirmPrompt}
                             </label>
                             <div className="border-2 border-red-400/50 bg-black/50 p-3 focus-within:border-red-400 transition-all"
                                 style={{ clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}>
@@ -110,7 +113,7 @@ export default function ServerModals({
                                 className="flex-1 px-4 py-2 border-2 border-gray-500 text-gray-400 font-bold uppercase text-sm hover:bg-gray-500 hover:text-black transition-all disabled:opacity-50"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                             >
-                                Annuler
+                                {t.common.cancel}
                             </button>
                             <button
                                 onClick={onDeleteServer}
@@ -118,7 +121,7 @@ export default function ServerModals({
                                 className="flex-1 px-4 py-2 border-2 border-red-400 bg-red-400 text-black font-bold uppercase text-sm hover:bg-red-500 hover:border-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                             >
-                                {actionLoading ? "..." : "Supprimer"}
+                                {actionLoading ? t.common.loading : t.server.deleteButton}
                             </button>
                         </div>
                     </div>

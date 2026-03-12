@@ -1,3 +1,4 @@
+import { useTranslation } from "@/i18n";
 import type { Member } from "../../../types";
 
 interface MemberContextMenuProps {
@@ -33,6 +34,8 @@ export default function MemberContextMenu({
     onDeban,
     onClose,
 }: MemberContextMenuProps) {
+    const { t } = useTranslation();
+    
     return (
         <>
             {/* Overlay pour fermer le menu */}
@@ -63,7 +66,7 @@ export default function MemberContextMenu({
                 {availableRoles.length > 0 && (
                     <div className="py-2">
                         <p className="px-4 py-1 text-[10px] text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                            Assigner un rôle
+                            {t.member.assignRole}
                         </p>
                         {availableRoles.map((role) => (
                             <button
@@ -97,7 +100,7 @@ export default function MemberContextMenu({
                         )}
                         <div className="py-2">
                             <p className="px-4 py-1 text-[10px] text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
-                                Actions
+                                {t.member.actions}
                             </p>
                             <button
                                 onClick={(e) => {
@@ -108,7 +111,7 @@ export default function MemberContextMenu({
                                 style={{ fontFamily: 'monospace' }}
                             >
                                 <span className="text-sm text-red-400">
-                                    👢 Expulser
+                                    {t.member.kickAction}
                                 </span>
                             </button>
                             {canBan && !isBanned && (
@@ -118,7 +121,7 @@ export default function MemberContextMenu({
                                     style={{ fontFamily: 'monospace' }}
                                 >
                                     <span className="text-sm text-red-600">
-                                        🔨 Bannir
+                                        {t.member.banAction}
                                     </span>
                                 </button>
                             )}
@@ -130,7 +133,7 @@ export default function MemberContextMenu({
                                         style={{ fontFamily: 'monospace' }}
                                     >
                                         <span className="text-sm text-yellow-500">
-                                            ✏️ Modifier le ban
+                                            {t.member.editBan}
                                         </span>
                                     </button>
                                     <button
@@ -139,7 +142,7 @@ export default function MemberContextMenu({
                                         style={{ fontFamily: 'monospace' }}
                                     >
                                         <span className="text-sm text-green-500">
-                                            🔓 Révoquer le ban
+                                            {t.member.revokeBan}
                                         </span>
                                     </button>
                                 </>
