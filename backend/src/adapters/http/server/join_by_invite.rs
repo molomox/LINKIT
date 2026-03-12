@@ -1,6 +1,7 @@
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
 use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
+use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::domain::entities::member::Member;
 use crate::adapters::http::error::ApiError;
 use crate::domain::usecases::server::join_by_invite::JoinServerByInvite;
@@ -23,7 +24,8 @@ pub async fn join_server_by_invite_handler(
         let repo = PostgresServerRepo;
         let repo2 = PostgresMemberRepo;
         let repo3 = PostgresRoleRepo;
-        let usecase = JoinServerByInvite { repo: &repo, repo2: &repo2, repo3: &repo3 };
+        let ban_repo = PostgresBanRepo;
+        let usecase = JoinServerByInvite { repo: &repo, repo2: &repo2, repo3: &repo3, ban_repo: &ban_repo };
         usecase.execute(request.user_id, invite_code, "role02".to_string())
     })
     .await

@@ -72,8 +72,13 @@ impl<'a> CreateBan<'a>{
 
         self.repo.save(ban.clone())?;
 
-        self.member_repo.update_member_role(ban.bannished_user_id.clone(), ban.server_id.clone(), "role01".to_string())
-            .map_err(|e| format!("Echec du changement de role: {}", e))?;
+        // Changer le rôle du membre banni à "role01" (Ban)
+        self.member_repo.update_member_role(
+            ban.bannished_user_id.clone(), 
+            ban.server_id.clone(), 
+            "role01".to_string()
+        )
+        .map_err(|e| format!("Echec du changement de rôle: {}", e))?;
         
         Ok(ban)
     }

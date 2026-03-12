@@ -57,7 +57,7 @@ pub async fn handle_server_socket(socket: WebSocket, server_id: String, state: A
                                 
                                 println!("👤 Utilisateur identifié: {} ({})", username, user_id);
                                 
-                                // Broadcaster user_online
+                                // Broadcaster user_online (seulement si ce n'est pas déjà fait)
                                 let online_msg = WsMessage::UserOnline {
                                     user_id: user_id.clone(),
                                     username: username.clone(),
@@ -65,6 +65,7 @@ pub async fn handle_server_socket(socket: WebSocket, server_id: String, state: A
                                 };
                                 if let Ok(json) = serde_json::to_string(&online_msg) {
                                     let _ = tx_clone.send(json);
+                                    println!("📡 Broadcast user_online pour: {}", username);
                                 }
                             }
                             IncomingWsMessage::Ping => {

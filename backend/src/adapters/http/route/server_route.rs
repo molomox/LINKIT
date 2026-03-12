@@ -15,7 +15,8 @@ use crate::adapters::http::server::{
     ban_member::ban_member_handler as ban_member_handler,
     deban::deban_member_handler as deban_member_handler,
     update_ban_member::update_ban_handler as update_ban_handler,
-    find_ban_by_id::get_ban_handler as get_ban_handler
+    find_ban_by_id::get_ban_handler as get_ban_handler,
+    cleanup_expired_bans::cleanup_expired_bans_handler as cleanup_expired_bans_handler
 };
 use crate::adapters::websocket::AppState;
 
@@ -37,6 +38,7 @@ pub fn server_routes(state: AppState) -> Router {
         .route("/servers/:server_id/members/:user_id/deban", delete(deban_member_handler))
         .route("/servers/:server_id/members/:user_id/update_ban", put(update_ban_handler))
         .route("/servers/:server_id/members/:user_id/get_ban", get(get_ban_handler))
+        .route("/servers/:server_id/cleanup-bans", post(cleanup_expired_bans_handler))
 
         .route("/invite/:invite_code", post(join_server_by_invite_handler))
         .with_state(state)

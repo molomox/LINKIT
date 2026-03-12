@@ -1,5 +1,6 @@
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
+use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::domain::usecases::server::create::CreateServer;
 use crate::adapters::http::error::ApiError;
 use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
@@ -35,7 +36,8 @@ pub async fn create_server_handler(
         let repo = PostgresServerRepo;
         let repo2 = PostgresMemberRepo;
         let repo3 = PostgresRoleRepo;
-        let usecase = JoinServer { repo: &repo, repo2: &repo2, repo3: &repo3 };
+        let ban_repo = PostgresBanRepo;
+        let usecase = JoinServer { repo: &repo, repo2: &repo2, repo3: &repo3, ban_repo: &ban_repo };
         usecase.execute(user_id, server_id, password, "role04".to_string())
     })
     .await

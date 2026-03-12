@@ -42,6 +42,31 @@ impl BanRepository for PostgresBanRepo{
         };
         Ok(ban)
     }
+
+    fn find_by_server(&self, server_id: String) -> Result<Vec<Ban>, String> {
+        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let rows = client
+            .query(
+                "SELECT ban_id,server_id,bannished_user_id,banned_by_user_id,reason,expired_at,create_at FROM bans WHERE server_id = $1",
+                &[&server_id]
+            ).map_err(|e| e.to_string())?;
+
+        let mut bans = Vec::new();
+        for row in rows {
+            let ban = Ban {
+                ban_id: row.get(0),
+                server_id: row.get(1),
+                bannished_user_id: row.get(2),
+                banned_by_user_id: row.get(3),
+                reason: row.get(4),
+                expired_at: row.get(5),
+                create_at: row.get(6),
+            };
+            bans.push(ban);
+        }
+        Ok(bans)
+    }
+
     fn update_ban(&self, user_id: String, server_id: String, reason: String, expired_at: String,) -> Result<String,String>{
         let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
         client.execute("UPDATE bans SET reason = $3, expired_at = $4 WHERE bannished_user_id = $1 AND server_id = $2", &[&user_id, &server_id, &reason, &expired_at]).map_err(|e| e.to_string())?;
