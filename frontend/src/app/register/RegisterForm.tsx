@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { RegisterResponse } from "./register.controller";
 
 type RegisterFormProps = {
@@ -33,6 +34,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     
     return (
         <div className="relative flex items-center justify-center min-h-screen overflow-hidden" style={{ background: '#0a0a0a' }}>
+            {/* Sélecteur de langue */}
+            <div className="fixed top-4 right-4 z-50">
+                <LanguageSwitcher />
+            </div>
+            
             <style dangerouslySetInnerHTML={{
                 __html: `
                     @keyframes glitch {

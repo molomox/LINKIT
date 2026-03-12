@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type UserProfile = {
     username: string;
@@ -218,6 +219,7 @@ export default function DashboardPage() {
                             </h1>
                         </div>
                         <div className="flex items-center gap-3">
+                            <LanguageSwitcher />
                             <button
                                 onClick={handleCreateServer}
                                 className="px-4 py-2 border-2 border-yellow-400 text-yellow-400 font-bold uppercase text-xs tracking-wider hover:bg-yellow-400 hover:text-black transition-all"

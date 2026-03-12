@@ -35,6 +35,7 @@ export const en: Translations = {
     haveAccount: "Already registered?",
     createOne: "Create an account",
     loginHere: "Login here",
+    linkyt: "Welcome to L!nkyt"
   },
 
   // Servers
@@ -48,7 +49,7 @@ export const en: Translations = {
     name: "Server name",
     password: "Password (optional)",
     inviteCode: "Invite code",
-    copyInvite: "� INVITE",
+    copyInvite: "INVITE",
     inviteCopied: "✓ COPIED",
     copyInviteTooltip: "Copy invite link",
     join: "JOIN",
@@ -69,17 +70,17 @@ export const en: Translations = {
     serversTitle: "YOUR SERVERS",
     owner: "Owner",
     cannotLeave: "Owner cannot leave their server",
-    leaveTitle: "⚠️ LEAVE SERVER",
+    leaveTitle: "LEAVE SERVER",
     leaveConfirm: "Are you sure you want to leave {serverName}?",
     leaveWarningDetail: "You will no longer be able to access this server's messages and channels.",
     leaveTooltip: "Leave server",
-    deleteTitle: "🗑️ DELETE SERVER",
+    deleteTitle: "DELETE SERVER",
     deleteIrreversible: "This action is IRREVERSIBLE!",
     deleteWarningDetail: "All channels, messages and members will be permanently deleted.",
     deleteConfirmPrompt: "Type the server name to confirm:",
     deleteTooltip: "Delete server",
-    quitButton: "👋 LEAVE",
-    deleteButtonShort: "🗑️ DELETE",
+    quitButton: "LEAVE",
+    deleteButtonShort: "DELETE",
     defaultName: "Server",
   },
 
@@ -88,7 +89,7 @@ export const en: Translations = {
     create: "CREATE CHANNEL",
     createButton: "➕ CREATE CHANNEL",
     delete: "Delete channel",
-    deleteConfirm: "⚠️ Permanently delete channel #{name}?\n\nThis action is irreversible and will delete all messages.",
+    deleteConfirm: "Permanently delete channel #{name}?\n\nThis action is irreversible and will delete all messages.",
     name: "Channel name",
     channels: "CHANNELS",
     noChannels: "No channels available",
@@ -114,8 +115,8 @@ export const en: Translations = {
     deleted: "Message deleted",
     updated: "Message updated",
     send: "▶ SEND",
-    editAction: "✏️ Edit",
-    deleteAction: "🗑️ Delete",
+    editAction: "Edit",
+    deleteAction: "Delete",
     editTooltip: "Edit this message",
     deleteTooltip: "Delete this message",
     saveEdit: "✓ Save",
@@ -150,10 +151,10 @@ export const en: Translations = {
     count: "({count})",
     assignRole: "Assign role",
     actions: "Actions",
-    kickAction: "👢 Kick",
-    banAction: "🔨 Ban",
-    editBan: "✏️ Edit ban",
-    revokeBan: "🔓 Revoke ban",
+    kickAction: "Kick",
+    banAction: "Ban",
+    editBan: "Edit ban",
+    revokeBan: "Revoke ban",
   },
 
   // Roles
@@ -164,21 +165,14 @@ export const en: Translations = {
     banned: "BANNED",
   },
 
-  // WebSocket
-  websocket: {
-    connected: "LIVE",
-    connecting: "CONNECTING...",
-    disconnected: "OFFLINE",
-    error: "ERROR",
-  },
 
   // Ban
   ban: {
-    editTitle: "✏️ EDIT BAN FOR",
-    createTitle: "🔨 BAN",
+    editTitle: "EDIT BAN FOR",
+    createTitle: "BAN",
     reasonLabel: "Ban reason *",
     reasonPlaceholder: "E.g.: Spam, toxic behavior, rules violation...",
-    permanentLabel: "⚠️ PERMANENT BAN",
+    permanentLabel: "PERMANENT BAN",
     durationLabel: "Ban duration",
     durationRequired: "*",
     months: "Months",
@@ -186,10 +180,10 @@ export const en: Translations = {
     hours: "Hours",
     minutes: "Min",
     seconds: "Sec",
-    durationHint: "💡 Specify at least one duration for the ban",
-    permanentWarning: "⚠️ Ban will be PERMANENT (100 years)",
-    editButton: "✏️ EDIT",
-    createButton: "🔨 BAN",
+    durationHint: "Specify at least one duration for the ban",
+    permanentWarning: "Ban will be PERMANENT (100 years)",
+    editButton: "EDIT",
+    createButton: "BAN",
   },
 
   // Errors

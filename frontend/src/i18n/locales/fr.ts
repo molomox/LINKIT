@@ -33,6 +33,7 @@ export const fr = {
     haveAccount: "Déjà inscrit ?",
     createOne: "Créer un compte",
     loginHere: "Se connecter",
+    linkyt: "Bienvenue sur L!nkyt"
   },
 
   // Serveurs
@@ -46,7 +47,7 @@ export const fr = {
     name: "Nom du serveur",
     password: "Mot de passe (optionnel)",
     inviteCode: "Code d'invitation",
-    copyInvite: "� INVITER",
+    copyInvite: "INVITER",
     inviteCopied: "✓ COPIÉ",
     copyInviteTooltip: "Copier le lien d'invitation",
     join: "REJOINDRE",
@@ -67,7 +68,7 @@ export const fr = {
     serversTitle: "VOS SERVEURS",
     owner: "Owner",
     cannotLeave: "Le propriétaire ne peut pas quitter son serveur",
-    leaveTitle: "⚠️ QUITTER LE SERVEUR",
+    leaveTitle: "QUITTER LE SERVEUR",
     leaveConfirm: "Êtes-vous sûr de vouloir quitter {serverName} ?",
     leaveWarningDetail: "Vous ne pourrez plus accéder aux messages et canaux de ce serveur.",
     leaveTooltip: "Quitter le serveur",
@@ -76,8 +77,8 @@ export const fr = {
     deleteWarningDetail: "Tous les canaux, messages et membres seront définitivement supprimés.",
     deleteConfirmPrompt: "Tapez le nom du serveur pour confirmer :",
     deleteTooltip: "Supprimer le serveur",
-    quitButton: "👋 QUITTER",
-    deleteButtonShort: "🗑️ SUPPRIMER",
+    quitButton: "QUITTER",
+    deleteButtonShort: "SUPPRIMER",
     defaultName: "Serveur",
   },
 
@@ -86,7 +87,7 @@ export const fr = {
     create: "CRÉER UN CHANNEL",
     createButton: "➕ CRÉER CHANNEL",
     delete: "Supprimer channel",
-    deleteConfirm: "⚠️ Supprimer définitivement le channel #{name} ?\n\nCette action est irréversible et supprimera tous les messages.",
+    deleteConfirm: "Supprimer définitivement le channel #{name} ?\n\nCette action est irréversible et supprimera tous les messages.",
     name: "Nom du Channel",
     channels: "CHANNELS",
     noChannels: "Aucun channel disponible",
@@ -112,8 +113,8 @@ export const fr = {
     deleted: "Message supprimé",
     updated: "Message modifié",
     send: "▶ SEND",
-    editAction: "✏️ Éditer",
-    deleteAction: "🗑️ Supprimer",
+    editAction: "Éditer",
+    deleteAction: "Supprimer",
     editTooltip: "Éditer ce message",
     deleteTooltip: "Supprimer ce message",
     saveEdit: "✓ Save",
@@ -148,10 +149,10 @@ export const fr = {
     count: "({count})",
     assignRole: "Assigner un rôle",
     actions: "Actions",
-    kickAction: "👢 Expulser",
-    banAction: "🔨 Bannir",
-    editBan: "✏️ Modifier le ban",
-    revokeBan: "🔓 Révoquer le ban",
+    kickAction: "Expulser",
+    banAction: "Bannir",
+    editBan: "Modifier le ban",
+    revokeBan: "Révoquer le ban",
   },
 
   // Rôles
@@ -162,21 +163,14 @@ export const fr = {
     banned: "BANNI",
   },
 
-  // WebSocket
-  websocket: {
-    connected: "LIVE",
-    connecting: "CONNECTING...",
-    disconnected: "OFFLINE",
-    error: "ERROR",
-  },
 
   // Bannissement
   ban: {
-    editTitle: "✏️ MODIFIER LE BAN DE",
-    createTitle: "🔨 BANNIR",
+    editTitle: "MODIFIER LE BAN DE",
+    createTitle: "BANNIR",
     reasonLabel: "Raison du bannissement *",
     reasonPlaceholder: "Ex: Spam, comportement toxique, violation des règles...",
-    permanentLabel: "⚠️ BANNISSEMENT PERMANENT",
+    permanentLabel: "BANNISSEMENT PERMANENT",
     durationLabel: "Durée du bannissement",
     durationRequired: "*",
     months: "Mois",
@@ -184,10 +178,10 @@ export const fr = {
     hours: "Heures",
     minutes: "Min",
     seconds: "Sec",
-    durationHint: "💡 Spécifiez au moins une durée pour le bannissement",
-    permanentWarning: "⚠️ Le bannissement sera PERMANENT (100 ans)",
-    editButton: "✏️ MODIFIER",
-    createButton: "🔨 BANNIR",
+    durationHint: "Spécifiez au moins une durée pour le bannissement",
+    permanentWarning: "Le bannissement sera PERMANENT (100 ans)",
+    editButton: "MODIFIER",
+    createButton: "BANNIR",
   },
 
   // Erreurs

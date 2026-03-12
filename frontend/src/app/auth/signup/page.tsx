@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type RegisterResponse = {
     username: string,
@@ -76,6 +77,11 @@ export default function RegisterPage() {
 
     return (
         <div className="relative flex items-center justify-center min-h-screen overflow-hidden" style={{ background: '#0a0a0a' }}>
+            {/* Sélecteur de langue */}
+            <div className="fixed top-4 right-4 z-50">
+                <LanguageSwitcher />
+            </div>
+            
             <style dangerouslySetInnerHTML={{
                 __html: `
                     @keyframes glitch {
@@ -146,8 +152,8 @@ export default function RegisterPage() {
                                     color: '#FF0055',
                                     textShadow: '0 0 10px #FF0055'
                                 }}
-                            >
-                                Welcome to L!nkyt
+                            >   {t.auth.username}
+                                
                             </p>
                             <div className="h-px w-8 bg-gradient-to-l from-transparent to-red-500" />
                         </div>
@@ -266,16 +272,6 @@ export default function RegisterPage() {
                                     : "bg-yellow-950/50 border-yellow-400 text-yellow-400"
                         }`} style={{ fontFamily: 'monospace' }}>
                             {status}
-                        </div>
-                    )}
-
-                    {result && (
-                        <div className="mt-4 p-4 bg-yellow-950/30 border-l-4 border-yellow-400" style={{ fontFamily: 'monospace' }}>
-                            <h3 className="font-black text-yellow-400 mb-2 text-center uppercase text-sm tracking-wider">{t.auth.signupSuccess}</h3>
-                            <div className="text-xs text-yellow-300 space-y-1 text-center">
-                                <p>User: <strong className="text-yellow-400">{result.username}</strong></p>
-                                <p className="text-gray-500">Redirecting...</p>
-                            </div>
                         </div>
                     )}
 
