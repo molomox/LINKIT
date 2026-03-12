@@ -7,15 +7,23 @@ type ChannelListProps = {
     selectedChannel: Channel | null;
     serverId: string;
     onSelectChannel: (channel: Channel) => void;
+    onDeleteChannel?: (channelId: string, channelName: string) => void;
+    currentUserRole?: string;
 };
+
 
 export default function ChannelList({
     channels,
     selectedChannel,
     serverId,
-    onSelectChannel
+    onSelectChannel,
+    onDeleteChannel,
+    currentUserRole
 }: ChannelListProps) {
     const router = useRouter();
+    
+    // Vérifier si l'utilisateur peut supprimer des channels (Owner ou Admin)
+    const canDeleteChannels = currentUserRole === 'role04' || currentUserRole === 'role03';
 
     return (
         <aside className="w-60 border-r-2 border-yellow-400/30 bg-black/60 flex flex-col">
@@ -31,18 +39,35 @@ export default function ChannelList({
                     </div>
                 ) : (
                     channels.map((channel) => (
-                        <button
-                            key={channel.channel_id}
-                            onClick={() => onSelectChannel(channel)}
-                            className={`w-full text-left px-3 py-2 mb-1 transition-all ${
-                                selectedChannel?.channel_id === channel.channel_id
-                                    ? 'bg-yellow-400/20 border-l-4 border-yellow-400 text-yellow-400'
-                                    : 'text-gray-400 hover:bg-yellow-400/10 hover:text-yellow-400'
-                            }`}
-                            style={{ fontFamily: 'monospace' }}
-                        >
-                            # {channel.name}
-                        </button>
+                        <div key={channel.channel_id} className="flex items-center gap-1 mb-1">
+                            <button
+                                onClick={() => onSelectChannel(channel)}
+                                className={`flex-1 text-left px-3 py-2 transition-all ${
+                                    selectedChannel?.channel_id === channel.channel_id
+                                        ? 'bg-yellow-400/20 border-l-4 border-yellow-400 text-yellow-400'
+                                        : 'text-gray-400 hover:bg-yellow-400/10 hover:text-yellow-400'
+                                }`}
+                                style={{ fontFamily: 'monospace' }}
+                            >
+                                # {channel.name}
+                            </button>
+                            
+                            {/* Bouton supprimer - seulement pour Owner/Admin */}
+                            {canDeleteChannels && onDeleteChannel && (
+                                <button
+                                    onClick={() => {
+                                        if (confirm(`⚠️ Supprimer définitivement le channel #${channel.name} ?\n\nCette action est irréversible et supprimera tous les messages.`)) {
+                                            onDeleteChannel(channel.channel_id, channel.name);
+                                        }
+                                    }}
+                                    className="px-2 py-2 text-red-500 hover:bg-red-500/20 border border-red-500/50 transition-all text-xs"
+                                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)" }}
+                                    title="Supprimer channel"
+                                >
+                                    🗑️
+                                </button>
+                            )}
+                        </div>
                     ))
                 )}
             </div>

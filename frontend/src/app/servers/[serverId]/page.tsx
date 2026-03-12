@@ -181,19 +181,22 @@ export default function ServerPage() {
         }
     };
 
-    const getCurrentUserRole = (): string | null => {
-        if (typeof window === 'undefined') return null;
+    const getCurrentUserRole = (): { role_id: string | null; role_name: string | null } => {
+        if (typeof window === 'undefined') return { role_id: null, role_name: null };
         
         const userId = sessionStorage.getItem("user_id");
-        if (!userId) return null;
+        if (!userId) return { role_id: null, role_name: null };
 
         const member = members.find(m => m.user_id === userId);
-        return member?.role_name || null;
+        return {
+            role_id: member?.role_id || null,
+            role_name: member?.role_name || null
+        };
     };
 
     const currentUserRole = getCurrentUserRole();
-    const isOwner = currentUserRole === "Owner";
-    const canLeave = ["membre", "Admin"].includes(currentUserRole || "");
+    const isOwner = currentUserRole.role_id === "role04";
+    const canLeave = ["role02", "role03"].includes(currentUserRole.role_id || "");
 
     // Server action handlers
     const handleCopyInvite = async () => {
@@ -258,6 +261,36 @@ export default function ServerPage() {
             );
         } catch (error) {
             alert(`Erreur: ${error}`);
+        }
+    };
+
+    // Channel action handlers
+    const handleDeleteChannel = async (channelId: string, channelName: string) => {
+        try {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                alert('Vous devez être connecté pour supprimer un channel');
+                return;
+            }
+
+            const res = await fetch(`${apiBase}/channels/${channelId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                const errText = await res.text();
+                alert(`Erreur lors de la suppression : ${errText}`);
+                return;
+            }
+
+            console.log(`✅ Channel #${channelName} supprimé avec succès`);
+            // Le WebSocket mettra à jour automatiquement la liste des channels via useServerEvents
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la suppression du channel');
         }
     };
 
@@ -331,6 +364,8 @@ export default function ServerPage() {
                     selectedChannel={selectedChannel}
                     serverId={serverId}
                     onSelectChannel={setSelectedChannel}
+                    onDeleteChannel={handleDeleteChannel}
+                    currentUserRole={currentUserRole.role_id ?? undefined}
                 />
 
                 {/* Chat principal */}
@@ -354,7 +389,7 @@ export default function ServerPage() {
                                     key={message.message_id}
                                     message={message}
                                     currentUserId={typeof window !== 'undefined' ? sessionStorage.getItem("user_id") : null}
-                                    currentUserRole={currentUserRole}
+                                    currentUserRole={currentUserRole.role_name}
                                     onDelete={handleDeleteMessage}
                                     onUpdate={handleUpdateMessage}
                                 />
