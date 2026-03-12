@@ -1,5 +1,5 @@
 use axum::Router;
-use axum::http::{header::CONTENT_TYPE, Method, HeaderValue};
+use axum::http::{header::{CONTENT_TYPE, AUTHORIZATION}, Method, HeaderValue};
 use tower_http::cors::{CorsLayer, Any};
 use std::net::SocketAddr;
 use std::env;
@@ -43,7 +43,7 @@ async fn main() {
     let cors = CorsLayer::new()
         .allow_origin(allowed_origins)
         .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PUT, Method::OPTIONS])
-        .allow_headers([CONTENT_TYPE]);
+        .allow_headers([CONTENT_TYPE, AUTHORIZATION]);
 
     // 3. Assembler les routes
     let app = Router::new()
