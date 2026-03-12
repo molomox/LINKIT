@@ -1,5 +1,6 @@
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
+use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::domain::ports::ban_repository::BanRepository;
 use crate::domain::ports::member_repository::MemberRepository;
 use crate::domain::ports::user_repository::UserRepository;

@@ -1,5 +1,3 @@
-use crate::domain::entities::user::User;
-use crate::domain::entities::server::Server;
 use serde ::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]

@@ -9,7 +9,7 @@ use chrono::Utc;
 pub struct CreateBan<'a>{
     pub repo: &'a dyn BanRepository,
     pub member_repo: &'a dyn MemberRepository,
-    pub user_repo: &'a dyn UserRepository,
+    pub user_repo: &'a dyn UserRepository
 }
 
 impl<'a> CreateBan<'a>{
@@ -62,25 +62,21 @@ impl<'a> CreateBan<'a>{
         let create_at = Utc::now().to_string();
         let ban = Ban{
             ban_id,
-            bannished_user_id,
-            server_id,
+            bannished_user_id: bannished_user_id.clone(),
+            server_id: server_id.clone(),
             banned_by_user_id,
             reason,
             create_at,
             expired_at,
         };
 
-        self.repo.save(ban.clone())?;
+        self.repo.save(ban.clone())
+            .map_err(|e| format!("Save ban failed: {}", e))?;
 
-        // Changer le rôle du membre banni à "role01" (Ban)
-        self.member_repo.update_member_role(
-            ban.bannished_user_id.clone(), 
-            ban.server_id.clone(), 
-            "role01".to_string()
-        )
-        .map_err(|e| format!("Echec du changement de rôle: {}", e))?;
+        self.member_repo.update_member_role(bannished_user_id.clone(), server_id.clone(), "role01".to_string())
+            .map_err(|e| format!("Echec du changement de role: {}", e))?;
         
-        Ok(ban)
+        return Ok(ban.clone());
     }
 }
 
