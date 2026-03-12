@@ -1,5 +1,4 @@
 use crate::domain::entities::server::Server;
-use axum::Json;
 
 pub trait ServerRepository{
     fn save(&self, server: Server) -> Result<Server, String>;

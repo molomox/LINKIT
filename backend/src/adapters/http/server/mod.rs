@@ -11,3 +11,6 @@ pub mod update_member;
 pub mod join_by_invite;
 pub mod kick_member;
 pub mod ban_member;
+pub mod deban;
+pub mod update_ban_member;
+pub mod find_ban_by_id;

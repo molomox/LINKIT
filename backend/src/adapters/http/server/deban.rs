@@ -1,5 +1,6 @@
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
+use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::domain::ports::ban_repository::BanRepository;
 use crate::domain::ports::member_repository::MemberRepository;
 use crate::domain::ports::user_repository::UserRepository;
@@ -20,16 +21,16 @@ pub async fn deban_member_handler(
     let target_user_id_clone = target_user_id.clone();
     let server_id_clone = server_id.clone();
 
-    tokio::task::spawn_blocking(move || {
-        let repo = BanRepository,
-        let usecase = Deban{repo};
+    tokio::task::spawn_blocking(move || {
+        let repo = PostgresBanRepo;
+        let usecase = Deban{repo: &repo};
         usecase.execute(target_user_id_clone,server_id_clone)
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
     .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
     
-    Ok(Json("le membre a été bannis"));
-};
+    return Ok(Json("le membre a été bannis".to_string()));
+}
 
 
