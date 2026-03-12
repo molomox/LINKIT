@@ -1,0 +1,50 @@
+import { useState, useCallback, useEffect } from "react";
+import type { Message, ApiMessage, Channel } from "../types";
+
+interface UseMessagesProps {
+    selectedChannel: Channel | null;
+    apiBase: string;
+}
+
+export function useMessages({ selectedChannel, apiBase }: UseMessagesProps) {
+    const [messages, setMessages] = useState<Message[]>([]);
+
+    const loadMessages = useCallback(async () => {
+        if (!selectedChannel) return;
+
+        try {
+            const messagesRes = await fetch(`${apiBase}/channels/${selectedChannel.channel_id}/messages`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (messagesRes.ok) {
+                const messagesData: ApiMessage[] = await messagesRes.json();
+
+                const transformedMessages: Message[] = messagesData.map((msg) => ({
+                    message_id: msg.message_id,
+                    content: msg.content,
+                    user_id: msg.user?.user_id || msg.user_id,
+                    username: msg.user?.username || msg.username || "Utilisateur",
+                    create_at: msg.create_at,
+                }));
+
+                setMessages(transformedMessages);
+            }
+        } catch (error) {
+            console.error("Erreur chargement messages:", error);
+        }
+    }, [selectedChannel, apiBase]);
+
+    useEffect(() => {
+        if (selectedChannel) {
+            loadMessages();
+        }
+    }, [selectedChannel, loadMessages]);
+
+    return {
+        messages,
+        setMessages,
+        loadMessages,
+    };
+}
