@@ -47,15 +47,13 @@ services:
       - "${BACKEND_PORT}:3000"
     environment:
       # Configuration de la base de données
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - RUST_LOG=${RUST_LOG}
       - PORT=3000
       - HOST=0.0.0.0
       - FRONTEND_URL=${FRONTEND_URL}
       - JWT_SECRET=${JWT_SECRET}
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     networks:
       - app-network
     restart: unless-stopped
