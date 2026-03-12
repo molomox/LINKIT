@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import type { Member } from "../../../types";
+import { STORAGE_KEYS } from '@/utils/constants';
 
 export const roleOptions = [
     { id: 'role04', name: 'Owner', color: '#FF0000' },
     { id: 'role03', name: 'Admin', color: '#FFA500' },
     { id: 'role02', name: 'Membre', color: '#00FF00' },
-    { id: 'role01', name: 'Ban', color: '#808080' },
 ];
 
 export function useMemberPermissions(members: Member[]) {
@@ -13,7 +13,7 @@ export function useMemberPermissions(members: Member[]) {
     const getCurrentUserRole = (): string | null => {
         if (typeof window === 'undefined') return null;
         
-        const currentUserId = sessionStorage.getItem('user_id');
+        const currentUserId = sessionStorage.getItem(STORAGE_KEYS.USER_ID);
         if (!currentUserId) return null;
         
         const currentMember = members.find(m => m.user_id === currentUserId);
@@ -23,11 +23,11 @@ export function useMemberPermissions(members: Member[]) {
     // Filtrer les rôles disponibles selon les permissions
     const getAvailableRoles = (currentUserRoleId: string | null) => {
         if (currentUserRoleId === 'role04') {
-            // Owner peut assigner : Admin, Membre, Ban
-            return roleOptions;
+            // Owner peut assigner : Admin et Membre (pas Owner)
+            return roleOptions.filter(r => r.id !== 'role04');
         } else if (currentUserRoleId === 'role03') {
-            // Admin peut assigner : Membre, Ban
-            return roleOptions.filter(r => r.id === 'role01' || r.id === 'role02');
+            // Admin peut assigner : Membre uniquement
+            return roleOptions.filter(r => r.id === 'role02');
         }
         // Membre et Ban ne peuvent rien assigner
         return [];
@@ -102,7 +102,7 @@ export function useMemberPermissions(members: Member[]) {
         }
         
         // Ne pas permettre d'interagir avec soi-même
-        const currentUserId = sessionStorage.getItem('user_id');
+        const currentUserId = sessionStorage.getItem(STORAGE_KEYS.USER_ID);
         if (member.user_id === currentUserId) {
             return false;
         }

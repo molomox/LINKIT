@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { Member } from "../types";
+import type { Member } from "../../../types";
 
 interface UseBanCheckProps {
     members: Member[];

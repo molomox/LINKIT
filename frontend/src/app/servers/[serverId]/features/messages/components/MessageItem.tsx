@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import type { Message } from "../types";
+import type { Message } from "../../../types";
 
 type MessageItemProps = {
     message: Message;

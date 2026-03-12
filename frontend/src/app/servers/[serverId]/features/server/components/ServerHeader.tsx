@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import type { Server, Channel } from "../types";
+import type { Server, Channel } from "../../../types";
 import type { WebSocketStatus } from "@/hooks/useWebSocket";
 
 type ServerHeaderProps = {

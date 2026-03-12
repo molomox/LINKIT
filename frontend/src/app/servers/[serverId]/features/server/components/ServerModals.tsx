@@ -1,5 +1,5 @@
 "use client";
-import type { Server } from "../types";
+import type { Server } from "../../../types";
 
 type ServerModalsProps = {
     showLeaveModal: boolean;

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import type { Message, ApiMessage, Channel } from "../types";
+import type { Message, ApiMessage, Channel } from "../../../types";
 
 interface UseMessagesProps {
     selectedChannel: Channel | null;
