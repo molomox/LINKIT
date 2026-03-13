@@ -120,11 +120,11 @@ export default function CreateChannelPage() {
                             <div className={`border-2 p-4 ${
                                 status.includes(t.error.generic) 
                                     ? "border-red-500 bg-red-500/10" 
-                                    : "border-green-400 bg-green-400/10"
+                                    : "border-yellow-400 bg-yellow-400/10"
                             }`}
                                 style={{ clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}>
                                 <p className={`font-bold ${
-                                    status.includes(t.error.generic) ? "text-red-500" : "text-green-400"
+                                    status.includes(t.error.generic) ? "text-red-500" : "text-yellow-400"
                                 }`} style={{ fontFamily: 'monospace' }}>
                                     {status}
                                 </p>
