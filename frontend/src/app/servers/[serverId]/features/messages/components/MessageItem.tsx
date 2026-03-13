@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useTranslation } from "@/i18n";
-import type { Message } from "../../../types";
+import type { Message, Reaction } from "../../../types";
 
 type MessageItemProps = {
     message: Message;
@@ -9,7 +9,22 @@ type MessageItemProps = {
     currentUserRole: string | null;
     onDelete: (messageId: string) => void;
     onUpdate: (messageId: string, newContent: string) => void;
+    availableReactions: Reaction[];
+    onToggleReaction: (messageId: string, reaction: Reaction) => void;
 };
+
+function aggregateReactions(reactions: Reaction[]) {
+    const grouped = new Map<number, { reaction: Reaction; count: number }>();
+    for (const reaction of reactions) {
+        const entry = grouped.get(reaction.reaction_id);
+        if (entry) {
+            entry.count += 1;
+        } else {
+            grouped.set(reaction.reaction_id, { reaction, count: 1 });
+        }
+    }
+    return Array.from(grouped.values()).sort((a, b) => b.count - a.count);
+}
 
 function formatDate(dateString: string, t: any) {
     try {
@@ -36,7 +51,15 @@ function isLikelyGifUrl(content: string): boolean {
     return value.includes("giphy.com/media/") || value.endsWith(".gif") || value.includes("/giphy-");
 }
 
-export default function MessageItem({ message, currentUserId, currentUserRole, onDelete, onUpdate }: MessageItemProps) {
+export default function MessageItem({
+    message,
+    currentUserId,
+    currentUserRole,
+    onDelete,
+    onUpdate,
+    availableReactions,
+    onToggleReaction,
+}: MessageItemProps) {
     const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(message.content);
@@ -44,6 +67,7 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
     const isOwnMessage = message.user_id === currentUserId;
     const isSystemMessage = message.user_id === 'system';
     const shouldRenderGif = message.is_gif || isLikelyGifUrl(message.content);
+    const reactionSummary = aggregateReactions(message.reactions ?? []);
     
     // Permissions : Seul le propriétaire peut éditer son message, Owner/Admin peuvent supprimer
     const canEdit = isOwnMessage;
@@ -137,6 +161,32 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
                                     {message.content}
                                 </p>
                             )}
+
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                                {reactionSummary.map(({ reaction, count }) => (
+                                    <button
+                                        key={reaction.reaction_id}
+                                        onClick={() => onToggleReaction(message.message_id, reaction)}
+                                        className="px-2 py-1 text-xs border border-yellow-400/30 text-yellow-300 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                                        style={{ fontFamily: "monospace" }}
+                                        title={reaction.reaction_name}
+                                    >
+                                        {reaction.emoji} {count}
+                                    </button>
+                                ))}
+
+                                {availableReactions.slice(0, 8).map((reaction) => (
+                                    <button
+                                        key={`picker-${reaction.reaction_id}`}
+                                        onClick={() => onToggleReaction(message.message_id, reaction)}
+                                        className="px-2 py-1 text-xs border border-gray-600 text-gray-300 hover:border-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 transition-all"
+                                        style={{ fontFamily: "monospace" }}
+                                        title={`Ajouter ${reaction.reaction_name}`}
+                                    >
+                                        {reaction.emoji}
+                                    </button>
+                                ))}
+                            </div>
                         </>
                     )}
                 </div>

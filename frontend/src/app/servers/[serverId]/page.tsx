@@ -5,6 +5,7 @@ import { useTranslation } from "@/i18n";
 import { useWebSocket, type WsMessage } from "@/hooks/useWebSocket";
 import { useServerWebSocket } from "@/hooks/useServerWebSocket";
 import type { Message } from "./types";
+import type { Reaction } from "./types";
 import MessageItem from "./features/messages/components/MessageItem";
 import TypingIndicator from "./features/messages/components/TypingIndicator";
 import MessageInput from "./features/messages/components/MessageInput";
@@ -19,6 +20,7 @@ import { useBanCleanup } from "./features/members/hooks/useBanCleanup";
 import { useBanCheck } from "./features/members/hooks/useBanCheck";
 import { useServerEvents } from "./features/server/hooks/useServerEvents";
 import { useMessageEvents } from "./features/messages/hooks/useMessageEvents";
+import { useMessageReactions } from "./features/messages/hooks/useMessageReactions";
 import * as serverActions from "./utils/serverActions";
 import * as messageActions from "./utils/messageActions";
 
@@ -86,6 +88,14 @@ export default function ServerPage() {
                     return newSet;
                 });
             }, 3000);
+        },
+    });
+
+    const { availableReactions, handleToggleReaction } = useMessageReactions({
+        apiBase,
+        onMessagesUpdate: setMessages,
+        onError: (error) => {
+            alert(`${t.error.generic}: ${error}`);
         },
     });
 
@@ -436,6 +446,8 @@ export default function ServerPage() {
                                     currentUserRole={currentUserRole.role_name}
                                     onDelete={handleDeleteMessage}
                                     onUpdate={handleUpdateMessage}
+                                    availableReactions={availableReactions}
+                                    onToggleReaction={handleToggleReaction}
                                 />
                             ))
                         )}
