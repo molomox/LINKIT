@@ -252,7 +252,7 @@ export default function LoginPage() {
 
                     <div className="mt-6 text-center text-xs text-gray-500 font-bold uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
                         {t.auth.noAccount}{" "}
-                        <a href="/register" className="text-yellow-400 hover:text-yellow-300 underline">
+                        <a href="/auth/signup" className="text-yellow-400 hover:text-yellow-300 underline">
                             {t.auth.createOne}
                         </a>
                     </div>

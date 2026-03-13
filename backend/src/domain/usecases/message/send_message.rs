@@ -17,6 +17,16 @@ impl<'a> SendMessage<'a> {
         user_id: String,
         content: String,
     ) -> Result<Message, String> {
+        self.execute_with_gif(channel_id, user_id, content, false)
+    }
+
+    pub fn execute_with_gif(
+        &self,
+        channel_id: String,
+        user_id: String,
+        content: String,
+        is_gif: bool,
+    ) -> Result<Message, String> {
         // Validations
         if content.is_empty() {
             return Err("Le contenu du message ne peut pas être vide".to_string());
@@ -50,7 +60,7 @@ impl<'a> SendMessage<'a> {
             },
             content,
             create_at,
-            is_gif: false,
+            is_gif,
             reactions: Vec::new(),
         };
 

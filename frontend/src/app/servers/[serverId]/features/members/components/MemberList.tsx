@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "@/i18n";
 import type { Member } from "../../../types";
 import { useMemberPermissions } from "../hooks/useMemberPermissions";
@@ -14,29 +14,26 @@ type MemberListProps = {
     onlineMembers: Set<string>;
     serverId: string;
     onMemberUpdate: () => void;
+    onStartPrivateMessage: (member: Member) => void;
 };
 
-export default function MemberList({ members, onlineMembers, serverId, onMemberUpdate }: MemberListProps) {
+export default function MemberList({ members, onlineMembers, serverId, onMemberUpdate, onStartPrivateMessage }: MemberListProps) {
     const { t } = useTranslation();
     const [contextMenu, setContextMenu] = useState<{
         x: number;
         y: number;
         member: Member;
     } | null>(null);
-    const [bannedUsers, setBannedUsers] = useState<Set<string>>(new Set());
 
     // Custom hooks
     const permissions = useMemberPermissions(members);
     const banState = useBanState();
     const actions = useMemberActions({ serverId, onMemberUpdate });
 
-    // Mettre à jour la liste des membres bannis
-    useEffect(() => {
-        const bannedUserIds = members
-            .filter(member => member.role_id === 'role01')
-            .map(member => member.user_id);
-        setBannedUsers(new Set(bannedUserIds));
-    }, [members]);
+    const bannedUsers = useMemo(
+        () => new Set(members.filter((member) => member.role_id === "role01").map((member) => member.user_id)),
+        [members],
+    );
 
     // Handlers
     const handleContextMenu = (e: React.MouseEvent, member: Member) => {
@@ -101,11 +98,6 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
         
         const success = await actions.handleDeban(contextMenu.member);
         if (success) {
-            setBannedUsers(prev => {
-                const newSet = new Set(prev);
-                newSet.delete(contextMenu.member.user_id);
-                return newSet;
-            });
             setContextMenu(null);
         }
     };
@@ -126,9 +118,6 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
         );
         
         if (success) {
-            if (!banState.isEditMode) {
-                setBannedUsers(prev => new Set(prev).add(banState.banTarget!.user_id));
-            }
             banState.closeBanModal();
         }
     };
@@ -152,6 +141,7 @@ export default function MemberList({ members, onlineMembers, serverId, onMemberU
                             member={member}
                             isOnline={onlineMembers.has(member.user_id)}
                             onContextMenu={handleContextMenu}
+                            onStartPrivateMessage={onStartPrivateMessage}
                         />
                     ))
                 )}
