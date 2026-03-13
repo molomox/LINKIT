@@ -94,7 +94,8 @@ impl MessageRepository for PostgresMessageRepo{
                     create_at: row.get(4),
                 };
             }
-            if let Some(reaction_id) = row.get::<usize, Option<String>>(7) {
+            let reaction_id = row.get(7) 
+            if reaction_id != NULL {
                 let reaction = crate::domain::entities::reaction::Reaction {
                     reaction_id,
                     emoji: row.get(8),
