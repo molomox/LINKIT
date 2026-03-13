@@ -118,6 +118,39 @@ INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GI
 ('message9', 'hello world 9', 'channel1','idnum01', '2023-01-01',false),
 ('message10', 'hello world 10', 'channel1','idnum01', '2023-01-01',false);
 
+
+INSERT INTO reaction (reaction_id, emoji, nom_reaction) VALUES
+(1, '👍', 'like'),
+(2, '👎', 'dislike'),
+(3, '❤️', 'heart'),
+(4, '🔥', 'fire'),
+(5, '😢', 'sad'),
+(6, '😠', 'angry'),
+(7, '😭', 'crying'),
+(8, '🤯', 'shocked'),
+(9, '😝', 'happy'),
+(10, '😜', 'tongue')
+(11, '😂', 'laughing'),
+(12, '😎', 'cool'),
+(13, '🤔', 'thinking'),
+(14, '🙌', 'celebration'),
+(15, '👏', 'clapping'),
+(16, '💔', 'broken_heart'),
+(17, '😇', 'innocent'),
+(18, '🤗', 'hugging'),
+(19, '😴', 'sleepy'),
+(20, '🤤', 'drooling')
+(21, '😈', 'devil'),
+(22, '👻', 'ghost'),
+(23, '💩', 'poop'),
+(24, '👽', 'alien'),
+(25, '🤖', 'robot'),
+(26, '🎉', 'party'),
+(27, '🎂', 'birthday'),
+(28, '🎁', 'gift'),
+(29, '🎈', 'balloon'),
+(30, '🎊', 'confetti');
+
 -- Vue pour récupérer les messages avec les informations des utilisateurs (PostgreSQL)
 CREATE OR REPLACE VIEW view_messages AS
 SELECT
