@@ -69,27 +69,51 @@ impl MessageRepository for PostgresMessageRepo{
         let mut messages = Vec::new();
 
         for row in client.query(
-            "SELECT message_id, content, channel_id, user_id, create_at, username, email
+            "SELECT message_id, content, channel_id, user_id, create_at, username, email, reaction_id, emoji, reaction_user_id, IS_GIF,reaction_username
             FROM view_messages
             WHERE channel_id = $1
             ORDER BY create_at ASC
             LIMIT 100",
             &[&channel_id]
         ).map_err(|e| e.to_string())? {
-            let message = Message {
-                message_id: row.get(0),
-                content: row.get(1),
-                channel_id: row.get(2),
-                user: crate::domain::entities::user::User {
-                    user_id: row.get(3),
-                    username: row.get(5),
-                    email: row.get(6),
-                    password: String::new(),
-                    create_at: String::new(),
-                    token: None,
-                },
-                create_at: row.get(4),
-            };
+            let message = messages.iter().find(|m| m.message_id == row.get::<usize, String>(0));
+            if message.is_none() {
+                let message = Message {
+                    message_id: row.get(0),
+                    content: row.get(1),
+                    channel_id: row.get(2),
+                    user: crate::domain::entities::user::User {
+                        user_id: row.get(3),
+                        username: row.get(5),
+                        email: row.get(6),
+                        password: String::new(),
+                        create_at: String::new(),
+                        token: None,
+                    },
+                    is_gif: row.get(10),
+                    create_at: row.get(4),
+                };
+            }
+            if let Some(reaction_id) = row.get::<usize, Option<String>>(7) {
+                let reaction = crate::domain::entities::reaction::Reaction {
+                    reaction_id,
+                    emoji: row.get(8),
+                    reaction_name: String::new(),
+                };
+                let reagi = crate::domain::entities::reagi::Reagi {
+                    message: message.clone(),
+                    user: crate::domain::entities::user::User {
+                        user_id: row.get(9),
+                        username: row.get(11),
+                        email: String::new(),
+                        password: String::new(),
+                        create_at: String::new(),
+                        token: None,
+                    },
+                    reaction,
+                };
+                message.reactions.push(reagi.reaction);
+            }
             messages.push(message);
         }
 

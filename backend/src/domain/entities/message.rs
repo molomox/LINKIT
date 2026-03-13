@@ -9,4 +9,6 @@ pub struct Message{
     pub content: String,
     pub user: User,
     pub create_at: String,
+    pub is_gif: bool,
+    pub reactions: Vec<crate::domain::entities::reaction::Reaction>,
 }

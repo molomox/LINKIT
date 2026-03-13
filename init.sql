@@ -102,6 +102,9 @@ INSERT INTO roles (role_id, role_name) VALUES
 ('role03','Admin'),
 ('role04', 'Owner');
 
+INSERT INTO channel_dm (channel_id,user_id,user2_id) VALUES
+('channeldm4', 'idnum01', 'idnum02');
+
 INSERT INTO members (user_id, server_id, role_id,join_at) VALUES
 ('idnum01', 'po90kE34scz1bnH87', 'role04', '2023-01-01'),
 ('idnum01', 'ag5y8iplo04rf3c', 'role02', '2023-01-01');
@@ -116,7 +119,7 @@ INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GI
 ('message7', 'hello world 7', 'channel1','idnum01', '2023-01-01',false),
 ('message8', 'hello world 8', 'channel1','idnum01', '2023-01-01',false),
 ('message9', 'hello world 9', 'channel1','idnum01', '2023-01-01',false),
-('message10', 'hello world 10', 'channel1','idnum01', '2023-01-01',false);
+('message10', 'hello world 10', 'channeldm4','idnum01', '2023-01-01',false);
 
 
 INSERT INTO reaction (reaction_id, emoji, nom_reaction) VALUES
@@ -129,7 +132,7 @@ INSERT INTO reaction (reaction_id, emoji, nom_reaction) VALUES
 (7, '😭', 'crying'),
 (8, '🤯', 'shocked'),
 (9, '😝', 'happy'),
-(10, '😜', 'tongue')
+(10, '😜', 'tongue'),
 (11, '😂', 'laughing'),
 (12, '😎', 'cool'),
 (13, '🤔', 'thinking'),
@@ -139,7 +142,7 @@ INSERT INTO reaction (reaction_id, emoji, nom_reaction) VALUES
 (17, '😇', 'innocent'),
 (18, '🤗', 'hugging'),
 (19, '😴', 'sleepy'),
-(20, '🤤', 'drooling')
+(20, '🤤', 'drooling'),
 (21, '😈', 'devil'),
 (22, '👻', 'ghost'),
 (23, '💩', 'poop'),
@@ -151,8 +154,27 @@ INSERT INTO reaction (reaction_id, emoji, nom_reaction) VALUES
 (29, '🎈', 'balloon'),
 (30, '🎊', 'confetti');
 
+INSERT INTO channel_dm (channel_id,user_id,user2_id) VALUES
+('channeldm4', 'idnum01', 'idnum02');
+
+INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GIF) VALUES
+('message11', 'hello world 10', 'channeldm4','idnum01', '2023-01-01',false)
+
+INSERT INTO reagi (reaction_id,user_id,message_id) VALUES
+('1', 'idnum01', 'message1'),
+('2', 'idnum01', 'message1'),
+('3', 'idnum01', 'message1'),
+('4', 'idnum01', 'message1'),
+('5', 'idnum01', 'message1'),
+('6', 'idnum01', 'message1'),
+('7', 'idnum01', 'message1'),
+('8', 'idnum01', 'message1'),
+('9', 'idnum01', 'message1'),
+('10', 'idnum01', 'message1');
+
 -- Vue pour récupérer les messages avec les informations des utilisateurs (PostgreSQL)
 CREATE OR REPLACE VIEW view_messages AS
+
 SELECT
     m.message_id,
     m.content,
@@ -160,9 +182,20 @@ SELECT
     m.user_id,
     m.create_at,
     u.username,
-    u.email
-FROM messages AS m
-JOIN users AS u ON m.user_id = u.user_id;
+    u.email,
+    re.user_id AS reaction_user_id,
+    r.reaction_id,
+    r.emoji,
+    m.IS_GIF,
+	ur.username AS reaction_username
+FROM messages      AS m
+JOIN channels      AS c  ON m.channel_id  = c.channel_id
+JOIN users         AS u  ON m.user_id     = u.user_id
+LEFT JOIN reagi    AS re ON m.message_id  = re.message_id
+LEFT JOIN reaction AS r  ON re.reaction_id = r.reaction_id
+JOIN users         AS ur ON  re.user_id = ur.user_id
+
+
 
 -- Index composite avec INCLUDE pour optimiser complètement la requête (covering index)
 CREATE INDEX IF NOT EXISTS idx_messages_channel_create ON messages(channel_id, create_at)
