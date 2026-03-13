@@ -15,3 +15,5 @@ pub mod deban;
 pub mod update_ban_member;
 pub mod find_ban_by_id;
 pub mod cleanup_expired_bans;
+pub mod create_or_get_dm_channel;
+pub mod list_dm_channels;

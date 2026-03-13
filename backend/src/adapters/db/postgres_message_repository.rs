@@ -11,8 +11,8 @@ impl MessageRepository for PostgresMessageRepo{
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         client.execute(
-            "INSERT INTO messages (message_id, content, channel_id, user_id, create_at) VALUES ($1, $2, $3, $4, $5)",
-            &[&message.message_id, &message.content, &message.channel_id, &message.user.user_id, &message.create_at]
+            "INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GIF) VALUES ($1, $2, $3, $4, $5, $6)",
+            &[&message.message_id, &message.content, &message.channel_id, &message.user.user_id, &message.create_at, &message.is_gif]
         ).map_err(|e| format!("Failed to save message: {}", e))?;
 
         Ok(message)
@@ -40,9 +40,10 @@ impl MessageRepository for PostgresMessageRepo{
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         let row = client.query_one(
-            "SELECT message_id, content, channel_id, user_id, create_at, username, email
-            FROM view_messages
-            WHERE message_id = $1",
+            "SELECT m.message_id, m.content, m.channel_id, m.user_id, m.create_at, u.username, u.email, m.IS_GIF
+             FROM messages m
+             JOIN users u ON u.user_id = m.user_id
+             WHERE m.message_id = $1",
             &[&message_id]
         ).map_err(|e| e.to_string())?;
 
@@ -59,7 +60,7 @@ impl MessageRepository for PostgresMessageRepo{
                 token: None,
             },
             create_at: row.get(4),
-            is_gif: false,
+            is_gif: row.get(7),
             reactions: Vec::new(),
         };
 
@@ -71,11 +72,15 @@ impl MessageRepository for PostgresMessageRepo{
         let mut messages: Vec<Message> = Vec::new();
 
         for row in client.query(
-            "SELECT message_id, content, channel_id, user_id, create_at, username, email, reaction_id, emoji, reaction_user_id, IS_GIF, reaction_username
-            FROM view_messages
-            WHERE channel_id = $1
-            ORDER BY create_at ASC
-            LIMIT 100",
+            "SELECT m.message_id, m.content, m.channel_id, m.user_id, m.create_at, u.username, u.email,
+                    r.reaction_id, r.emoji, m.IS_GIF
+             FROM messages m
+             JOIN users u ON u.user_id = m.user_id
+             LEFT JOIN reagi rg ON rg.message_id = m.message_id
+             LEFT JOIN reaction r ON r.reaction_id = rg.reaction_id
+             WHERE m.channel_id = $1
+             ORDER BY m.create_at ASC
+             LIMIT 100",
             &[&channel_id]
         ).map_err(|e| e.to_string())? {
             let msg_id: String = row.get(0);
@@ -103,7 +108,7 @@ impl MessageRepository for PostgresMessageRepo{
                         token: None,
                     },
                     create_at: row.get(4),
-                    is_gif: row.get(10),
+                    is_gif: row.get(9),
                     reactions: Vec::new(),
                 };
                 if let Some(r_id) = reaction_id {

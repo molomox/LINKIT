@@ -1,11 +1,10 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslation } from "@/i18n";
-import { useWebSocket, type WsMessage } from "@/hooks/useWebSocket";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { useServerWebSocket } from "@/hooks/useServerWebSocket";
-import type { Message } from "./types";
-import type { Reaction } from "./types";
+import type { Message, Member, Channel } from "./types";
 import MessageItem from "./features/messages/components/MessageItem";
 import TypingIndicator from "./features/messages/components/TypingIndicator";
 import MessageInput from "./features/messages/components/MessageInput";
@@ -21,8 +20,19 @@ import { useBanCheck } from "./features/members/hooks/useBanCheck";
 import { useServerEvents } from "./features/server/hooks/useServerEvents";
 import { useMessageEvents } from "./features/messages/hooks/useMessageEvents";
 import { useMessageReactions } from "./features/messages/hooks/useMessageReactions";
+import { useMessageComposer } from "./features/messages/hooks/useMessageComposer";
 import * as serverActions from "./utils/serverActions";
 import * as messageActions from "./utils/messageActions";
+
+type DmHeaderNotification = {
+    id: string;
+    channel_id: string;
+    server_id: string;
+    from_user_id: string;
+    from_username: string;
+    preview: string;
+    is_gif: boolean;
+};
 
 export default function ServerPage() {
     const router = useRouter();
@@ -41,16 +51,17 @@ export default function ServerPage() {
     const { messages, setMessages, loadMessages } = useMessages({ selectedChannel, apiBase });
 
     // State
-    const [newMessage, setNewMessage] = useState("");
-    const [sending, setSending] = useState(false);
     const [copied, setCopied] = useState(false);
     const [showLeaveModal, setShowLeaveModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteConfirmName, setDeleteConfirmName] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
     const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
-    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [dmNotifications, setDmNotifications] = useState<DmHeaderNotification[]>([]);
+    const [unreadDmCount, setUnreadDmCount] = useState(0);
+    const [isDmNotifOpen, setIsDmNotifOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const dmNotifOpenRef = useRef(false);
 
     // WebSocket hooks
     const { status: wsStatus, lastMessage, sendMessage: sendWsMessage, isConnected } = useWebSocket(
@@ -99,6 +110,24 @@ export default function ServerPage() {
         },
     });
 
+    const {
+        newMessage,
+        sending,
+        handleSendMessage,
+        handleGifSelect,
+        handleMessageChange,
+    } = useMessageComposer({
+        selectedChannel,
+        isConnected,
+        sendWsMessage,
+        serverId,
+        apiBase,
+        loadMessages,
+        networkErrorLabel: t.error.network,
+    });
+
+    const sessionUserId = typeof window !== "undefined" ? sessionStorage.getItem("user_id") : null;
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -106,6 +135,47 @@ export default function ServerPage() {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    useEffect(() => {
+        dmNotifOpenRef.current = isDmNotifOpen;
+    }, [isDmNotifOpen]);
+
+    useEffect(() => {
+        const onDmNotification = (event: Event) => {
+            const detail = (event as CustomEvent<{
+                channel_id?: string;
+                server_id?: string;
+                from_user_id?: string;
+                from_username?: string;
+                preview?: string;
+                is_gif?: boolean;
+            }>).detail;
+
+            if (!detail?.channel_id) {
+                return;
+            }
+
+            const notif: DmHeaderNotification = {
+                id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                channel_id: detail.channel_id,
+                server_id: detail.server_id || serverId,
+                from_user_id: detail.from_user_id || "",
+                from_username: detail.from_username || "Utilisateur",
+                preview: detail.is_gif ? "a envoye un GIF" : (detail.preview || "Nouveau message"),
+                is_gif: !!detail.is_gif,
+            };
+
+            setDmNotifications((prev) => [notif, ...prev].slice(0, 10));
+            if (!dmNotifOpenRef.current) {
+                setUnreadDmCount((prev) => prev + 1);
+            }
+        };
+
+        window.addEventListener("linkyt:dm-notification", onDmNotification as EventListener);
+        return () => {
+            window.removeEventListener("linkyt:dm-notification", onDmNotification as EventListener);
+        };
+    }, [serverId]);
 
     // Gérer la connexion WebSocket
     useEffect(() => {
@@ -128,127 +198,14 @@ export default function ServerPage() {
         }
     }, [isConnected, selectedChannel, sendWsMessage, serverId, setOnlineMembers]);
 
-    const handleSendMessage = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newMessage.trim() || !selectedChannel || sending) return;
-
-        setSending(true);
-        try {
-            const userId = sessionStorage.getItem("user_id");
-            const username = sessionStorage.getItem("username") || "User";
-
-            if (isConnected) {
-                const wsMessage: WsMessage = {
-                    type: 'new_message',
-                    content: newMessage,
-                    user_id: userId || undefined,
-                    username: username,
-                    channel_id: selectedChannel.channel_id,
-                    server_id: serverId,
-                };
-                sendWsMessage(wsMessage);
-                setNewMessage("");
-            } else {
-                console.log('⚠️ WebSocket non connecté, utilisation de l\'API REST');
-                const res = await fetch(`${apiBase}/channels/${selectedChannel.channel_id}/messages`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        content: newMessage,
-                        user_id: userId
-                    }),
-                });
-
-                if (res.ok) {
-                    setNewMessage("");
-                    await loadMessages();
-                }
-            }
-        } catch (error) {
-            console.error(t.error.network, error);
-        } finally {
-            setSending(false);
-        }
-    };
-
-    const handleGifSelect = async (gifUrl: string) => {
-        if (!selectedChannel || sending) return;
-
-        setSending(true);
-        try {
-            const userId = sessionStorage.getItem("user_id");
-            const username = sessionStorage.getItem("username") || "User";
-
-            if (isConnected) {
-                const wsMessage: WsMessage = {
-                    type: 'new_message',
-                    content: gifUrl,
-                    user_id: userId || undefined,
-                    username: username,
-                    channel_id: selectedChannel.channel_id,
-                    server_id: serverId,
-                    is_gif: true,
-                };
-                sendWsMessage(wsMessage);
-            } else {
-                console.log('⚠️ WebSocket non connecté, utilisation de l\'API REST');
-                const res = await fetch(`${apiBase}/channels/${selectedChannel.channel_id}/messages`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        content: gifUrl,
-                        user_id: userId,
-                        is_gif: true
-                    }),
-                });
-
-                if (res.ok) {
-                    await loadMessages();
-                }
-            }
-        } catch (error) {
-            console.error(t.error.network, error);
-        } finally {
-            setSending(false);
-        }
-    };
-
-    const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewMessage(e.target.value);
-
-        if (isConnected && selectedChannel) {
-            const userId = sessionStorage.getItem("user_id");
-            const username = sessionStorage.getItem("username") || "User";
-
-            if (typingTimeoutRef.current) {
-                clearTimeout(typingTimeoutRef.current);
-            }
-
-            typingTimeoutRef.current = setTimeout(() => {
-                sendWsMessage({
-                    type: 'typing',
-                    user_id: userId || undefined,
-                    username: username,
-                    channel_id: selectedChannel.channel_id,
-                });
-            }, 500);
-        }
-    };
-
-    const getCurrentUserRole = (): { role_id: string | null; role_name: string | null } => {
-        if (typeof window === 'undefined') return { role_id: null, role_name: null };
-        
-        const userId = sessionStorage.getItem("user_id");
-        if (!userId) return { role_id: null, role_name: null };
-
-        const member = members.find(m => m.user_id === userId);
+    const currentUserRole = useMemo((): { role_id: string | null; role_name: string | null } => {
+        if (!sessionUserId) return { role_id: null, role_name: null };
+        const member = members.find((m) => m.user_id === sessionUserId);
         return {
             role_id: member?.role_id || null,
-            role_name: member?.role_name || null
+            role_name: member?.role_name || null,
         };
-    };
-
-    const currentUserRole = getCurrentUserRole();
+    }, [members, sessionUserId]);
     const isOwner = currentUserRole.role_id === "role04";
     const canLeave = ["role02", "role03"].includes(currentUserRole.role_id || "");
 
@@ -348,6 +305,32 @@ export default function ServerPage() {
         }
     };
 
+    const handleStartPrivateMessage = async (member: Member) => {
+        try {
+            const dm = await serverActions.createOrGetDmChannel(serverId, member.user_id, apiBase);
+            const dmUrl = `/dm/${dm.channel_id}?serverId=${encodeURIComponent(serverId)}&username=${encodeURIComponent(dm.username)}&userId=${encodeURIComponent(dm.user_id)}`;
+            router.push(dmUrl);
+        } catch (error) {
+            alert(`${t.error.generic}: ${error}`);
+        }
+    };
+
+    const handleToggleDmNotifications = () => {
+        setIsDmNotifOpen((prev) => {
+            const next = !prev;
+            if (next) {
+                setUnreadDmCount(0);
+            }
+            return next;
+        });
+    };
+
+    const handleOpenDmFromNotification = (notif: DmHeaderNotification) => {
+        setIsDmNotifOpen(false);
+        const dmUrl = `/dm/${notif.channel_id}?serverId=${encodeURIComponent(notif.server_id)}&username=${encodeURIComponent(notif.from_username)}&userId=${encodeURIComponent(notif.from_user_id)}`;
+        router.push(dmUrl);
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen" style={{ background: '#0a0a0a' }}>
@@ -405,9 +388,15 @@ export default function ServerPage() {
                 copied={copied}
                 isOwner={isOwner}
                 canLeave={canLeave}
+                dmNotifications={dmNotifications}
+                unreadDmCount={unreadDmCount}
+                isDmNotifOpen={isDmNotifOpen}
                 onCopyInvite={handleCopyInvite}
                 onShowLeaveModal={() => setShowLeaveModal(true)}
                 onShowDeleteModal={() => setShowDeleteModal(true)}
+                onToggleDmNotifications={handleToggleDmNotifications}
+                onCloseDmNotifications={() => setIsDmNotifOpen(false)}
+                onOpenDmFromNotification={handleOpenDmFromNotification}
             />
 
             {/* Main content */}
@@ -442,7 +431,7 @@ export default function ServerPage() {
                                 <MessageItem
                                     key={message.message_id}
                                     message={message}
-                                    currentUserId={typeof window !== 'undefined' ? sessionStorage.getItem("user_id") : null}
+                                    currentUserId={sessionUserId}
                                     currentUserRole={currentUserRole.role_name}
                                     onDelete={handleDeleteMessage}
                                     onUpdate={handleUpdateMessage}
@@ -474,6 +463,7 @@ export default function ServerPage() {
                     onlineMembers={onlineMembers}
                     serverId={serverId}
                     onMemberUpdate={loadMembers}
+                    onStartPrivateMessage={handleStartPrivateMessage}
                 />
             </div>
 

@@ -15,7 +15,7 @@ pub async fn create_message_handler(
         let repo = PostgresMessageRepo;
         let repo_user = PostgresUserRepo; 
         let usecase = SendMessage { repo_message: &repo , repo_user: &repo_user};
-        usecase.execute(channel_id, request.user_id, request.content)
+        usecase.execute_with_gif(channel_id, request.user_id, request.content, request.is_gif.unwrap_or(false))
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?

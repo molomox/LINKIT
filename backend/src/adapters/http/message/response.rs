@@ -5,6 +5,7 @@ use serde::{Serialize, Deserialize};
 pub struct CreateMessageRequest{
     pub content: String,
     pub user_id: String,
+    pub is_gif: Option<bool>,
 }
 
 #[derive(Deserialize, Serialize)]

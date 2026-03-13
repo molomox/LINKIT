@@ -62,6 +62,7 @@ export default function MessageItem({
 }: MessageItemProps) {
     const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
+    const [isReactionMenuOpen, setIsReactionMenuOpen] = useState(false);
     const [editContent, setEditContent] = useState(message.content);
     
     const isOwnMessage = message.user_id === currentUserId;
@@ -85,6 +86,15 @@ export default function MessageItem({
         setIsEditing(false);
     };
 
+    const handleToggleReactionMenu = () => {
+        setIsReactionMenuOpen((prev) => !prev);
+    };
+
+    const handleSelectReaction = (reaction: Reaction) => {
+        onToggleReaction(message.message_id, reaction);
+        setIsReactionMenuOpen(false);
+    };
+
     // Message système (join/leave)
     if (isSystemMessage) {
         return (
@@ -102,7 +112,7 @@ export default function MessageItem({
 
     // Message normal
     return (
-        <div className="group p-3 hover:bg-yellow-400/5 transition-colors border-l-2 border-transparent hover:border-yellow-400/50">
+        <div className="group relative p-3 hover:bg-yellow-400/5 transition-colors border-l-2 border-transparent hover:border-yellow-400/50">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
@@ -166,7 +176,7 @@ export default function MessageItem({
                                 {reactionSummary.map(({ reaction, count }) => (
                                     <button
                                         key={reaction.reaction_id}
-                                        onClick={() => onToggleReaction(message.message_id, reaction)}
+                                        onClick={() => handleSelectReaction(reaction)}
                                         className="px-2 py-1 text-xs border border-yellow-400/30 text-yellow-300 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                                         style={{ fontFamily: "monospace" }}
                                         title={reaction.reaction_name}
@@ -174,24 +184,38 @@ export default function MessageItem({
                                         {reaction.emoji} {count}
                                     </button>
                                 ))}
-
-                                {availableReactions.slice(0, 8).map((reaction) => (
-                                    <button
-                                        key={`picker-${reaction.reaction_id}`}
-                                        onClick={() => onToggleReaction(message.message_id, reaction)}
-                                        className="px-2 py-1 text-xs border border-gray-600 text-gray-300 hover:border-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 transition-all"
-                                        style={{ fontFamily: "monospace" }}
-                                        title={`Ajouter ${reaction.reaction_name}`}
-                                    >
-                                        {reaction.emoji}
-                                    </button>
-                                ))}
                             </div>
+
+                            {isReactionMenuOpen && (
+                                <div className="mt-2 p-2 border border-yellow-400/30 bg-black/90 rounded flex flex-wrap gap-2">
+                                    {availableReactions.slice(0, 12).map((reaction) => (
+                                        <button
+                                            key={`picker-${reaction.reaction_id}`}
+                                            onClick={() => handleSelectReaction(reaction)}
+                                            className="px-2 py-1 text-xs border border-gray-600 text-gray-300 hover:border-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 transition-all"
+                                            style={{ fontFamily: "monospace" }}
+                                            title={`Ajouter ${reaction.reaction_name}`}
+                                        >
+                                            {reaction.emoji}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
 
                 <div className="ml-auto flex gap-1 opacity-0 group-hover:opacity-100">
+                    {!isEditing && (
+                        <button
+                            onClick={handleToggleReactionMenu}
+                            className="text-yellow-300 hover:text-yellow-200 text-xs px-2 py-1 border border-yellow-400/50 hover:bg-yellow-400/10 transition-all"
+                            style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%)" }}
+                            title="Ajouter une reaction"
+                        >
+                            +
+                        </button>
+                    )}
                     {canEdit && !isEditing && (
                         <button
                             onClick={() => setIsEditing(true)}
