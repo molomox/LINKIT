@@ -9,6 +9,7 @@ export type WsMessage = {
     channel_id?: string;
     server_id?: string;
     create_at?: string;
+    is_gif?: boolean;
 };
 
 export type WebSocketStatus = 'connecting' | 'connected' | 'disconnected' | 'error';

@@ -27,6 +27,9 @@ export function useMessages({ selectedChannel, apiBase }: UseMessagesProps) {
                     user_id: msg.user?.user_id || msg.user_id,
                     username: msg.user?.username || msg.username || "Utilisateur",
                     create_at: msg.create_at,
+                    is_gif: (msg as ApiMessage & { IS_GIF?: boolean }).is_gif ??
+                        (msg as ApiMessage & { IS_GIF?: boolean }).IS_GIF ??
+                        false,
                 }));
 
                 setMessages(transformedMessages);

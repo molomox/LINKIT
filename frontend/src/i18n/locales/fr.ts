@@ -126,6 +126,15 @@ export const fr = {
     defaultUser: "Utilisateur",
   },
 
+  // GIF
+  gif: {
+    title: "SÉLECTIONNER UN GIF",
+    search: "Rechercher des GIFs...",
+    loading: "Chargement...",
+    noResults: "Aucun GIF trouvé",
+    poweredBy: "Propulsé par GIPHY",
+  },
+
   // Membres
   member: {
     members: "MEMBRES",

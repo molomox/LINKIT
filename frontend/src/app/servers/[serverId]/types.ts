@@ -4,6 +4,7 @@ export type Message = {
     user_id: string;
     username: string;
     create_at: string;
+    is_gif?: boolean;
 };
 
 export type ApiMessage = {
@@ -18,6 +19,7 @@ export type ApiMessage = {
     user_id: string;
     username?: string;
     create_at: string;
+    is_gif?: boolean;
 };
 
 export type Member = {

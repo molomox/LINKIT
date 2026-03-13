@@ -20,12 +20,14 @@ export function useMessageEvents({
 
         switch (lastMessage.type) {
             case 'new_message': {
+                const ws = lastMessage as WsMessage & { IS_GIF?: boolean; isGif?: boolean };
                 const newMsg: Message = {
                     message_id: lastMessage.message_id || '',
                     content: lastMessage.content || '',
                     user_id: lastMessage.user_id || '',
                     username: lastMessage.username || '',
                     create_at: lastMessage.create_at || new Date().toISOString(),
+                    is_gif: ws.is_gif ?? ws.IS_GIF ?? ws.isGif ?? false,
                 };
 
                 onMessagesUpdate(prevMessages => {

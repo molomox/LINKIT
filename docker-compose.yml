@@ -1,4 +1,3 @@
-
 services:
   # Base de données PostgreSQL
   db:
@@ -46,7 +45,6 @@ services:
     ports:
       - "${BACKEND_PORT}:3000"
     environment:
-      # Configuration de la base de données
       - RUST_LOG=${RUST_LOG}
       - PORT=3000
       - HOST=0.0.0.0
@@ -70,12 +68,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_GIPHY_API_KEY: ${NEXT_PUBLIC_GIPHY_API_KEY}
     ports:
       - "${FRONTEND_PORT}:3001"
     environment:
       # Variables d'environnement pour le frontend
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+      - NEXT_PUBLIC_GIPHY_API_KEY=${NEXT_PUBLIC_GIPHY_API_KEY}
       - NODE_ENV=${NODE_ENV}
     depends_on:
       - backend
@@ -98,4 +99,3 @@ volumes:
     driver: local
   pgdata:
     driver: local
-    
