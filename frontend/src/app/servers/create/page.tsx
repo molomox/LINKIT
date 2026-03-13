@@ -246,7 +246,7 @@ export default function CreateServerPage() {
                         status.includes("Error") || status.includes("error")
                             ? "bg-red-950/50 border-red-500 text-red-400"
                             : status.includes("created") || status.includes("Redirecting")
-                                ? "bg-green-950/50 border-green-400 text-green-400"
+                                ? "bg-yellow-950/50 border-yellow-400 text-yellow-400"
                                 : "bg-yellow-950/50 border-yellow-400 text-yellow-400"
                     }`} style={{ fontFamily: 'monospace' }}>
                         {status}
