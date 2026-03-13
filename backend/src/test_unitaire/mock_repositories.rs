@@ -5,6 +5,8 @@ use crate::domain::entities::{
     user::User,
     message::Message,
     channel::Channel,
+    reaction::Reaction,
+    reagi::Reagi,
 };
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -270,6 +272,10 @@ impl MessageRepository for MockMessageRepository {
             .cloned()
             .ok_or_else(|| "Message not found".to_string())
     }
+    fn find_reaction(&self, reagi: Reagi) -> Result<bool, String>;
+    fn create_reaction(&self, reagi: Reagi) -> Result<String, String>;
+    fn delete_reaction(&self, reagi: Reagi) -> Result<String, String>;
+    fn find_reaction_emoji(&self, reaction_id: String) -> Result<Reaction, String>;
 }
 
 pub struct MockUserRepository {

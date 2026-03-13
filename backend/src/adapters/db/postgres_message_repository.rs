@@ -3,6 +3,8 @@ use postgres::NoTls;
 use crate::domain::entities::message::Message;
 use crate::adapters::http::constants::db_url;
 use crate::domain::ports::message_repository::MessageRepository;
+use crate::domain::entities::reagi::Reagi;
+use crate::domain::entities::reaction::Reaction;
 
 pub struct PostgresMessageRepo;
 impl MessageRepository for PostgresMessageRepo{
@@ -118,5 +120,62 @@ impl MessageRepository for PostgresMessageRepo{
         }
 
         Ok(messages)
+    }
+    fn find_reaction(&self, reagi: Reagi) -> Result<bool, String> {
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
+
+        let row = client.query_one(
+            "SELECT count(*)
+            FROM view_messages
+            WHERE message_id = $1 AND reaction_user_id = $2 AND reaction_id = $3",
+            &[&reagi.message.message_id, &reagi.user.user_id, &reagi.reaction.reaction_id]
+        ).map_err(|e| e.to_string())?;
+
+        if row.get::<usize, i64>(0) > 0 {
+            return Ok(true);
+        } else {
+            return Ok(false);
+        }
+    }
+
+    fn create_reaction(&self, reagi: Reagi) -> Result<String, String> {
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
+
+        client.execute(
+            "INSERT INTO reactions (message_id, user_id, reaction_id) VALUES ($1, $2, $3)",
+            &[&reagi.message.message_id, &reagi.user.user_id, &reagi.reaction.reaction_id]
+        ).map_err(|e| format!("Failed to create reaction: {}", e))?;
+
+        return Ok("Reaction added".to_string());
+    }
+
+    fn delete_reaction(&self,reagi: Reagi) -> Result<String, String> {
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
+
+        client.execute(
+            "DELETE FROM reactions WHERE message_id = $1 AND user_id = $2 AND reaction_id = $3", 
+            &[&reagi.message.message_id, &reagi.user.user_id, &reagi.reaction.reaction_id]
+        ).map_err(|e| format!("Failed to delete reaction: {}", e))?;
+
+        return Ok("Reaction removed".to_string());
+    }
+
+    fn find_reaction_emoji(&self, reaction_id: String) -> Result<Reaction,String>{
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
+
+        let row = client.query_one(
+            "SELECT reaction_id, emoji, nom_reaction 
+            FROM reaction
+            WHERE reaction_id = $1",
+            &[&reaction_id]
+        ).map_err(|e| e.to_string())?;
+
+        let reaction = Reaction {
+            reaction_id: row.get(0),
+            emoji: row.get(1),
+            nom_reaction: row.get(2)
+        };
+
+        Ok(reaction)
     }
 }

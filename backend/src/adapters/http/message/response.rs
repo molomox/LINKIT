@@ -19,9 +19,14 @@ pub struct UpgradeMemberRequest{
     pub user_id: String,
 }
 
-
 #[derive(Serialize)]
 pub struct CreateServerResponse{
     pub server_id: String,
     pub name: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct CreateReactionResponse{
+    pub user_id: String,
+    pub reaction_id: String,
 }
