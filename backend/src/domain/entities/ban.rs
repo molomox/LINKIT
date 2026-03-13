@@ -1,8 +1,7 @@
-use serde ::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
-#[derive(Debug)]
-pub struct Ban{
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct Ban {
     pub ban_id: String,
     pub bannished_user_id: String,
     pub server_id: String,

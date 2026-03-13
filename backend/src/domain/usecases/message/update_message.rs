@@ -1,28 +1,29 @@
 use crate::domain::entities::message::Message;
-use crate::domain::ports::message_repository::MessageRepository;
 use crate::domain::ports::channel_repository::ChannelRepository;
 use crate::domain::ports::member_repository::MemberRepository;
+use crate::domain::ports::message_repository::MessageRepository;
 
-pub struct UpdateMessage<'a>{
+pub struct UpdateMessage<'a> {
     pub message_repo: &'a dyn MessageRepository,
     pub channel_repo: &'a dyn ChannelRepository,
     pub member_repo: &'a dyn MemberRepository,
 }
 
-impl<'a> UpdateMessage<'a>{
+impl<'a> UpdateMessage<'a> {
     pub fn execute(
         &self,
         message_id: String,
         editor_user_id: String,
         content: String,
-    ) -> Result<(String, String, String), String>{  // (channel_id, message_id, username)
+    ) -> Result<(String, String, String), String> {
+        // (channel_id, message_id, username)
 
         // 1. Vérifier que l'ID n'est pas vide
-        if message_id.is_empty(){
-            return Err("L'ID du message est requis".to_string())
+        if message_id.is_empty() {
+            return Err("L'ID du message est requis".to_string());
         }
 
-        // 2. Récupérer le message 
+        // 2. Récupérer le message
         let mut message = self.message_repo.find_by_id(message_id.clone())?;
         let author_user_id = message.user.user_id.clone();
         let username = message.user.username.clone();

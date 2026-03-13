@@ -1,21 +1,13 @@
 use crate::domain::entities::{
-    server::Server, 
-    member::Member, 
-    role::Role, 
-    user::User,
-    message::Message,
-    channel::Channel,
+    channel::Channel, member::Member, message::Message, role::Role, server::Server, user::User,
+};
+use crate::domain::ports::{
+    channel_repository::ChannelRepository, member_repository::MemberRepository,
+    message_repository::MessageRepository, role_repository::RoleRepository,
+    server_repository::ServerRepository, user_repository::UserRepository,
 };
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use crate::domain::ports::{
-    server_repository::ServerRepository,
-    member_repository::MemberRepository,
-    role_repository::RoleRepository,
-    message_repository::MessageRepository,
-    user_repository::UserRepository,
-    channel_repository::ChannelRepository,
-};
 pub struct MockChannelRepository {
     channels: Arc<Mutex<HashMap<String, Channel>>>,
     should_fail: bool,
@@ -39,9 +31,11 @@ impl MockChannelRepository {
     }
 
     pub fn add_channel(&self, channel: Channel) {
-        self.channels.lock().unwrap().insert(channel.channel_id.clone(), channel);
+        self.channels
+            .lock()
+            .unwrap()
+            .insert(channel.channel_id.clone(), channel);
     }
-
 }
 impl ChannelRepository for MockChannelRepository {
     fn save(&self, channel: Channel) -> Result<Channel, String> {
@@ -84,7 +78,7 @@ impl ChannelRepository for MockChannelRepository {
     fn delete_channel(&self, channel_id: String) -> Result<String, String> {
         let mut channels = self.channels.lock().unwrap();
         if channels.remove(&channel_id).is_some() {
-            return Ok(channel_id)
+            return Ok(channel_id);
         }
         Err("Channel not found".to_string())
     }
@@ -115,17 +109,26 @@ impl MockServerRepository {
     }
 
     pub fn add_server(&self, server: Server) {
-        self.servers.lock().unwrap().insert(server.server_id.clone(), server);
+        self.servers
+            .lock()
+            .unwrap()
+            .insert(server.server_id.clone(), server);
     }
 
     pub fn add_member(&self, member: Member) {
-        self.members.lock().unwrap().insert(member.user.user_id.clone(), member);
+        self.members
+            .lock()
+            .unwrap()
+            .insert(member.user.user_id.clone(), member);
     }
 }
 
 impl ServerRepository for MockServerRepository {
     fn save(&self, server: Server) -> Result<Server, String> {
-        self.servers.lock().unwrap().insert(server.server_id.clone(), server.clone());
+        self.servers
+            .lock()
+            .unwrap()
+            .insert(server.server_id.clone(), server.clone());
         Ok(server)
     }
 
@@ -139,7 +142,8 @@ impl ServerRepository for MockServerRepository {
     }
 
     fn find_by_user_id(&self, user_id: String) -> Result<Vec<Server>, String> {
-        let server_ids: Vec<String> = self.members
+        let server_ids: Vec<String> = self
+            .members
             .lock()
             .unwrap()
             .values()
@@ -151,7 +155,8 @@ impl ServerRepository for MockServerRepository {
             return Ok(vec![]);
         }
 
-        let servers_result: Vec<Server> = self.servers
+        let servers_result: Vec<Server> = self
+            .servers
             .lock()
             .unwrap()
             .values()
@@ -185,7 +190,7 @@ impl ServerRepository for MockServerRepository {
         let mut servers = self.servers.lock().unwrap();
         if servers.contains_key(&server.server_id) {
             servers.insert(server.server_id.clone(), server.clone());
-            return Ok(server)
+            return Ok(server);
         }
         Err("Server not found".to_string())
     }
@@ -204,7 +209,13 @@ impl MockMessageRepository {
         }
     }
 
-    pub fn create_test_message(&self, message_id: &str, channel_id: &str, user_id: &str, content: &str) -> Message {
+    pub fn create_test_message(
+        &self,
+        message_id: &str,
+        channel_id: &str,
+        user_id: &str,
+        content: &str,
+    ) -> Message {
         Message {
             message_id: message_id.to_string(),
             channel_id: channel_id.to_string(),
@@ -223,13 +234,19 @@ impl MockMessageRepository {
         }
     }
     pub fn add_message(&self, message: Message) {
-        self.messages.lock().unwrap().insert(message.message_id.clone(), message);
+        self.messages
+            .lock()
+            .unwrap()
+            .insert(message.message_id.clone(), message);
     }
 }
 
 impl MessageRepository for MockMessageRepository {
     fn save(&self, message: Message) -> Result<Message, String> {
-        self.messages.lock().unwrap().insert(message.message_id.clone(), message.clone());
+        self.messages
+            .lock()
+            .unwrap()
+            .insert(message.message_id.clone(), message.clone());
         Ok(message)
     }
 
@@ -257,7 +274,7 @@ impl MessageRepository for MockMessageRepository {
         let mut messages = self.messages.lock().unwrap();
         if messages.contains_key(&message.message_id) {
             messages.insert(message.message_id.clone(), message.clone());
-            return Ok(message)
+            return Ok(message);
         }
         Err("Message not found".to_string())
     }
@@ -302,20 +319,33 @@ impl MockUserRepository {
         }
     }
     pub fn add_user(&self, user: User) {
-        self.users.lock().unwrap().insert(user.user_id.clone(), user);
+        self.users
+            .lock()
+            .unwrap()
+            .insert(user.user_id.clone(), user);
     }
 }
 
 impl UserRepository for MockUserRepository {
     fn save(&self, user: User) -> Result<User, String> {
-        self.users.lock().unwrap().insert(user.user_id.clone(), user.clone());
+        self.users
+            .lock()
+            .unwrap()
+            .insert(user.user_id.clone(), user.clone());
         Ok(user)
     }
     fn find_by_id(&self, user_id: std::string::String) -> Result<User, String> {
         let users = self.users.lock().unwrap();
-        users.get(&user_id).cloned().ok_or_else(|| "User not found".to_string())
+        users
+            .get(&user_id)
+            .cloned()
+            .ok_or_else(|| "User not found".to_string())
     }
-    fn update_token(&self, user_id: std::string::String, token: Option<String>) -> Result<(), std::string::String> {
+    fn update_token(
+        &self,
+        user_id: std::string::String,
+        token: Option<String>,
+    ) -> Result<(), std::string::String> {
         let mut users = self.users.lock().unwrap();
         if let Some(user) = users.get_mut(&user_id) {
             user.token = token.clone();
@@ -326,10 +356,13 @@ impl UserRepository for MockUserRepository {
     }
     fn find_by_username(&self, username: String) -> Result<User, String> {
         let users = self.users.lock().unwrap();
-        users.values().find(|u| u.username == username).cloned().ok_or_else(|| "User not found".to_string())
+        users
+            .values()
+            .find(|u| u.username == username)
+            .cloned()
+            .ok_or_else(|| "User not found".to_string())
     }
 }
-
 
 pub struct MockMemberRepository {
     members: Arc<Mutex<Vec<Member>>>,
@@ -345,27 +378,27 @@ impl MockMemberRepository {
     pub fn create_test_member(&self, user_id: &str, server_id: &str, role_id: &str) -> Member {
         if role_id == "role04" {
             return Member {
-            user: User {
-                user_id: user_id.to_string(),
-                username: format!("User{}", user_id),
-                email: format!("user{}@example.com", user_id),
-                create_at: "2024-01-01T00:00:00Z".to_string(),
-                password: "password".to_string(),
-                token: None,
-            },
-            server: Server {
-                server_id: server_id.to_string(),
-                name: format!("Server{}", server_id),
-                invite_code: format!("invite-{}", server_id),
-                password: "".to_string(),
-                all_channels: Vec::new(),
-                create_at: "2024-01-01T00:00:00Z".to_string(),
-            },
-            role: Role {
-                role_id: "role04".to_string(),
-                role_name: "Owner".to_string(),
-            },
-            join_at: "2024-01-01T00:00:00Z".to_string(),
+                user: User {
+                    user_id: user_id.to_string(),
+                    username: format!("User{}", user_id),
+                    email: format!("user{}@example.com", user_id),
+                    create_at: "2024-01-01T00:00:00Z".to_string(),
+                    password: "password".to_string(),
+                    token: None,
+                },
+                server: Server {
+                    server_id: server_id.to_string(),
+                    name: format!("Server{}", server_id),
+                    invite_code: format!("invite-{}", server_id),
+                    password: "".to_string(),
+                    all_channels: Vec::new(),
+                    create_at: "2024-01-01T00:00:00Z".to_string(),
+                },
+                role: Role {
+                    role_id: "role04".to_string(),
+                    role_name: "Owner".to_string(),
+                },
+                join_at: "2024-01-01T00:00:00Z".to_string(),
             };
         }
         return Member {
@@ -437,7 +470,10 @@ impl MemberRepository for MockMemberRepository {
     fn delete_member(&self, user_id: String, server_id: String) -> Result<String, String> {
         let mut members = self.members.lock().unwrap();
         members.retain(|m| !(m.user.user_id == user_id && m.server.server_id == server_id));
-        Ok(format!("Deleted member {} from server {}", user_id, server_id))
+        Ok(format!(
+            "Deleted member {} from server {}",
+            user_id, server_id
+        ))
     }
 
     fn update_member_role(
@@ -446,7 +482,10 @@ impl MemberRepository for MockMemberRepository {
         server_id: String,
         _role_id: String,
     ) -> Result<String, String> {
-        Ok(format!("Role updated for user {} in server {}", user_id, server_id))
+        Ok(format!(
+            "Role updated for user {} in server {}",
+            user_id, server_id
+        ))
     }
 }
 
@@ -479,7 +518,10 @@ impl MockRoleRepository {
     }
 
     pub fn add_role(&self, role: Role) {
-        self.roles.lock().unwrap().insert(role.role_id.clone(), role);
+        self.roles
+            .lock()
+            .unwrap()
+            .insert(role.role_id.clone(), role);
     }
 }
 
@@ -492,7 +534,7 @@ impl RoleRepository for MockRoleRepository {
             .cloned()
             .ok_or_else(|| "Role not found".to_string())
     }
-    fn find_by_name(&self, name: String) -> Result<Role,String> {
+    fn find_by_name(&self, name: String) -> Result<Role, String> {
         self.roles
             .lock()
             .unwrap()

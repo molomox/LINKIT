@@ -1,27 +1,25 @@
-
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
-pub struct CreateMessageRequest{
+pub struct CreateMessageRequest {
     pub content: String,
     pub user_id: String,
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct JoinServerRequest{
+pub struct JoinServerRequest {
     pub user_id: String,
     pub password: String,
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct UpgradeMemberRequest{
+pub struct UpgradeMemberRequest {
     pub server_id: String,
     pub user_id: String,
 }
 
-
 #[derive(Serialize)]
-pub struct CreateServerResponse{
+pub struct CreateServerResponse {
     pub server_id: String,
     pub name: String,
 }

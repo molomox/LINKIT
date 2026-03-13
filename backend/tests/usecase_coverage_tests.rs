@@ -1,10 +1,10 @@
 // Tests pour augmenter la couverture des use cases
 // Objectif : atteindre 70%+ de couverture
 
-use backend::domain::entities::user::User;
-use backend::domain::entities::server::Server;
 use backend::domain::entities::channel::Channel;
 use backend::domain::entities::message::Message;
+use backend::domain::entities::server::Server;
+use backend::domain::entities::user::User;
 
 // ═══════════════════════════════════════════════════════════════
 // TESTS USE CASE: USER CREATE
@@ -97,7 +97,10 @@ mod user_login_tests {
         let username = "testuser";
 
         // Simulate JWT token payload
-        let payload = format!("{{\"user_id\":\"{}\",\"username\":\"{}\"}}", user_id, username);
+        let payload = format!(
+            "{{\"user_id\":\"{}\",\"username\":\"{}\"}}",
+            user_id, username
+        );
         assert!(payload.contains(user_id));
         assert!(payload.contains(username));
     }
@@ -196,16 +199,14 @@ mod user_find_by_id_tests {
 
     #[test]
     fn test_find_user_not_found() {
-        let users = vec![
-            User {
-                user_id: "u1".to_string(),
-                username: "user1".to_string(),
-                email: "user1@test.com".to_string(),
-                password: "hash1".to_string(),
-                create_at: "2024-01-01".to_string(),
-                token: None,
-            },
-        ];
+        let users = vec![User {
+            user_id: "u1".to_string(),
+            username: "user1".to_string(),
+            email: "user1@test.com".to_string(),
+            password: "hash1".to_string(),
+            create_at: "2024-01-01".to_string(),
+            token: None,
+        }];
 
         let search_id = "u999";
         let found = users.iter().find(|u| u.user_id == search_id);
@@ -313,17 +314,16 @@ mod server_delete_tests {
     #[test]
     fn test_server_delete_cascades_channels() {
         let server_id = "srv1";
-        let channels = vec![
-            Channel {
-                channel_id: "ch1".to_string(),
-                server_id: server_id.to_string(),
-                name: "general".to_string(),
-                create_at: "2024-01-01".to_string(),
-            },
-        ];
+        let channels = vec![Channel {
+            channel_id: "ch1".to_string(),
+            server_id: server_id.to_string(),
+            name: "general".to_string(),
+            create_at: "2024-01-01".to_string(),
+        }];
 
         // Simulate cascade delete
-        let remaining: Vec<_> = channels.iter()
+        let remaining: Vec<_> = channels
+            .iter()
             .filter(|c| c.server_id != server_id)
             .collect();
         assert_eq!(remaining.len(), 0);
@@ -385,16 +385,14 @@ mod server_get_tests {
 
     #[test]
     fn test_get_server_by_id() {
-        let servers = vec![
-            Server {
-                name: "Server 1".to_string(),
-                server_id: "srv1".to_string(),
-                password: "".to_string(),
-                create_at: "2024-01-01".to_string(),
-                invite_code: "CODE1".to_string(),
-                all_channels: vec![],
-            },
-        ];
+        let servers = vec![Server {
+            name: "Server 1".to_string(),
+            server_id: "srv1".to_string(),
+            password: "".to_string(),
+            create_at: "2024-01-01".to_string(),
+            invite_code: "CODE1".to_string(),
+            all_channels: vec![],
+        }];
 
         let search_id = "srv1";
         let found = servers.iter().find(|s| s.server_id == search_id);
@@ -506,16 +504,15 @@ mod channel_delete_tests {
     #[test]
     fn test_channel_delete_by_id() {
         let channel_id = "ch1";
-        let channels = vec![
-            Channel {
-                channel_id: "ch1".to_string(),
-                server_id: "srv1".to_string(),
-                name: "general".to_string(),
-                create_at: "2024-01-01".to_string(),
-            },
-        ];
+        let channels = vec![Channel {
+            channel_id: "ch1".to_string(),
+            server_id: "srv1".to_string(),
+            name: "general".to_string(),
+            create_at: "2024-01-01".to_string(),
+        }];
 
-        let remaining: Vec<_> = channels.iter()
+        let remaining: Vec<_> = channels
+            .iter()
             .filter(|c| c.channel_id != channel_id)
             .collect();
         assert_eq!(remaining.len(), 0);
@@ -533,17 +530,16 @@ mod channel_delete_tests {
             token: None,
         };
 
-        let messages = vec![
-            Message {
-                message_id: "m1".to_string(),
-                channel_id: channel_id.to_string(),
-                content: "Message".to_string(),
-                user: user,
-                create_at: "2024-01-01".to_string(),
-            },
-        ];
+        let messages = vec![Message {
+            message_id: "m1".to_string(),
+            channel_id: channel_id.to_string(),
+            content: "Message".to_string(),
+            user: user,
+            create_at: "2024-01-01".to_string(),
+        }];
 
-        let remaining: Vec<_> = messages.iter()
+        let remaining: Vec<_> = messages
+            .iter()
             .filter(|m| m.channel_id != channel_id)
             .collect();
         assert_eq!(remaining.len(), 0);
@@ -704,16 +700,14 @@ mod additional_coverage_tests {
     #[test]
     fn test_server_list_by_user() {
         let user_id = "user123";
-        let servers = vec![
-            Server {
-                name: "Server 1".to_string(),
-                server_id: "srv1".to_string(),
-                password: "".to_string(),
-                create_at: "2024-01-01".to_string(),
-                invite_code: "CODE1".to_string(),
-                all_channels: vec![],
-            },
-        ];
+        let servers = vec![Server {
+            name: "Server 1".to_string(),
+            server_id: "srv1".to_string(),
+            password: "".to_string(),
+            create_at: "2024-01-01".to_string(),
+            invite_code: "CODE1".to_string(),
+            all_channels: vec![],
+        }];
 
         // In real code: filter by member.user_id
         assert!(!servers.is_empty());
@@ -722,16 +716,15 @@ mod additional_coverage_tests {
     #[test]
     fn test_channel_list_by_server() {
         let server_id = "srv1";
-        let channels = vec![
-            Channel {
-                channel_id: "ch1".to_string(),
-                server_id: server_id.to_string(),
-                name: "general".to_string(),
-                create_at: "2024-01-01".to_string(),
-            },
-        ];
+        let channels = vec![Channel {
+            channel_id: "ch1".to_string(),
+            server_id: server_id.to_string(),
+            name: "general".to_string(),
+            create_at: "2024-01-01".to_string(),
+        }];
 
-        let server_channels: Vec<_> = channels.iter()
+        let server_channels: Vec<_> = channels
+            .iter()
             .filter(|c| c.server_id == server_id)
             .collect();
         assert_eq!(server_channels.len(), 1);
@@ -749,17 +742,16 @@ mod additional_coverage_tests {
             token: None,
         };
 
-        let messages = vec![
-            Message {
-                message_id: "m1".to_string(),
-                channel_id: channel_id.to_string(),
-                content: "Message 1".to_string(),
-                user: user.clone(),
-                create_at: "2024-01-01".to_string(),
-            },
-        ];
+        let messages = vec![Message {
+            message_id: "m1".to_string(),
+            channel_id: channel_id.to_string(),
+            content: "Message 1".to_string(),
+            user: user.clone(),
+            create_at: "2024-01-01".to_string(),
+        }];
 
-        let channel_messages: Vec<_> = messages.iter()
+        let channel_messages: Vec<_> = messages
+            .iter()
             .filter(|m| m.channel_id == channel_id)
             .collect();
         assert_eq!(channel_messages.len(), 1);
@@ -790,14 +782,12 @@ mod additional_coverage_tests {
 
     #[test]
     fn test_channel_get() {
-        let channels = vec![
-            Channel {
-                channel_id: "ch1".to_string(),
-                server_id: "srv1".to_string(),
-                name: "general".to_string(),
-                create_at: "2024-01-01".to_string(),
-            },
-        ];
+        let channels = vec![Channel {
+            channel_id: "ch1".to_string(),
+            server_id: "srv1".to_string(),
+            name: "general".to_string(),
+            create_at: "2024-01-01".to_string(),
+        }];
 
         let search_id = "ch1";
         let found = channels.iter().find(|c| c.channel_id == search_id);
@@ -807,16 +797,14 @@ mod additional_coverage_tests {
     #[test]
     fn test_server_join_by_invite() {
         let invite_code = "ABC123";
-        let servers = vec![
-            Server {
-                name: "Server".to_string(),
-                server_id: "srv1".to_string(),
-                password: "".to_string(),
-                create_at: "2024-01-01".to_string(),
-                invite_code: invite_code.to_string(),
-                all_channels: vec![],
-            },
-        ];
+        let servers = vec![Server {
+            name: "Server".to_string(),
+            server_id: "srv1".to_string(),
+            password: "".to_string(),
+            create_at: "2024-01-01".to_string(),
+            invite_code: invite_code.to_string(),
+            all_channels: vec![],
+        }];
 
         let found = servers.iter().find(|s| s.invite_code == invite_code);
         assert!(found.is_some());

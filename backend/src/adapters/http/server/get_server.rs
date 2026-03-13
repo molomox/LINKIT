@@ -1,12 +1,10 @@
+use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
+use crate::adapters::http::error::ApiError;
 use crate::domain::entities::server::Server;
 use crate::domain::usecases::server::get::GetServerDetails;
-use crate::adapters::http::error::ApiError;
-use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
-use axum::{Json, extract::Path};
+use axum::{extract::Path, Json};
 
-pub async fn get_server_handler(
-    Path(server_id): Path<String>,
-) -> Result<Json<Server>, ApiError> {
+pub async fn get_server_handler(Path(server_id): Path<String>) -> Result<Json<Server>, ApiError> {
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;
         let usecase = GetServerDetails { repo: &repo };
@@ -18,4 +16,3 @@ pub async fn get_server_handler(
 
     Ok(Json(result))
 }
-

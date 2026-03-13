@@ -1,7 +1,7 @@
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
+use crate::adapters::http::error::ApiError;
 use crate::domain::entities::user::User;
 use crate::domain::usecases::user::find_by_id::GetUserById;
-use crate::adapters::http::error::ApiError;
 use axum::extract::Query;
 use serde::Deserialize;
 
@@ -25,4 +25,3 @@ pub async fn get_user_handler(
 
     Ok(axum::Json(result))
 }
-

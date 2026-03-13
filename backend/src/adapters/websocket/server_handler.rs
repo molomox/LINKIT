@@ -42,7 +42,7 @@ pub async fn handle_server_socket(socket: WebSocket, server_id: String, state: A
     let user_id_clone = current_user_id.clone();
     let username_clone = current_username.clone();
     let server_id_clone = server_id.clone();
-    
+
     let mut recv_task = tokio::spawn(async move {
         while let Some(Ok(msg)) = receiver.next().await {
             match msg {
@@ -54,9 +54,9 @@ pub async fn handle_server_socket(socket: WebSocket, server_id: String, state: A
                                 // Stocker l'identité de l'utilisateur
                                 *user_id_clone.write().await = Some(user_id.clone());
                                 *username_clone.write().await = Some(username.clone());
-                                
+
                                 println!("👤 Utilisateur identifié: {} ({})", username, user_id);
-                                
+
                                 // Broadcaster user_online (seulement si ce n'est pas déjà fait)
                                 let online_msg = WsMessage::UserOnline {
                                     user_id: user_id.clone(),
@@ -79,7 +79,10 @@ pub async fn handle_server_socket(socket: WebSocket, server_id: String, state: A
                     }
                 }
                 Message::Close(_) => {
-                    println!("🔴 Client a fermé la connexion pour serveur: {}", server_key);
+                    println!(
+                        "🔴 Client a fermé la connexion pour serveur: {}",
+                        server_key
+                    );
                     break;
                 }
                 _ => {}

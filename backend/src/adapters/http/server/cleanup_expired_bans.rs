@@ -1,9 +1,9 @@
 use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
-use crate::domain::usecases::ban::cleanup_expired::CleanupExpiredBans;
-use axum::extract::{Path, State};
 use crate::adapters::http::error::ApiError;
 use crate::adapters::websocket::{AppState, WsMessage};
+use crate::domain::usecases::ban::cleanup_expired::CleanupExpiredBans;
+use axum::extract::{Path, State};
 use axum::Json;
 
 pub async fn cleanup_expired_bans_handler(
@@ -27,16 +27,18 @@ pub async fn cleanup_expired_bans_handler(
 
     // Broadcaster les changements de rôle pour chaque utilisateur débanni
     for user_id in &unbanned_users {
-        state.broadcast_to_server(
-            &server_id,
-            WsMessage::MemberRoleChanged {
-                user_id: user_id.clone(),
-                username: "Utilisateur".to_string(), // On pourrait récupérer le vrai username si nécessaire
-                role_id: "role02".to_string(),
-                role_name: "Membre".to_string(),
-                server_id: server_id.clone(),
-            },
-        ).await;
+        state
+            .broadcast_to_server(
+                &server_id,
+                WsMessage::MemberRoleChanged {
+                    user_id: user_id.clone(),
+                    username: "Utilisateur".to_string(), // On pourrait récupérer le vrai username si nécessaire
+                    role_id: "role02".to_string(),
+                    role_name: "Membre".to_string(),
+                    server_id: server_id.clone(),
+                },
+            )
+            .await;
     }
 
     Ok(Json(unbanned_users))

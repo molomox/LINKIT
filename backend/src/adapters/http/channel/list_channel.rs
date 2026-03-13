@@ -1,13 +1,13 @@
 use crate::adapters::db::postgres_channel_repository::PostgresChannelRepo;
-use crate::domain::entities::channel::Channel;
 use crate::adapters::http::error::ApiError;
+use crate::domain::entities::channel::Channel;
 use crate::domain::usecases::channel::create::CreateChannel;
 use crate::domain::usecases::channel::list_channel::ListServerChannel;
-use axum::Json;
 use axum::extract::Path;
+use axum::Json;
 
 pub async fn list_channel_handler(
-    Path(server_id): Path<String>
+    Path(server_id): Path<String>,
 ) -> Result<Json<Vec<Channel>>, ApiError> {
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresChannelRepo;

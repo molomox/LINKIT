@@ -1,6 +1,6 @@
 use crate::domain::entities::server::Server;
 
-pub trait ServerRepository{
+pub trait ServerRepository {
     fn save(&self, server: Server) -> Result<Server, String>;
     fn update(&self, server: Server) -> Result<Server, String>;
     fn find_by_id(&self, server_id: String) -> Result<Server, String>;

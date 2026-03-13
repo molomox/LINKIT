@@ -1,25 +1,21 @@
 use crate::domain::entities::server::Server;
 use crate::domain::ports::server_repository::ServerRepository;
-use uuid::Uuid;
 use chrono::Utc;
+use uuid::Uuid;
 
-pub struct CreateServer<'a>{
+pub struct CreateServer<'a> {
     pub repo: &'a dyn ServerRepository,
 }
 
 impl<'a> CreateServer<'a> {
-    pub fn execute (
-        &self,
-        name: String,
-        password: String,
-     ) -> Result<Server, String> {
-        if name.is_empty() || password.is_empty(){
+    pub fn execute(&self, name: String, password: String) -> Result<Server, String> {
+        if name.is_empty() || password.is_empty() {
             return Err("Entrez un nom et un password".to_string());
         }
         let server_id = Uuid::new_v4().to_string();
         let create_at = Utc::now().to_string();
         let invite_code = Uuid::new_v4().to_string();
-        let server = Server{
+        let server = Server {
             server_id,
             create_at,
             name,
@@ -29,19 +25,21 @@ impl<'a> CreateServer<'a> {
         };
         self.repo.save(server.clone()).map_err(|e| e.to_string())?;
         Ok(server)
-        }
-
     }
+}
 
 #[cfg(test)]
-mod test{
-    use crate::domain::{entities::server::Server, ports::server_repository::ServerRepository, usecases::server::create::CreateServer};
+mod test {
+    use crate::domain::{
+        entities::server::Server, ports::server_repository::ServerRepository,
+        usecases::server::create::CreateServer,
+    };
 
     struct FakeRepo;
 
-    impl ServerRepository for FakeRepo{
-        fn save(&self, _: Server)-> Result<Server, String> {
-            Ok(Server{
+    impl ServerRepository for FakeRepo {
+        fn save(&self, _: Server) -> Result<Server, String> {
+            Ok(Server {
                 server_id: "server_id".to_string(),
                 create_at: "2024-01-01".to_string(),
                 name: "server".to_string(),
@@ -69,17 +67,13 @@ mod test{
     }
 
     #[test]
-    fn server_name_return_name(){
+    fn server_name_return_name() {
         let repo = FakeRepo;
-        let usecase = CreateServer{repo: &repo};
-        
-        let server = usecase.execute(
-            "server".into(),
-            "123".into(),
-        );
+        let usecase = CreateServer { repo: &repo };
+
+        let server = usecase.execute("server".into(), "123".into());
         assert!(server.is_ok());
         let srv = server.unwrap();
-        assert_eq!(srv.name,"server");
-
+        assert_eq!(srv.name, "server");
     }
 }

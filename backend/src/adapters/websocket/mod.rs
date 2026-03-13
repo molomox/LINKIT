@@ -1,18 +1,15 @@
 // Modules WebSocket
-mod types;
-mod state;
 mod channel_handler;
 mod server_handler;
+mod state;
+mod types;
 
 // Réexporter les types publics
-pub use types::{IncomingWsMessage, WsMessage};
 pub use state::{AppState, Clients};
+pub use types::{IncomingWsMessage, WsMessage};
 
 use axum::{
-    extract::{
-        ws::WebSocketUpgrade,
-        Path, State,
-    },
+    extract::{ws::WebSocketUpgrade, Path, State},
     response::Response,
     routing::get,
     Router,

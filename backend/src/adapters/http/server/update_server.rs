@@ -1,10 +1,10 @@
+use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
+use crate::adapters::http::error::ApiError;
 use crate::adapters::http::server::response::CreateServerRequest;
 use crate::domain::entities::server::Server;
-use crate::adapters::http::error::ApiError;
-use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
 use crate::domain::usecases::server::update::UpdateServer;
-use axum::Json;
 use axum::extract::Path;
+use axum::Json;
 
 pub async fn update_server_handler(
     Path(server_id): Path<String>,

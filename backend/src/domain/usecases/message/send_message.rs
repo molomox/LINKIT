@@ -1,9 +1,9 @@
 use crate::domain::entities::message::Message;
+use crate::domain::entities::user::User;
 use crate::domain::ports::message_repository::MessageRepository;
 use crate::domain::ports::user_repository::UserRepository;
-use uuid::Uuid;
 use chrono::Utc;
-use crate::domain::entities::user::User;
+use uuid::Uuid;
 
 pub struct SendMessage<'a> {
     pub repo_message: &'a dyn MessageRepository,
@@ -29,8 +29,10 @@ impl<'a> SendMessage<'a> {
         }
 
         // Récupérer le username depuis la base de données
-        let user = self.repo_user.find_by_id(user_id.clone())
-        .map_err(|e| format!("Erreur lors de la récupération de l'utilisateur: {}", e))?;
+        let user = self
+            .repo_user
+            .find_by_id(user_id.clone())
+            .map_err(|e| format!("Erreur lors de la récupération de l'utilisateur: {}", e))?;
 
         // Génération de l'ID et du timestamp
         let message_id = Uuid::new_v4().to_string();
@@ -58,4 +60,3 @@ impl<'a> SendMessage<'a> {
         self.repo_message.save(message)
     }
 }
-
