@@ -5,3 +5,5 @@ pub mod server_repository;
 pub mod user_repository;
 pub mod channel_repository;
 pub mod ban_repository;
+pub mod reagi_repository;
+pub mod reaction_repository;

@@ -5,3 +5,5 @@ pub mod postgres_channel_repository;
 pub mod postgres_message_repository;
 pub mod postgres_user_repository;
 pub mod postgres_ban_repository;
+pub mod postgres_reaction_repository;
+pub mod postgres_reagi_repository;

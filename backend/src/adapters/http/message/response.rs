@@ -25,3 +25,13 @@ pub struct CreateServerResponse{
     pub server_id: String,
     pub name: String,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct ToggleReactionRequest {
+    pub user_id: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct ToggleReactionResponse {
+    pub status: String,
+}

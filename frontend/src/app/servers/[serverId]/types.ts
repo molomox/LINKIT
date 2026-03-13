@@ -5,6 +5,13 @@ export type Message = {
     username: string;
     create_at: string;
     is_gif?: boolean;
+    reactions?: Reaction[];
+};
+
+export type Reaction = {
+    reaction_id: number;
+    emoji: string;
+    reaction_name: string;
 };
 
 export type ApiMessage = {
@@ -20,6 +27,7 @@ export type ApiMessage = {
     username?: string;
     create_at: string;
     is_gif?: boolean;
+    reactions?: Reaction[];
 };
 
 export type Member = {

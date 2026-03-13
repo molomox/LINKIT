@@ -30,6 +30,7 @@ export function useMessages({ selectedChannel, apiBase }: UseMessagesProps) {
                     is_gif: (msg as ApiMessage & { IS_GIF?: boolean }).is_gif ??
                         (msg as ApiMessage & { IS_GIF?: boolean }).IS_GIF ??
                         false,
+                    reactions: msg.reactions ?? [],
                 }));
 
                 setMessages(transformedMessages);
