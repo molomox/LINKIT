@@ -59,6 +59,8 @@ impl MessageRepository for PostgresMessageRepo{
                 token: None,
             },
             create_at: row.get(4),
+            is_gif: false,
+            reactions: Vec::new(),
         };
 
         Ok(message)
@@ -66,20 +68,30 @@ impl MessageRepository for PostgresMessageRepo{
     
     fn find_by_channel(&self, channel_id: String) -> Result<Vec<Message>, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
-        let mut messages = Vec::new();
+        let mut messages: Vec<Message> = Vec::new();
 
         for row in client.query(
-            "SELECT message_id, content, channel_id, user_id, create_at, username, email, reaction_id, emoji, reaction_user_id, IS_GIF,reaction_username
+            "SELECT message_id, content, channel_id, user_id, create_at, username, email, reaction_id, emoji, reaction_user_id, IS_GIF, reaction_username
             FROM view_messages
             WHERE channel_id = $1
             ORDER BY create_at ASC
             LIMIT 100",
             &[&channel_id]
         ).map_err(|e| e.to_string())? {
-            let message = messages.iter().find(|m| m.message_id == row.get::<usize, String>(0));
-            if message.is_none() {
-                let message = Message {
-                    message_id: row.get(0),
+            let msg_id: String = row.get(0);
+            let reaction_id: Option<i32> = row.get(7);
+
+            if let Some(existing) = messages.iter_mut().find(|m| m.message_id == msg_id) {
+                if let Some(r_id) = reaction_id {
+                    existing.reactions.push(crate::domain::entities::reaction::Reaction {
+                        reaction_id: r_id,
+                        emoji: row.get(8),
+                        reaction_name: String::new(),
+                    });
+                }
+            } else {
+                let mut msg = Message {
+                    message_id: msg_id,
                     content: row.get(1),
                     channel_id: row.get(2),
                     user: crate::domain::entities::user::User {
@@ -90,32 +102,19 @@ impl MessageRepository for PostgresMessageRepo{
                         create_at: String::new(),
                         token: None,
                     },
-                    is_gif: row.get(10),
                     create_at: row.get(4),
+                    is_gif: row.get(10),
+                    reactions: Vec::new(),
                 };
+                if let Some(r_id) = reaction_id {
+                    msg.reactions.push(crate::domain::entities::reaction::Reaction {
+                        reaction_id: r_id,
+                        emoji: row.get(8),
+                        reaction_name: String::new(),
+                    });
+                }
+                messages.push(msg);
             }
-            let reaction_id = row.get(7) 
-            if reaction_id != NULL {
-                let reaction = crate::domain::entities::reaction::Reaction {
-                    reaction_id,
-                    emoji: row.get(8),
-                    reaction_name: String::new(),
-                };
-                let reagi = crate::domain::entities::reagi::Reagi {
-                    message: message.clone(),
-                    user: crate::domain::entities::user::User {
-                        user_id: row.get(9),
-                        username: row.get(11),
-                        email: String::new(),
-                        password: String::new(),
-                        create_at: String::new(),
-                        token: None,
-                    },
-                    reaction,
-                };
-                message.reactions.push(reagi.reaction);
-            }
-            messages.push(message);
         }
 
         Ok(messages)

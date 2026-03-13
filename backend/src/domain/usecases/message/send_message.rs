@@ -50,6 +50,8 @@ impl<'a> SendMessage<'a> {
             },
             content,
             create_at,
+            is_gif: false,
+            reactions: Vec::new(),
         };
 
         // Sauvegarder en base de données et retourner le résultat
