@@ -218,6 +218,8 @@ impl MockMessageRepository {
                 token: None,
             },
             create_at: "2024-01-01T00:00:00Z".to_string(),
+            is_gif: false,
+            reactions: Vec::new(),
         }
     }
     pub fn add_message(&self, message: Message) {
