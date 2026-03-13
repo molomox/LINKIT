@@ -128,6 +128,15 @@ export const en: Translations = {
     defaultUser: "User",
   },
 
+  // GIF
+  gif: {
+    title: "SELECT A GIF",
+    search: "Search GIFs...",
+    loading: "Loading...",
+    noResults: "No GIFs found",
+    poweredBy: "Powered by GIPHY",
+  },
+
   // Members
   member: {
     members: "MEMBERS",

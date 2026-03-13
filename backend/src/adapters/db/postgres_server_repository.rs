@@ -2,13 +2,13 @@ use postgres::{Client, NoTls};
 use crate::domain::entities::channel::Channel;
 use crate::domain::entities::server::Server;
 use crate::domain::ports::server_repository::ServerRepository;
-use crate::adapters::http::constants::DB_URL;
+use crate::adapters::http::constants::db_url;
 
 pub struct PostgresServerRepo;
 
 impl ServerRepository for PostgresServerRepo {
     fn save(&self, server: Server) -> Result<Server, String> {
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         client.execute(
             "INSERT INTO servers (name, server_id, password, create_at, invite_code) VALUES ($1, $2, $3, $4, $5)",
@@ -19,7 +19,7 @@ impl ServerRepository for PostgresServerRepo {
     }
 
     fn find_by_id(&self, server_id: String) -> Result<Server, String> {
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         let row = client
             .query_one(
                 "SELECT name, server_id, password, create_at, invite_code FROM servers WHERE server_id = $1",
@@ -58,7 +58,7 @@ impl ServerRepository for PostgresServerRepo {
     }
 
     fn find_by_user_id(&self, user_id: String) -> Result<Vec<Server>, String> {
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         let mut server_response = Vec::new();
 
         for row in client.query(
@@ -100,7 +100,7 @@ impl ServerRepository for PostgresServerRepo {
     }
 
     fn delete_server(&self, server_id: String) -> Result<String, String> {
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         client.execute(
             "DELETE FROM servers WHERE server_id = $1",
             &[&server_id]
@@ -110,7 +110,7 @@ impl ServerRepository for PostgresServerRepo {
     }
     
     fn find_by_invite_code(&self, invite_code: String) -> Result<Server, String> {
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         let row = client
             .query_one(
                 "SELECT name, server_id, password, create_at, invite_code FROM servers WHERE invite_code = $1",
@@ -149,7 +149,7 @@ impl ServerRepository for PostgresServerRepo {
     }
     
     fn update(&self, server: Server) -> Result<Server, String> {
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         client.execute(
             "UPDATE servers SET name = $2 WHERE server_id = $1",

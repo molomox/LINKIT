@@ -4,9 +4,6 @@ use crate::domain::ports::user_repository::UserRepository;
 use uuid::Uuid;
 use chrono::Utc;
 use crate::domain::entities::user::User;
-use postgres::Client;
-use postgres::NoTls;
-use crate::adapters::http::constants::DB_URL;
 
 pub struct SendMessage<'a> {
     pub repo_message: &'a dyn MessageRepository,

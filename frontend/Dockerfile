@@ -19,6 +19,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ARG NEXT_PUBLIC_GIPHY_API_KEY
+ENV NEXT_PUBLIC_GIPHY_API_KEY=$NEXT_PUBLIC_GIPHY_API_KEY
+
 # Copier les dépendances depuis l'étape deps
 COPY --from=deps /app/node_modules ./node_modules
 

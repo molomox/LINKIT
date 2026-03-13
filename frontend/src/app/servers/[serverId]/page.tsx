@@ -161,6 +161,48 @@ export default function ServerPage() {
         }
     };
 
+    const handleGifSelect = async (gifUrl: string) => {
+        if (!selectedChannel || sending) return;
+
+        setSending(true);
+        try {
+            const userId = sessionStorage.getItem("user_id");
+            const username = sessionStorage.getItem("username") || "User";
+
+            if (isConnected) {
+                const wsMessage: WsMessage = {
+                    type: 'new_message',
+                    content: gifUrl,
+                    user_id: userId || undefined,
+                    username: username,
+                    channel_id: selectedChannel.channel_id,
+                    server_id: serverId,
+                    is_gif: true,
+                };
+                sendWsMessage(wsMessage);
+            } else {
+                console.log('⚠️ WebSocket non connecté, utilisation de l\'API REST');
+                const res = await fetch(`${apiBase}/channels/${selectedChannel.channel_id}/messages`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        content: gifUrl,
+                        user_id: userId,
+                        is_gif: true
+                    }),
+                });
+
+                if (res.ok) {
+                    await loadMessages();
+                }
+            }
+        } catch (error) {
+            console.error(t.error.network, error);
+        } finally {
+            setSending(false);
+        }
+    };
+
     const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewMessage(e.target.value);
 
@@ -408,6 +450,7 @@ export default function ServerPage() {
                         newMessage={newMessage}
                         onChange={handleMessageChange}
                         onSubmit={handleSendMessage}
+                        onGifSelect={handleGifSelect}
                         selectedChannel={selectedChannel}
                         sending={sending}
                     />

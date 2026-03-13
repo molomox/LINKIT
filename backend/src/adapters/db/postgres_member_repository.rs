@@ -7,12 +7,12 @@ use crate::domain::entities::role::{self, Role};
 use crate::domain::entities::server::Server;
 use crate::domain::entities::user::User;
 use crate::domain::ports::member_repository::MemberRepository;
-use crate::adapters::http::constants::DB_URL;
+use crate::adapters::http::constants::db_url;
 
 pub struct PostgresMemberRepo;
 impl MemberRepository for PostgresMemberRepo{
     fn save(&self, member: Member)-> Result<Member, String>{
-         let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         client.execute(
             "INSERT INTO members (user_id,role_id,server_id, join_at) VALUES ($1, $2, $3, $4)",
@@ -22,7 +22,7 @@ impl MemberRepository for PostgresMemberRepo{
     }
 
     fn find_by_id(&self, id: String) -> Result<Member, String>{
-         let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         let row = client.query_one(
             "SELECT members.user_id,
@@ -56,7 +56,7 @@ impl MemberRepository for PostgresMemberRepo{
     }
 
     fn get_by_user_and_server(&self, user_id: String, server_id: String) -> Result<Member, String> {
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         let row = client.query_one(
             "SELECT members.user_id,
@@ -95,7 +95,7 @@ impl MemberRepository for PostgresMemberRepo{
     }
 
     fn update_member_role(&self, user_id: String, server_id: String, role_id: String)-> Result<String, String>{
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         client.execute(
             "
@@ -110,13 +110,13 @@ impl MemberRepository for PostgresMemberRepo{
 
     }
     fn delete_member(&self, user_id: String, server_id: String)-> Result<String,String>{
-        let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string()).unwrap();
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string()).unwrap();
         client.execute("DELETE FROM members WHERE user_id = $1 AND server_id = $2", &[&user_id,&server_id]).unwrap();
         Ok(server_id)
 
     }
     fn find_by_server_id(&self, server_id: String)-> Result<Vec<Member>,String>{
-         let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         let mut result_members = Vec::new();
         for row in client.query(
             "SELECT members.user_id,

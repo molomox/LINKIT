@@ -1,14 +1,14 @@
 use postgres::Client;
 use postgres::NoTls;
 use crate::domain::entities::role::{self, Role};
-use crate::adapters::http::constants::DB_URL;
+use crate::adapters::http::constants::db_url;
 use crate::domain::ports::role_repository::RoleRepository;
 
 pub struct PostgresRoleRepo;
 impl RoleRepository for PostgresRoleRepo{
 
     fn find_by_id(&self, id: String) -> Result<Role,String>{
-         let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         let row = client.query_one(
             "SELECT role_id,
@@ -24,7 +24,7 @@ impl RoleRepository for PostgresRoleRepo{
 
     fn find_by_name(&self, name: String) -> Result<Role,String>{
         
-         let mut client = Client::connect(DB_URL, NoTls).map_err(|e| e.to_string())?;
+         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         let row = client.query_one(
             "SELECT role_id,

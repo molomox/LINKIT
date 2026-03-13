@@ -70,17 +70,17 @@ CREATE TABLE IF NOT EXISTS reaction (
 CREATE TABLE IF NOT EXISTS reagi (
     reaction_id int NOT NULL,
     user_id VARCHAR(36) NOT NULL,
-    message_id VARCHAR(36) NOT NULL
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-    FOREIGN KEY (message_id) REFERENCES messages(message_id)
+    message_id VARCHAR(36) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (message_id) REFERENCES messages(message_id),
     FOREIGN KEY (reaction_id) REFERENCES reaction(reaction_id)
 );
 
 CREATE TABLE IF NOT EXISTS channel_dm (
     channel_id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
-    user2_id VARCHAR(36) NOT NULL
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    user2_id VARCHAR(36) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (user2_id) REFERENCES users(user_id)
 );
 

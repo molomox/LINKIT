@@ -30,6 +30,12 @@ function formatDate(dateString: string, t: any) {
     }
 }
 
+function isLikelyGifUrl(content: string): boolean {
+    const value = content.trim().toLowerCase();
+    if (!value.startsWith("http://") && !value.startsWith("https://")) return false;
+    return value.includes("giphy.com/media/") || value.endsWith(".gif") || value.includes("/giphy-");
+}
+
 export default function MessageItem({ message, currentUserId, currentUserRole, onDelete, onUpdate }: MessageItemProps) {
     const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
@@ -37,6 +43,7 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
     
     const isOwnMessage = message.user_id === currentUserId;
     const isSystemMessage = message.user_id === 'system';
+    const shouldRenderGif = message.is_gif || isLikelyGifUrl(message.content);
     
     // Permissions : Seul le propriétaire peut éditer son message, Owner/Admin peuvent supprimer
     const canEdit = isOwnMessage;
@@ -114,9 +121,23 @@ export default function MessageItem({ message, currentUserId, currentUserRole, o
                             </button>
                         </div>
                     ) : (
-                        <p className="text-gray-300 text-sm leading-relaxed" style={{ fontFamily: 'monospace' }}>
-                            {message.content}
-                        </p>
+                        <>
+                            {shouldRenderGif ? (
+                                <div className="mt-2">
+                                    <img 
+                                        src={message.content}
+                                        alt="GIF"
+                                        className="max-w-md max-h-80 rounded border-2 border-yellow-400/30 hover:border-yellow-400/50 transition-all"
+                                        style={{ clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
+                                        loading="lazy"
+                                    />
+                                </div>
+                            ) : (
+                                <p className="text-gray-300 text-sm leading-relaxed" style={{ fontFamily: 'monospace' }}>
+                                    {message.content}
+                                </p>
+                            )}
+                        </>
                     )}
                 </div>
 
