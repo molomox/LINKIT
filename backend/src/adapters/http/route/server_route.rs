@@ -12,7 +12,10 @@ use crate::adapters::http::server::{
     join_server::join_server_handler, kick_member::kick_member_handler,
     leave_server::delete_member_handler,
     update_ban_member::update_ban_member_handler as update_ban_handler,
-    update_member::update_members_handler, update_server::update_server_handler,
+    find_ban_by_id::get_ban_handler as get_ban_handler,
+    cleanup_expired_bans::cleanup_expired_bans_handler as cleanup_expired_bans_handler,
+    create_or_get_dm_channel::create_or_get_dm_channel_handler as create_or_get_dm_channel_handler,
+    list_dm_channels::list_dm_channels_handler as list_dm_channels_handler
 };
 use crate::adapters::websocket::AppState;
 
@@ -26,34 +29,18 @@ pub fn server_routes(state: AppState) -> Router {
         .route("/servers/:server_id/join", post(join_server_handler))
         .route("/servers/:server_id/leave", delete(delete_member_handler))
         .route("/servers/:server_id/members", get(get_members_handler))
-        .route(
-            "/servers/:server_id/members/:user_id",
-            put(update_members_handler),
-        )
-        .route(
-            "/servers/:server_id/members/:user_id/kick",
-            delete(kick_member_handler),
-        )
-        .route(
-            "/servers/:server_id/members/:user_id/ban",
-            post(ban_member_handler),
-        )
-        .route(
-            "/servers/:server_id/members/:user_id/deban",
-            delete(deban_member_handler),
-        )
-        .route(
-            "/servers/:server_id/members/:user_id/update_ban",
-            put(update_ban_handler),
-        )
-        .route(
-            "/servers/:server_id/members/:user_id/get_ban",
-            get(get_ban_handler),
-        )
-        .route(
-            "/servers/:server_id/cleanup-bans",
-            post(cleanup_expired_bans_handler),
-        )
+        .route("/servers/:server_id/members/:user_id", put(update_members_handler))
+
+        .route("/servers/:server_id/members/:user_id/kick", delete(kick_member_handler))
+        .route("/servers/:server_id/members/:user_id/ban", post(ban_member_handler))
+        .route("/servers/:server_id/members/:user_id/deban", delete(deban_member_handler))
+        .route("/servers/:server_id/members/:user_id/update_ban", put(update_ban_handler))
+        .route("/servers/:server_id/members/:user_id/get_ban", get(get_ban_handler))
+        .route("/servers/:server_id/cleanup-bans", post(cleanup_expired_bans_handler))
+
+        .route("/servers/:server_id/dm/:target_user_id", post(create_or_get_dm_channel_handler))
+        .route("/servers/:server_id/dm/user/:user_id", get(list_dm_channels_handler))
+
         .route("/invite/:invite_code", post(join_server_by_invite_handler))
         .with_state(state)
 }

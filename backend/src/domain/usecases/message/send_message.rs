@@ -1,9 +1,9 @@
 use crate::domain::entities::message::Message;
-use crate::domain::entities::user::User;
 use crate::domain::ports::message_repository::MessageRepository;
 use crate::domain::ports::user_repository::UserRepository;
-use chrono::Utc;
 use uuid::Uuid;
+use chrono::Utc;
+use crate::domain::entities::user::User;
 
 pub struct SendMessage<'a> {
     pub repo_message: &'a dyn MessageRepository,
@@ -17,6 +17,16 @@ impl<'a> SendMessage<'a> {
         user_id: String,
         content: String,
     ) -> Result<Message, String> {
+        self.execute_with_gif(channel_id, user_id, content, false)
+    }
+
+    pub fn execute_with_gif(
+        &self,
+        channel_id: String,
+        user_id: String,
+        content: String,
+        is_gif: bool,
+    ) -> Result<Message, String> {
         // Validations
         if content.is_empty() {
             return Err("Le contenu du message ne peut pas être vide".to_string());
@@ -29,10 +39,8 @@ impl<'a> SendMessage<'a> {
         }
 
         // Récupérer le username depuis la base de données
-        let user = self
-            .repo_user
-            .find_by_id(user_id.clone())
-            .map_err(|e| format!("Erreur lors de la récupération de l'utilisateur: {}", e))?;
+        let user = self.repo_user.find_by_id(user_id.clone())
+        .map_err(|e| format!("Erreur lors de la récupération de l'utilisateur: {}", e))?;
 
         // Génération de l'ID et du timestamp
         let message_id = Uuid::new_v4().to_string();
@@ -52,7 +60,7 @@ impl<'a> SendMessage<'a> {
             },
             content,
             create_at,
-            is_gif: false,
+            is_gif,
             reactions: Vec::new(),
         };
 
@@ -60,3 +68,4 @@ impl<'a> SendMessage<'a> {
         self.repo_message.save(message)
     }
 }
+

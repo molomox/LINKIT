@@ -6,15 +6,16 @@ interface MemberItemProps {
     member: Member;
     isOnline: boolean;
     onContextMenu: (e: React.MouseEvent, member: Member) => void;
+    onStartPrivateMessage: (member: Member) => void;
 }
 
-export default function MemberItem({ member, isOnline, onContextMenu }: MemberItemProps) {
+export default function MemberItem({ member, isOnline, onContextMenu, onStartPrivateMessage }: MemberItemProps) {
     const { t } = useTranslation();
     const couleur = getRoleColor(member.role_id);
 
     return (
         <div
-            className="flex items-center gap-3 p-2 rounded hover:bg-yellow-400/5 transition-all cursor-pointer"
+            className="group flex items-center gap-3 p-2 rounded hover:bg-yellow-400/5 transition-all cursor-pointer"
             onContextMenu={(e) => onContextMenu(e, member)}
         >
             <div className="relative">
@@ -57,6 +58,17 @@ export default function MemberItem({ member, isOnline, onContextMenu }: MemberIt
                     {member.role_name}
                 </div>
             </div>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onStartPrivateMessage(member);
+                }}
+                className="opacity-0 group-hover:opacity-100 px-2 py-1 text-[10px] border border-yellow-400/40 text-yellow-300 hover:bg-yellow-400/10 transition-all"
+                style={{ fontFamily: 'monospace' }}
+                title="Message prive"
+            >
+                MP
+            </button>
         </div>
     );
 }

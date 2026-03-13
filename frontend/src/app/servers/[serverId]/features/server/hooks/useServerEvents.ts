@@ -148,6 +148,23 @@ export function useServerEvents({
                     });
                 }
                 break;
+
+            case 'dm_message': {
+                const currentUserId = sessionStorage.getItem('user_id');
+                if (lastServerMessage.to_user_id && currentUserId === lastServerMessage.to_user_id) {
+                    window.dispatchEvent(new CustomEvent('linkyt:dm-notification', {
+                        detail: {
+                            channel_id: lastServerMessage.channel_id,
+                            server_id: lastServerMessage.server_id,
+                            from_user_id: lastServerMessage.from_user_id,
+                            from_username: lastServerMessage.from_username,
+                            preview: lastServerMessage.preview,
+                            is_gif: lastServerMessage.is_gif,
+                        },
+                    }));
+                }
+                break;
+            }
         }
     }, [lastServerMessage, selectedChannel, onChannelsUpdate, onSelectedChannelUpdate, onMembersReload, onRedirect, onOnlineMembersUpdate]);
 }

@@ -10,6 +10,8 @@ pub enum IncomingWsMessage {
         user_id: String,
         username: String,
         channel_id: String,
+        #[serde(default)]
+        is_gif: bool,
         #[serde(skip_serializing_if = "Option::is_none")]
         server_id: Option<String>,
     },
@@ -37,6 +39,17 @@ pub enum WsMessage {
         username: String,
         channel_id: String,
         create_at: String,
+        is_gif: bool,
+    },
+    #[serde(rename = "dm_message")]
+    DmMessage {
+        channel_id: String,
+        server_id: String,
+        from_user_id: String,
+        from_username: String,
+        to_user_id: String,
+        preview: String,
+        is_gif: bool,
     },
     #[serde(rename = "message_updated")]
     MessageUpdated {

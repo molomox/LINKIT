@@ -196,7 +196,7 @@ JOIN channels      AS c  ON m.channel_id  = c.channel_id
 JOIN users         AS u  ON m.user_id     = u.user_id
 LEFT JOIN reagi    AS re ON m.message_id  = re.message_id
 LEFT JOIN reaction AS r  ON re.reaction_id = r.reaction_id
-JOIN users         AS ur ON  re.user_id = ur.user_id;
+LEFT JOIN users    AS ur ON  re.user_id = ur.user_id;
 
 
 

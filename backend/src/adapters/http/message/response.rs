@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct CreateMessageRequest {
     pub content: String,
     pub user_id: String,
+    pub is_gif: Option<bool>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -22,4 +23,14 @@ pub struct UpgradeMemberRequest {
 pub struct CreateServerResponse {
     pub server_id: String,
     pub name: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct ToggleReactionRequest {
+    pub user_id: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct ToggleReactionResponse {
+    pub status: String,
 }

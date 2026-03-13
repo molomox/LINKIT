@@ -13,12 +13,9 @@ pub async fn create_message_handler(
 ) -> Result<Json<Message>, ApiError> {
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresMessageRepo;
-        let repo_user = PostgresUserRepo;
-        let usecase = SendMessage {
-            repo_message: &repo,
-            repo_user: &repo_user,
-        };
-        usecase.execute(channel_id, request.user_id, request.content)
+        let repo_user = PostgresUserRepo; 
+        let usecase = SendMessage { repo_message: &repo , repo_user: &repo_user};
+        usecase.execute_with_gif(channel_id, request.user_id, request.content, request.is_gif.unwrap_or(false))
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?

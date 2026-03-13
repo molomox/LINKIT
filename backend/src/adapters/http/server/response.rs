@@ -37,3 +37,17 @@ pub struct UpdateBanMemberRequest {
     pub reason: String,
     pub expired_at: String,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct CreateDmChannelRequest {
+    pub user_id: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct DmChannelResponse {
+    pub channel_id: String,
+    pub user_id: String,
+    pub username: String,
+    pub server_id: String,
+}
+

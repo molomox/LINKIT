@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import * as serverActions from "../../servers/[serverId]/utils/serverActions";
 
 type UserProfile = {
     username: string;
@@ -25,16 +26,45 @@ type ServerApiResponse = {
     all_channels: unknown[];
 };
 
+type DmConversation = {
+    channel_id: string;
+    user_id: string;
+    username: string;
+    server_id: string;
+    server_name: string;
+};
+
+type DmRealtimeNotification = {
+    id: string;
+    channel_id: string;
+    server_id: string;
+    from_user_id: string;
+    from_username: string;
+    preview: string;
+    is_gif: boolean;
+};
+
 export default function DashboardPage() {
     const router = useRouter();
     const { t } = useTranslation();
     const [user, setUser] = useState<UserProfile | null>(null);
     const [servers, setServers] = useState<Server[]>([]);
     const [loading, setLoading] = useState(true);
+    const [dmConversations, setDmConversations] = useState<DmConversation[]>([]);
     const [showJoinModal, setShowJoinModal] = useState(false);
     const [inviteLink, setInviteLink] = useState("");
+    const [dmNotifications, setDmNotifications] = useState<DmRealtimeNotification[]>([]);
+    const [unreadDmCount, setUnreadDmCount] = useState(0);
+    const [isNotifOpen, setIsNotifOpen] = useState(false);
+    const wsConnectionsRef = useRef<WebSocket[]>([]);
+    const notifOpenRef = useRef(false);
 
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+    const wsBase = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3000";
+
+    useEffect(() => {
+        notifOpenRef.current = isNotifOpen;
+    }, [isNotifOpen]);
 
     useEffect(() => {
         let isMounted = true;
@@ -93,11 +123,29 @@ export default function DashboardPage() {
                 if (serversRes.ok) {
                     const serversData = await serversRes.json();
                     console.log("✅ Serveurs chargés:", serversData);
-                    setServers(serversData.map((server: ServerApiResponse) => ({
+                    const normalizedServers = serversData.map((server: ServerApiResponse) => ({
                         id: server.server_id,
                         name: server.name,
                         memberCount: 0,
-                    })));
+                    }));
+                    setServers(normalizedServers);
+
+                    const dmResults = await Promise.allSettled(
+                        normalizedServers.map((server: Server) =>
+                            serverActions.listDmChannels(server.id, userId, apiBase).then((channels) =>
+                                channels.map((dm) => ({
+                                    ...dm,
+                                    server_name: server.name,
+                                })),
+                            ),
+                        ),
+                    );
+
+                    const mergedDms = dmResults
+                        .filter((r): r is PromiseFulfilledResult<DmConversation[]> => r.status === "fulfilled")
+                        .flatMap((r) => r.value);
+
+                    setDmConversations(mergedDms);
                 } else {
                     const errorText = await serversRes.text();
                     console.error("🔴 Erreur chargement serveurs:", errorText);
@@ -120,6 +168,78 @@ export default function DashboardPage() {
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        const userId = sessionStorage.getItem("user_id");
+        const username = sessionStorage.getItem("username");
+
+        wsConnectionsRef.current.forEach((socket) => socket.close());
+        wsConnectionsRef.current = [];
+
+        if (!userId || !username || servers.length === 0) {
+            return;
+        }
+
+        const uniqueServerIds = Array.from(new Set(servers.map((s) => s.id)));
+        const sockets = uniqueServerIds.map((serverId) => {
+            const ws = new WebSocket(`${wsBase}/ws/servers/${serverId}`);
+
+            ws.onopen = () => {
+                ws.send(
+                    JSON.stringify({
+                        type: "identify",
+                        user_id: userId,
+                        username,
+                    }),
+                );
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data) as {
+                        type?: string;
+                        to_user_id?: string;
+                        from_user_id?: string;
+                        from_username?: string;
+                        preview?: string;
+                        is_gif?: boolean;
+                        channel_id?: string;
+                        server_id?: string;
+                    };
+
+                    if (message.type !== "dm_message" || message.to_user_id !== userId) {
+                        return;
+                    }
+
+                    const notification: DmRealtimeNotification = {
+                        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                        channel_id: message.channel_id || "",
+                        server_id: message.server_id || serverId,
+                        from_user_id: message.from_user_id || "",
+                        from_username: message.from_username || "Utilisateur",
+                        preview: message.is_gif ? "a envoye un GIF" : (message.preview || "Nouveau message"),
+                        is_gif: !!message.is_gif,
+                    };
+
+                    setDmNotifications((prev) => [notification, ...prev].slice(0, 10));
+                    if (!notifOpenRef.current) {
+                        setUnreadDmCount((prev) => prev + 1);
+                    }
+                } catch {
+                    // Ignore malformed websocket payloads.
+                }
+            };
+
+            return ws;
+        });
+
+        wsConnectionsRef.current = sockets;
+
+        return () => {
+            sockets.forEach((socket) => socket.close());
+            wsConnectionsRef.current = [];
+        };
+    }, [servers, wsBase]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -144,6 +264,16 @@ export default function DashboardPage() {
 
     const handleCreateServer = () => {
         router.push("/servers/create");
+    };
+
+    const toggleNotifications = () => {
+        setIsNotifOpen((prev) => {
+            const next = !prev;
+            if (next) {
+                setUnreadDmCount(0);
+            }
+            return next;
+        });
     };
 
     const handleJoinServer = async () => {
@@ -219,6 +349,54 @@ export default function DashboardPage() {
                             </h1>
                         </div>
                         <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <button
+                                    onClick={toggleNotifications}
+                                    className="px-4 py-2 border-2 border-cyan-400 text-cyan-300 font-bold uppercase text-xs tracking-wider hover:bg-cyan-400 hover:text-black transition-all flex items-center gap-2"
+                                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
+                                >
+                                    <span>DM</span>
+                                    <span className="text-[10px] opacity-80">
+                                        {dmNotifications[0] ? dmNotifications[0].from_username : "-"}
+                                    </span>
+                                </button>
+                                {unreadDmCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center border border-black">
+                                        {unreadDmCount > 9 ? "9+" : unreadDmCount}
+                                    </span>
+                                )}
+
+                                {isNotifOpen && (
+                                    <div className="absolute right-0 mt-2 w-80 border-2 border-cyan-400/60 bg-black/95 z-30">
+                                        <div className="px-3 py-2 border-b border-cyan-400/30 text-cyan-300 text-xs font-bold uppercase" style={{ fontFamily: 'monospace' }}>
+                                            Notifications DM
+                                        </div>
+                                        {dmNotifications.length === 0 ? (
+                                            <div className="px-3 py-3 text-gray-500 text-xs" style={{ fontFamily: 'monospace' }}>
+                                                Aucune notification.
+                                            </div>
+                                        ) : (
+                                            <div className="max-h-72 overflow-y-auto">
+                                                {dmNotifications.map((notif) => (
+                                                    <button
+                                                        key={notif.id}
+                                                        onClick={() => {
+                                                            setIsNotifOpen(false);
+                                                            router.push(`/dm/${notif.channel_id}?serverId=${encodeURIComponent(notif.server_id)}&username=${encodeURIComponent(notif.from_username)}&userId=${encodeURIComponent(notif.from_user_id)}`);
+                                                        }}
+                                                        className="w-full text-left px-3 py-3 border-b border-cyan-400/20 hover:bg-cyan-400/10 transition-colors"
+                                                        style={{ fontFamily: 'monospace' }}
+                                                    >
+                                                        <div className="text-cyan-300 text-xs font-bold">{notif.from_username}</div>
+                                                        <div className="text-gray-300 text-xs truncate">{notif.preview}</div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
                             <button
                                 onClick={handleCreateServer}
                                 className="px-4 py-2 border-2 border-yellow-400 text-yellow-400 font-bold uppercase text-xs tracking-wider hover:bg-yellow-400 hover:text-black transition-all"
@@ -319,6 +497,38 @@ export default function DashboardPage() {
                                     </div>
                                 </div>
                             )}
+
+                            <div className="mt-8">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-1 h-6 bg-green-400"></div>
+                                    <h3 className="text-xl font-black text-green-400 uppercase tracking-wider" style={{ fontFamily: 'monospace' }}>
+                                        Messages prives
+                                    </h3>
+                                </div>
+
+                                {dmConversations.length === 0 ? (
+                                    <div className="border border-gray-700/60 bg-black/40 p-4 text-gray-500 text-sm" style={{ fontFamily: 'monospace' }}>
+                                        Aucune conversation DM en cours.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {dmConversations.map((dm) => (
+                                            <button
+                                                key={`${dm.server_id}-${dm.channel_id}`}
+                                                onClick={() => {
+                                                    const dmUrl = `/dm/${dm.channel_id}?serverId=${encodeURIComponent(dm.server_id)}&username=${encodeURIComponent(dm.username)}&userId=${encodeURIComponent(dm.user_id)}`;
+                                                    router.push(dmUrl);
+                                                }}
+                                                className="w-full text-left border border-green-400/30 bg-black/50 px-4 py-3 hover:bg-green-400/10 transition-all"
+                                                style={{ fontFamily: 'monospace' }}
+                                            >
+                                                <div className="text-green-300 font-bold">@{dm.username}</div>
+                                                <div className="text-xs text-gray-500">Server: {dm.server_name}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Profile Card - Droite */}
