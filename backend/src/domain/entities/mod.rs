@@ -5,6 +5,8 @@ pub mod member;
 pub mod role;
 pub mod server;
 pub mod ban;
+pub mod reaction;
+pub mod reagi;
 
 // Re-export des entités pour faciliter l'utilisation
 pub use message::Message;
@@ -14,3 +16,5 @@ pub use member::Member;
 pub use role::Role;
 pub use server::Server;
 pub use ban::Ban;
+pub use reaction::Reaction;
+pub use reagi::Reagi;

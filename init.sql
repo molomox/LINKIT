@@ -154,11 +154,8 @@ INSERT INTO reaction (reaction_id, emoji, nom_reaction) VALUES
 (29, '🎈', 'balloon'),
 (30, '🎊', 'confetti');
 
-INSERT INTO channel_dm (channel_id,user_id,user2_id) VALUES
-('channeldm4', 'idnum01', 'idnum02');
-
 INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GIF) VALUES
-('message11', 'hello world 10', 'channeldm4','idnum01', '2023-01-01',false)
+('message11', 'hello world 10', 'channeldm4','idnum01', '2023-01-01',false);
 
 INSERT INTO reagi (reaction_id,user_id,message_id) VALUES
 ('1', 'idnum01', 'message1'),
@@ -193,7 +190,7 @@ JOIN channels      AS c  ON m.channel_id  = c.channel_id
 JOIN users         AS u  ON m.user_id     = u.user_id
 LEFT JOIN reagi    AS re ON m.message_id  = re.message_id
 LEFT JOIN reaction AS r  ON re.reaction_id = r.reaction_id
-JOIN users         AS ur ON  re.user_id = ur.user_id
+JOIN users         AS ur ON  re.user_id = ur.user_id;
 
 
 
