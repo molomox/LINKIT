@@ -49,20 +49,9 @@ export default function ServerHeader({
             </div>
 
             <div className="flex items-center gap-3">
-                {/* Indicateur WebSocket */}
-                <div className="flex items-center gap-2 px-2 py-1 border border-yellow-400/30 bg-black/50"
-                    style={{ clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)" }}>
-                    <div className={`w-2 h-2 rounded-full ${
-                        wsStatus === 'connected' ? 'bg-green-400 animate-pulse' :
-                        wsStatus === 'connecting' ? 'bg-yellow-400 animate-pulse' :
-                        wsStatus === 'error' ? 'bg-red-400' :
-                        'bg-gray-600'
-                    }`} />
-                </div>
                 <div className="text-yellow-400/70 text-sm" style={{ fontFamily: 'monospace' }}>
                     {selectedChannel ? `# ${selectedChannel.name}` : ""}
                 </div>
-                <LanguageSwitcher />
                 <button
                     onClick={onCopyInvite}
                     className="px-3 py-1 border-2 border-yellow-400/50 text-yellow-400 font-bold uppercase text-xs hover:bg-yellow-400 hover:text-black transition-all"
@@ -94,7 +83,9 @@ export default function ServerHeader({
                     >
                         {t.server.deleteButtonShort}
                     </button>
+                    
                 )}
+                <LanguageSwitcher />
             </div>
         </header>
     );
