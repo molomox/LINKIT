@@ -15,4 +15,3 @@ pub fn db_url() -> String {
 
     url
 }
-

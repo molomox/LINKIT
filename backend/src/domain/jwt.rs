@@ -1,6 +1,6 @@
-use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
+use chrono::{Duration, Utc};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
-use chrono::{Utc, Duration};
 use std::env;
 
 fn get_jwt_secret() -> String {
@@ -13,15 +13,15 @@ fn get_jwt_secret() -> String {
          2. Ajoutez : JWT_SECRET=votre_clé_secrète_ici\n\
          3. Générez une clé sécurisée avec : openssl rand -base64 64\n\
          \n\
-         Pour Docker : Vérifiez que le fichier .env existe à la racine du projet."
+         Pour Docker : Vérifiez que le fichier .env existe à la racine du projet.",
     )
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub sub: String,      // user_id
+    pub sub: String, // user_id
     pub username: String,
-    pub exp: usize,       // Expiration timestamp
+    pub exp: usize, // Expiration timestamp
 }
 
 /// Génère un token JWT pour un utilisateur

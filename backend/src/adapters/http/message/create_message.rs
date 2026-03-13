@@ -1,11 +1,11 @@
 use crate::adapters::db::postgres_message_repository::PostgresMessageRepo;
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
-use crate::adapters::http::message::response::CreateMessageRequest;
 use crate::adapters::http::error::ApiError;
+use crate::adapters::http::message::response::CreateMessageRequest;
 use crate::domain::entities::message::Message;
 use crate::domain::usecases::message::send_message::SendMessage;
-use axum::Json;
 use axum::extract::Path;
+use axum::Json;
 
 pub async fn create_message_handler(
     Path(channel_id): Path<String>,

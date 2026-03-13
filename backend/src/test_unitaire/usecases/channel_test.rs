@@ -1,16 +1,12 @@
 use crate::domain::entities::channel::Channel;
-    use crate::domain::ports::channel_repository::ChannelRepository;
-    use crate::test_unitaire::mock_repositories::MockChannelRepository;
-    use crate::domain::usecases::channel::{
-        create::CreateChannel,
-        delete::DeleteChannel,
-        get::GetChannelDetails,
-        list_channel::ListServerChannel,
-        update::UpdateChannel,
-    };
-    use std::collections::HashMap;
-    use std::sync::{Arc, Mutex};
-
+use crate::domain::ports::channel_repository::ChannelRepository;
+use crate::domain::usecases::channel::{
+    create::CreateChannel, delete::DeleteChannel, get::GetChannelDetails,
+    list_channel::ListServerChannel, update::UpdateChannel,
+};
+use crate::test_unitaire::mock_repositories::MockChannelRepository;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 #[cfg(test)]
 mod tests {
@@ -20,10 +16,7 @@ mod tests {
         let repo = MockChannelRepository::new();
         let use_case = CreateChannel { repo: &repo };
 
-        let result = use_case.execute(
-            "general".to_string(),
-            "server-123".to_string(),
-        );
+        let result = use_case.execute("general".to_string(), "server-123".to_string());
 
         assert!(result.is_ok());
         let channel = result.unwrap();
@@ -85,13 +78,13 @@ mod tests {
     #[test]
     fn test_get_server_channels() {
         let repo = MockChannelRepository::new();
-        
+
         repo.add_channel(Channel {
             channel_id: "channel-1".to_string(),
             create_at: "2024-01-01".to_string(),
             name: "general".to_string(),
             server_id: "server-123".to_string(),
-        });      
+        });
         repo.add_channel(Channel {
             channel_id: "channel-2".to_string(),
             create_at: "2024-01-02".to_string(),
@@ -150,10 +143,7 @@ mod tests {
         repo.add_channel(channel);
 
         let use_case = UpdateChannel { repo: &repo };
-        let result = use_case.execute(
-            "channel-123".to_string(),
-            "new-general".to_string(),
-        );
+        let result = use_case.execute("channel-123".to_string(), "new-general".to_string());
 
         assert!(result.is_ok());
         let updated_channel = result.unwrap();
@@ -177,10 +167,7 @@ mod tests {
         let repo = MockChannelRepository::new();
         let use_case = UpdateChannel { repo: &repo };
 
-        let result = use_case.execute(
-            "non-existent".to_string(),
-            "new-name".to_string(),
-        );
+        let result = use_case.execute("non-existent".to_string(), "new-name".to_string());
 
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), "Channel not found");
@@ -202,7 +189,7 @@ mod tests {
 
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), "channel-123");
-        
+
         // Vérifier que le channel n'existe plus
         assert!(repo.find_by_id("channel-123".to_string()).is_err());
     }

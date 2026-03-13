@@ -1,5 +1,8 @@
-use crate::{adapters::{db::postgres_server_repository::PostgresServerRepo, http::error::ApiError}, domain::usecases::server::delete::DeleteServer};
-use axum::{Json, extract::Path};
+use crate::{
+    adapters::{db::postgres_server_repository::PostgresServerRepo, http::error::ApiError},
+    domain::usecases::server::delete::DeleteServer,
+};
+use axum::{extract::Path, Json};
 
 pub async fn delete_server_handler(
     Path(server_id): Path<String>,
@@ -12,6 +15,6 @@ pub async fn delete_server_handler(
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
     .map_err(|e| ApiError::BadRequest(format!("Server deletion failed: {}", e)))?;
-    
+
     Ok(Json(result))
 }

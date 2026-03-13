@@ -1,21 +1,14 @@
-use crate::domain::entities::{server::Server, member::Member, role::Role, user::User};
+use crate::domain::entities::{member::Member, role::Role, server::Server, user::User};
 
-use crate::test_unitaire::mock_repositories::{
-    MockUserRepository,
-    MockServerRepository,
-    MockMemberRepository,
-    MockRoleRepository,
-};
-use crate::domain::usecases::user::{
-    create::CreateUser,
-    find_by_id::GetUserById,
-    login::LoginUser,
-    logout::LogoutUser,
-};
 use crate::domain::usecases::user::find_by_username::GetUserByUsername;
+use crate::domain::usecases::user::{
+    create::CreateUser, find_by_id::GetUserById, login::LoginUser, logout::LogoutUser,
+};
+use crate::test_unitaire::mock_repositories::{
+    MockMemberRepository, MockRoleRepository, MockServerRepository, MockUserRepository,
+};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-
 
 #[cfg(test)]
 mod tests {
@@ -39,7 +32,7 @@ mod tests {
         assert!(!user.user_id.is_empty());
         assert!(!user.create_at.is_empty());
         assert!(user.token.is_none());
-        }
+    }
 
     #[test]
     fn test_create_user_empty() {
@@ -131,7 +124,10 @@ mod tests {
         let result = use_case.execute("".to_string(), "".to_string());
 
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Entrer un Utilisateur ou Mots de passe");
+        assert_eq!(
+            result.unwrap_err(),
+            "Entrer un Utilisateur ou Mots de passe"
+        );
     }
 
     #[test]

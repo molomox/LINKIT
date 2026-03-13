@@ -113,4 +113,3 @@ mod uuid_tests {
         assert_eq!(id.chars().filter(|c| *c == '-').count(), 4);
     }
 }
-

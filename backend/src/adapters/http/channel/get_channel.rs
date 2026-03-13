@@ -1,9 +1,9 @@
 use crate::adapters::db::postgres_channel_repository::PostgresChannelRepo;
-use crate::domain::entities::channel::Channel;
 use crate::adapters::http::error::ApiError;
+use crate::domain::entities::channel::Channel;
 use crate::domain::usecases::channel::get::GetChannelDetails;
-use axum::Json;
 use axum::extract::Path;
+use axum::Json;
 
 pub async fn get_channel_handler(
     Path(channel_id): Path<String>,

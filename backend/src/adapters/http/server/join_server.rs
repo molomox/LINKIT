@@ -1,13 +1,13 @@
+use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
 use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
-use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
-use crate::domain::entities::member::Member;
 use crate::adapters::http::error::ApiError;
 use crate::adapters::http::server::response::JoinServerRequest;
+use crate::domain::entities::member::Member;
 use crate::domain::usecases::server::join::JoinServer;
-use axum::Json;
 use axum::extract::Path;
+use axum::Json;
 
 pub async fn join_server_handler(
     Path(server_id): Path<String>,
@@ -18,8 +18,18 @@ pub async fn join_server_handler(
         let repo2 = PostgresMemberRepo;
         let repo3 = PostgresRoleRepo;
         let ban_repo = PostgresBanRepo;
-        let usecase = JoinServer { repo: &repo, repo2: &repo2, repo3: &repo3, ban_repo: &ban_repo };
-        usecase.execute( join_request.user_id, server_id,join_request.password, "role02".to_string())
+        let usecase = JoinServer {
+            repo: &repo,
+            repo2: &repo2,
+            repo3: &repo3,
+            ban_repo: &ban_repo,
+        };
+        usecase.execute(
+            join_request.user_id,
+            server_id,
+            join_request.password,
+            "role02".to_string(),
+        )
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?

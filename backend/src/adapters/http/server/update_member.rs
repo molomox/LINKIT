@@ -1,10 +1,10 @@
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
-use crate::adapters::http::server::response::UpgradeMemberRequest;
 use crate::adapters::http::error::ApiError;
-use crate::domain::usecases::server::update_member::UpdateMemberRole;
-use axum::Json;
-use axum::extract::{Path, State};
+use crate::adapters::http::server::response::UpgradeMemberRequest;
 use crate::adapters::websocket::{AppState, WsMessage};
+use crate::domain::usecases::server::update_member::UpdateMemberRole;
+use axum::extract::{Path, State};
+use axum::Json;
 
 pub async fn update_members_handler(
     State(state): State<AppState>,
@@ -19,7 +19,11 @@ pub async fn update_members_handler(
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresMemberRepo;
         let usecase = UpdateMemberRole { repo: &repo };
-        usecase.execute(upgrade_member_request.user_id, upgrade_member_request.server_id, role_id)
+        usecase.execute(
+            upgrade_member_request.user_id,
+            upgrade_member_request.server_id,
+            role_id,
+        )
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
@@ -28,12 +32,12 @@ pub async fn update_members_handler(
     // Récupérer les infos pour le broadcast
     let user_id_for_info = user_id_clone.clone();
     let role_id_for_info = role_id_clone.clone();
-    
+
     let member_info = tokio::task::spawn_blocking(move || {
-        use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
-        use crate::domain::ports::user_repository::UserRepository;
         use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
+        use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
         use crate::domain::ports::role_repository::RoleRepository;
+        use crate::domain::ports::user_repository::UserRepository;
 
         let user_repo = PostgresUserRepo;
         let role_repo = PostgresRoleRepo;
@@ -41,19 +45,22 @@ pub async fn update_members_handler(
         let user = user_repo.find_by_id(user_id_for_info)?;
         let role = role_repo.find_by_id(role_id_for_info)?;
         Ok::<_, String>((user.username, role.role_name))
-    }).await;
+    })
+    .await;
 
     if let Ok(Ok((username, role_name))) = member_info {
-        state.broadcast_to_server(
-            &server_id_clone,
-            WsMessage::MemberRoleChanged {
-                user_id: user_id_clone,
-                username,
-                server_id: server_id_clone.clone(),
-                role_id: role_id_clone,
-                role_name,
-            }
-        ).await;
+        state
+            .broadcast_to_server(
+                &server_id_clone,
+                WsMessage::MemberRoleChanged {
+                    user_id: user_id_clone,
+                    username,
+                    server_id: server_id_clone.clone(),
+                    role_id: role_id_clone,
+                    role_name,
+                },
+            )
+            .await;
     }
 
     Ok(Json(result))

@@ -1,10 +1,11 @@
-use axum::{Router, routing::{delete, get, post}};
+use axum::{
+    routing::{delete, get, post},
+    Router,
+};
 
 use crate::adapters::http::user::{
-    create::create_user_handler as create_user_handler,
-    login::login_user_handler as login_user_handler,
-    logout::logout_user_handler as logout_user_handler,
-    get_by_id::get_user_handler as get_user_handler
+    create::create_user_handler, get_by_id::get_user_handler, login::login_user_handler,
+    logout::logout_user_handler,
 };
 
 pub fn user_routes() -> Router {

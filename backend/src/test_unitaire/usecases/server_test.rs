@@ -1,30 +1,19 @@
-use crate::domain::entities::{server::Server, member::Member, role::Role, user::User};
+use crate::domain::entities::{member::Member, role::Role, server::Server, user::User};
 use crate::domain::ports::{
+    member_repository::MemberRepository, role_repository::RoleRepository,
     server_repository::ServerRepository,
-    member_repository::MemberRepository,
-    role_repository::RoleRepository,
-};
-use crate::test_unitaire::mock_repositories::{
-    MockServerRepository,
-    MockMemberRepository,
-    MockRoleRepository,
 };
 use crate::domain::usecases::server::{
-    create::CreateServer,
-    delete::DeleteServer,
-    get::GetServerDetails,
-    find_by_user_id::GetServerByUser,
-    join::JoinServer,
-    join_by_invite::JoinServerByInvite,
-    leave::LeaveServer,
-    list::ListUserServers,
-    list_member::ListServerMembers,
-    update::UpdateServer,
-    update_member::UpdateMemberRole,
+    create::CreateServer, delete::DeleteServer, find_by_user_id::GetServerByUser,
+    get::GetServerDetails, join::JoinServer, join_by_invite::JoinServerByInvite,
+    leave::LeaveServer, list::ListUserServers, list_member::ListServerMembers,
+    update::UpdateServer, update_member::UpdateMemberRole,
+};
+use crate::test_unitaire::mock_repositories::{
+    MockMemberRepository, MockRoleRepository, MockServerRepository,
 };
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-
 
 #[cfg(test)]
 mod tests {
@@ -146,7 +135,11 @@ mod tests {
         repo.add_server(server);
 
         let use_case = UpdateServer { repo: &repo };
-        let result = use_case.execute("srv-1".to_string(), "MyServer".to_string(), "newpass".to_string());
+        let result = use_case.execute(
+            "srv-1".to_string(),
+            "MyServer".to_string(),
+            "newpass".to_string(),
+        );
 
         assert!(result.is_ok());
         let updated = result.unwrap();
@@ -348,7 +341,7 @@ mod tests {
 
         let result = use_case.execute(
             "user-1".to_string(),
-            "invite-srv-1".to_string(),  
+            "invite-srv-1".to_string(),
             "role02".to_string(),
         );
 

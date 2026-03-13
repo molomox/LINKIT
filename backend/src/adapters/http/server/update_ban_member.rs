@@ -1,25 +1,24 @@
+use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
-use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
+use crate::adapters::http::error::ApiError;
+use crate::adapters::http::server::response::UpdateBanMemberRequest;
+use crate::adapters::websocket::{AppState, WsMessage};
+use crate::domain::entities::ban::Ban;
 use crate::domain::ports::ban_repository::BanRepository;
 use crate::domain::ports::member_repository::MemberRepository;
 use crate::domain::ports::user_repository::UserRepository;
 use crate::domain::usecases::ban::update_ban::UpdateBan;
 use axum::extract::{Path, State};
-use crate::adapters::http::error::ApiError;
-use crate::adapters::websocket::{AppState, WsMessage};
-use crate::adapters::http::server::response::UpdateBanMemberRequest;
 use axum::Json;
-use serde::Deserialize;
-use crate::domain::entities::ban::Ban;
 use chrono::Utc;
-
+use serde::Deserialize;
 
 pub async fn update_ban_member_handler(
     State(state): State<AppState>,
-    Path((server_id, target_user_id)):Path<(String, String)>,
+    Path((server_id, target_user_id)): Path<(String, String)>,
     Json(payload): Json<UpdateBanMemberRequest>,
-) ->  Result<Json<Ban>, ApiError> {
+) -> Result<Json<Ban>, ApiError> {
     let reason = payload.reason.clone();
     let expired_at = payload.expired_at.clone();
     let target_user_id_clone = target_user_id.clone();
@@ -27,14 +26,12 @@ pub async fn update_ban_member_handler(
 
     let ban = tokio::task::spawn_blocking(move || {
         let repo = PostgresBanRepo;
-        let usecase = UpdateBan{repo: &repo};
-        usecase.execute(target_user_id_clone,server_id_clone,reason,expired_at)
+        let usecase = UpdateBan { repo: &repo };
+        usecase.execute(target_user_id_clone, server_id_clone, reason, expired_at)
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
     .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
-    
+
     return Ok(Json(ban));
 }
-
-

@@ -1,10 +1,10 @@
 use crate::adapters::db::postgres_channel_repository::PostgresChannelRepo;
 use crate::adapters::http::error::ApiError;
-use crate::domain::usecases::channel::delete::DeleteChannel;
-use crate::domain::ports::channel_repository::ChannelRepository;
 use crate::adapters::websocket::{AppState, WsMessage};
-use axum::Json;
+use crate::domain::ports::channel_repository::ChannelRepository;
+use crate::domain::usecases::channel::delete::DeleteChannel;
 use axum::extract::{Path, State};
+use axum::Json;
 
 pub async fn delete_channel_handler(
     Path(channel_id): Path<String>,
@@ -40,7 +40,10 @@ pub async fn delete_channel_handler(
         server_id: server_id.clone(),
     };
     state.broadcast_to_server(&server_id, ws_message).await;
-    println!("📢 Événement channel_deleted broadcasted pour serveur: {}", server_id);
+    println!(
+        "📢 Événement channel_deleted broadcasted pour serveur: {}",
+        server_id
+    );
 
     Ok(Json(result))
 }

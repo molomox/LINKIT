@@ -1,8 +1,8 @@
-use postgres::{Client, NoTls};
+use crate::adapters::http::constants::db_url;
 use crate::domain::entities::channel::Channel;
 use crate::domain::entities::server::Server;
 use crate::domain::ports::server_repository::ServerRepository;
-use crate::adapters::http::constants::db_url;
+use postgres::{Client, NoTls};
 
 pub struct PostgresServerRepo;
 
@@ -41,15 +41,18 @@ impl ServerRepository for PostgresServerRepo {
             all_channels: Vec::new(),
         };
 
-        for row in client.query(
-            "SELECT channel_id, name, server_id, create_at FROM channels WHERE server_id = $1",
-            &[&server_id]
-        ).map_err(|e| e.to_string())? {
+        for row in client
+            .query(
+                "SELECT channel_id, name, server_id, create_at FROM channels WHERE server_id = $1",
+                &[&server_id],
+            )
+            .map_err(|e| e.to_string())?
+        {
             let channel = Channel {
                 channel_id: row.get(0),
                 name: row.get(1),
                 server_id: row.get(2),
-                create_at: row.get(3)
+                create_at: row.get(3),
             };
             server_response.all_channels.push(channel);
         }
@@ -101,14 +104,13 @@ impl ServerRepository for PostgresServerRepo {
 
     fn delete_server(&self, server_id: String) -> Result<String, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
-        client.execute(
-            "DELETE FROM servers WHERE server_id = $1",
-            &[&server_id]
-        ).map_err(|e| e.to_string())?;
+        client
+            .execute("DELETE FROM servers WHERE server_id = $1", &[&server_id])
+            .map_err(|e| e.to_string())?;
 
         Ok(server_id)
     }
-    
+
     fn find_by_invite_code(&self, invite_code: String) -> Result<Server, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         let row = client
@@ -132,30 +134,34 @@ impl ServerRepository for PostgresServerRepo {
             all_channels: Vec::new(),
         };
 
-        for row in client.query(
-            "SELECT channel_id, name, server_id, create_at FROM channels WHERE server_id = $1",
-            &[&server_id]
-        ).map_err(|e| e.to_string())? {
+        for row in client
+            .query(
+                "SELECT channel_id, name, server_id, create_at FROM channels WHERE server_id = $1",
+                &[&server_id],
+            )
+            .map_err(|e| e.to_string())?
+        {
             let channel = Channel {
                 channel_id: row.get(0),
                 name: row.get(1),
                 server_id: row.get(2),
-                create_at: row.get(3)
+                create_at: row.get(3),
             };
             server_response.all_channels.push(channel);
         }
 
         Ok(server_response)
     }
-    
+
     fn update(&self, server: Server) -> Result<Server, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
-        client.execute(
-            "UPDATE servers SET name = $2 WHERE server_id = $1",
-            &[&server.server_id, &server.name]
-        ).map_err(|e| e.to_string())?;
+        client
+            .execute(
+                "UPDATE servers SET name = $2 WHERE server_id = $1",
+                &[&server.server_id, &server.name],
+            )
+            .map_err(|e| e.to_string())?;
         Ok(server)
     }
-    
 }

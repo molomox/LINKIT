@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
-#[derive(Debug)]
-pub struct Role{
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct Role {
     pub role_id: String,
     pub role_name: String,
 }

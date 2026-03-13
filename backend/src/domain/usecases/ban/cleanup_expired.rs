@@ -14,7 +14,8 @@ impl<'a> CleanupExpiredBans<'a> {
         }
 
         // Récupérer tous les bans du serveur
-        let all_bans = self.ban_repo
+        let all_bans = self
+            .ban_repo
             .find_by_server(server_id.clone())
             .map_err(|e| format!("Échec de récupération des bans: {}", e))?;
 
@@ -26,29 +27,38 @@ impl<'a> CleanupExpiredBans<'a> {
             match DateTime::parse_from_rfc3339(&ban.expired_at) {
                 Ok(expired_at) => {
                     let expired_at_utc = expired_at.with_timezone(&Utc);
-                    
+
                     // Si le ban a expiré
                     if expired_at_utc <= now {
-                        println!("🔓 Ban expiré détecté: user {} sur serveur {}", ban.bannished_user_id, server_id);
-                        
+                        println!(
+                            "🔓 Ban expiré détecté: user {} sur serveur {}",
+                            ban.bannished_user_id, server_id
+                        );
+
                         // Supprimer le ban
-                        if let Err(e) = self.ban_repo.deban(ban.bannished_user_id.clone(), server_id.clone()) {
+                        if let Err(e) = self
+                            .ban_repo
+                            .deban(ban.bannished_user_id.clone(), server_id.clone())
+                        {
                             eprintln!("❌ Échec suppression ban expiré: {}", e);
                             continue;
                         }
-                        
+
                         // Restaurer le rôle à Membre (role02)
                         if let Err(e) = self.member_repo.update_member_role(
                             ban.bannished_user_id.clone(),
                             server_id.clone(),
-                            "role02".to_string()
+                            "role02".to_string(),
                         ) {
                             eprintln!("❌ Échec restauration rôle: {}", e);
                             continue;
                         }
-                        
+
                         unbanned_users.push(ban.bannished_user_id.clone());
-                        println!("✅ Utilisateur {} débanni automatiquement", ban.bannished_user_id);
+                        println!(
+                            "✅ Utilisateur {} débanni automatiquement",
+                            ban.bannished_user_id
+                        );
                     }
                 }
                 Err(e) => {

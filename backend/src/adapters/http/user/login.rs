@@ -1,4 +1,13 @@
-use crate::{adapters::{db::postgres_user_repository::PostgresUserRepo, http::{error::ApiError, user::response::{CreateUserResponse, LoginRequest, UserRequest}}}, domain::usecases::user::login::LoginUser};
+use crate::{
+    adapters::{
+        db::postgres_user_repository::PostgresUserRepo,
+        http::{
+            error::ApiError,
+            user::response::{CreateUserResponse, LoginRequest, UserRequest},
+        },
+    },
+    domain::usecases::user::login::LoginUser,
+};
 use axum::Json;
 
 pub async fn login_user_handler(

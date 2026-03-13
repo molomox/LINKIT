@@ -1,6 +1,6 @@
-use crate::domain::usecases::user::logout::LogoutUser;
-use crate::adapters::http::error::ApiError;
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
+use crate::adapters::http::error::ApiError;
+use crate::domain::usecases::user::logout::LogoutUser;
 use axum::extract::Query;
 use serde::Deserialize;
 
@@ -9,9 +9,7 @@ pub struct UserIdQuery {
     pub user_id: String,
 }
 
-pub async fn logout_user_handler(
-    Query(query): Query<UserIdQuery>,
-) -> Result<(), ApiError> {
+pub async fn logout_user_handler(Query(query): Query<UserIdQuery>) -> Result<(), ApiError> {
     let user_id = query.user_id;
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresUserRepo;
@@ -24,4 +22,3 @@ pub async fn logout_user_handler(
 
     Ok(result)
 }
-

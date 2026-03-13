@@ -1,6 +1,6 @@
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
 use crate::adapters::http::error::ApiError;
-use crate::adapters::http::user::response::{UserRequest, CreateUserResponse};
+use crate::adapters::http::user::response::{CreateUserResponse, UserRequest};
 use crate::domain::usecases::user::create::CreateUser;
 use axum::Json;
 
@@ -17,7 +17,7 @@ pub async fn create_user_handler(
     .map_err(|e| {
         let error_msg = e.to_string();
         println!("🔴 Erreur complète: {}", error_msg); // Debug log
-        
+
         // Détecter les erreurs de contrainte unique
         if error_msg.contains("duplicate key") {
             if error_msg.contains("users_username_key") {
@@ -35,7 +35,7 @@ pub async fn create_user_handler(
             ApiError::BadRequest(format!("User creation failed: {}", error_msg))
         }
     })?;
-    
+
     let response = CreateUserResponse {
         user_id: result.user_id,
         username: result.username,
