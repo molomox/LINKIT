@@ -24,6 +24,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set image name lowercase
+        run: echo "IMAGE_NAME_LOWER=$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
         
