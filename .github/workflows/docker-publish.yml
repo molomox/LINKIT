@@ -28,7 +28,7 @@ jobs:
           context: ./backend
 
       - name: Run tests
-        run: cargo test --verbose
+        run: checkout ./backend || cargo test --verbose
         
   build:
     runs-on: ubuntu-latest
