@@ -2,7 +2,6 @@ use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
 use crate::adapters::http::error::ApiError;
 use crate::domain::entities::user::User;
 use crate::domain::usecases::user::find_by_id::GetUserById;
-use crate::adapters::http::error::ApiError;
 use crate::domain::jwt::Claims;
 use axum::extract::Extension;
 

@@ -4,6 +4,7 @@ use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
 use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
 use crate::adapters::http::error::ApiError;
 use crate::adapters::http::server::response::JoinServerRequest;
+use crate::domain::entities::member::Member;
 use crate::domain::jwt::Claims;
 use crate::domain::usecases::server::join::JoinServer;
 use axum::Json;
