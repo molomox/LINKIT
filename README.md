@@ -1,4 +1,4 @@
-# 🎮 L!NKYT - Application de Messagerie Cyberpunk
+# 🎮 L!NKYT - Application de Messagerie Cyberpunk 
 
 Une application de messagerie en temps réel avec un style **Cyberpunk 2077**, construite avec **Rust (Axum)** pour le backend et **Next.js** pour le frontend.
 
