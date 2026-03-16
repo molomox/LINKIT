@@ -200,12 +200,11 @@ export default function ServerPage() {
         }
     }, [isConnected, selectedChannel, sendWsMessage, serverId, setOnlineMembers]);
 
-    const currentUserRole = useMemo((): { role_id: string | null; role_name: string | null } => {
-        if (!sessionUserId) return { role_id: null, role_name: null };
+    const currentUserRole = useMemo((): { role_id: string | null } => {
+        if (!sessionUserId) return { role_id: null };
         const member = members.find((m) => m.user_id === sessionUserId);
         return {
             role_id: member?.role_id || null,
-            role_name: member?.role_name || null,
         };
     }, [members, sessionUserId]);
     const isOwner = currentUserRole.role_id === "role04";
@@ -430,18 +429,22 @@ export default function ServerPage() {
                                 </div>
                             </div>
                         ) : (
-                            messages.map((message) => (
-                                <MessageItem
-                                    key={message.message_id}
-                                    message={message}
-                                    currentUserId={sessionUserId}
-                                    currentUserRole={currentUserRole.role_name}
-                                    onDelete={handleDeleteMessage}
-                                    onUpdate={handleUpdateMessage}
-                                    availableReactions={availableReactions}
-                                    onToggleReaction={handleToggleReaction}
-                                />
-                            ))
+                            messages.map((message) => {
+                                const messageAuthorRoleId = members.find((member) => member.user_id === message.user_id)?.role_id ?? null;
+                                return (
+                                    <MessageItem
+                                        key={message.message_id}
+                                        message={message}
+                                        currentUserId={sessionUserId}
+                                        currentUserRoleId={currentUserRole.role_id}
+                                        messageAuthorRoleId={messageAuthorRoleId}
+                                        onDelete={handleDeleteMessage}
+                                        onUpdate={handleUpdateMessage}
+                                        availableReactions={availableReactions}
+                                        onToggleReaction={handleToggleReaction}
+                                    />
+                                );
+                            })
                         )}
                         <div ref={messagesEndRef} />
                     </div>

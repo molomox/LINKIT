@@ -6,7 +6,8 @@ import type { Message, Reaction } from "../../../types";
 type MessageItemProps = {
     message: Message;
     currentUserId: string | null;
-    currentUserRole: string | null;
+    currentUserRoleId: string | null;
+    messageAuthorRoleId?: string | null;
     onDelete: (messageId: string) => void;
     onUpdate: (messageId: string, newContent: string) => void;
     availableReactions: Reaction[];
@@ -54,7 +55,8 @@ function isLikelyGifUrl(content: string): boolean {
 export default function MessageItem({
     message,
     currentUserId,
-    currentUserRole,
+    currentUserRoleId,
+    messageAuthorRoleId,
     onDelete,
     onUpdate,
     availableReactions,
@@ -70,9 +72,12 @@ export default function MessageItem({
     const shouldRenderGif = message.is_gif || isLikelyGifUrl(message.content);
     const reactionSummary = aggregateReactions(message.reactions ?? []);
     
-    // Permissions : Seul le propriétaire peut éditer son message, Owner/Admin peuvent supprimer
+    // Permissions: own message edit/delete, owner can delete all, admin can delete member/banned only.
     const canEdit = isOwnMessage;
-    const canDelete = isOwnMessage || currentUserRole === 'Owner' || currentUserRole === 'Admin';
+    const canDelete = isOwnMessage
+        || currentUserRoleId === 'role04'
+        || (currentUserRoleId === 'role03'
+            && (messageAuthorRoleId === 'role02' || messageAuthorRoleId === 'role01'));
     
     const handleSaveEdit = () => {
         if (editContent.trim() && editContent !== message.content) {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from "react";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 interface UseBanCleanupProps {
     serverId: string;
@@ -11,7 +12,7 @@ export function useBanCleanup({ serverId, apiBase, onMembersUpdate }: UseBanClea
         try {
             const response = await fetch(`${apiBase}/servers/${serverId}/cleanup-bans`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: buildAuthHeaders(),
             });
 
             if (response.ok) {

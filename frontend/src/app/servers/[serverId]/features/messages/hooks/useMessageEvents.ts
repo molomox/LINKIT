@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { Message } from "../../../types";
 import type { WsMessage } from "@/hooks/useWebSocket";
 
@@ -13,6 +13,17 @@ export function useMessageEvents({
     onMessagesUpdate,
     onTypingUpdate,
 }: UseMessageEventsProps) {
+    const onMessagesUpdateRef = useRef(onMessagesUpdate);
+    const onTypingUpdateRef = useRef(onTypingUpdate);
+
+    useEffect(() => {
+        onMessagesUpdateRef.current = onMessagesUpdate;
+    }, [onMessagesUpdate]);
+
+    useEffect(() => {
+        onTypingUpdateRef.current = onTypingUpdate;
+    }, [onTypingUpdate]);
+
     useEffect(() => {
         if (!lastMessage) return;
 
@@ -30,7 +41,7 @@ export function useMessageEvents({
                     is_gif: ws.is_gif ?? ws.IS_GIF ?? ws.isGif ?? false,
                 };
 
-                onMessagesUpdate(prevMessages => {
+                onMessagesUpdateRef.current(prevMessages => {
                     const exists = prevMessages.some(m => m.message_id === newMsg.message_id);
                     if (exists) return prevMessages;
                     return [...prevMessages, newMsg];
@@ -46,13 +57,13 @@ export function useMessageEvents({
             case 'typing': {
                 const currentUserId = sessionStorage.getItem("user_id");
                 if (lastMessage.user_id && lastMessage.user_id !== currentUserId && lastMessage.username) {
-                    onTypingUpdate(lastMessage.username);
+                    onTypingUpdateRef.current(lastMessage.username);
                 }
                 break;
             }
 
             case 'message_updated':
-                onMessagesUpdate(prevMessages =>
+                onMessagesUpdateRef.current(prevMessages =>
                     prevMessages.map(msg =>
                         msg.message_id === lastMessage.message_id
                             ? { ...msg, content: lastMessage.content || msg.content }
@@ -62,10 +73,44 @@ export function useMessageEvents({
                 break;
 
             case 'message_deleted':
-                onMessagesUpdate(prevMessages =>
+                onMessagesUpdateRef.current(prevMessages =>
                     prevMessages.filter(msg => msg.message_id !== lastMessage.message_id)
                 );
                 break;
+
+            case 'reaction_toggled':
+                if (!lastMessage.reaction_id || !lastMessage.emoji) {
+                    break;
+                }
+                onMessagesUpdateRef.current(prevMessages =>
+                    prevMessages.map(msg => {
+                        if (msg.message_id !== lastMessage.message_id) {
+                            return msg;
+                        }
+
+                        const reactions = [...(msg.reactions ?? [])];
+                        const reactionPayload = {
+                            reaction_id: lastMessage.reaction_id || 0,
+                            emoji: lastMessage.emoji || '',
+                            reaction_name: lastMessage.reaction_name || '',
+                        };
+
+                        if (lastMessage.status === 'removed') {
+                            const index = reactions.findIndex(r => r.reaction_id === reactionPayload.reaction_id);
+                            if (index !== -1) {
+                                reactions.splice(index, 1);
+                            }
+                        } else {
+                            reactions.push(reactionPayload);
+                        }
+
+                        return {
+                            ...msg,
+                            reactions,
+                        };
+                    })
+                );
+                break;
         }
-    }, [lastMessage, onMessagesUpdate, onTypingUpdate]);
+    }, [lastMessage]);
 }

@@ -66,12 +66,27 @@ impl ChannelRepository for PostgresChannelRepo {
         Ok(channels_response)
     }
     fn delete_channel(&self, channel_id: String) -> Result<String, String> {
-        let mut client = Client::connect(&db_url(), NoTls)
-            .map_err(|e| e.to_string())
-            .unwrap();
-        client
+        let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
+        let mut tx = client.transaction().map_err(|e| e.to_string())?;
+
+        tx.execute(
+            "DELETE FROM reagi WHERE message_id IN (SELECT message_id FROM messages WHERE channel_id = $1)",
+            &[&channel_id],
+        )
+        .map_err(|e| format!("Failed to delete channel reactions: {}", e))?;
+
+        tx.execute("DELETE FROM messages WHERE channel_id = $1", &[&channel_id])
+            .map_err(|e| format!("Failed to delete channel messages: {}", e))?;
+
+        let deleted = tx
             .execute("DELETE FROM channels WHERE channel_id = $1", &[&channel_id])
-            .unwrap();
+            .map_err(|e| format!("Failed to delete channel: {}", e))?;
+
+        if deleted == 0 {
+            return Err("Channel not found".to_string());
+        }
+
+        tx.commit().map_err(|e| e.to_string())?;
         Ok(channel_id)
     }
 
