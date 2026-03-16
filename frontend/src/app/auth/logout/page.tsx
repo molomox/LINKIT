@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 export default function LogoutPage() {
     const router = useRouter();
@@ -14,13 +15,13 @@ export default function LogoutPage() {
     useEffect(() => {
         const handleLogout = async () => {
             try {
-                const userId = sessionStorage.getItem("user_id");
+                const token = sessionStorage.getItem("token");
 
-                if (userId) {
+                if (token) {
                     // Appel à l'API pour invalider le token côté serveur
-                    await fetch(`${apiBase}/auth/logout?user_id=${userId}`, {
+                    await fetch(`${apiBase}/auth/logout`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: buildAuthHeaders(),
                     });
                 }
 

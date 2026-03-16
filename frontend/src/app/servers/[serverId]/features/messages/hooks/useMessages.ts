@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Message, ApiMessage, Channel } from "../../../types";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 interface UseMessagesProps {
     selectedChannel: Channel | null;
@@ -15,7 +16,7 @@ export function useMessages({ selectedChannel, apiBase }: UseMessagesProps) {
         try {
             const messagesRes = await fetch(`${apiBase}/channels/${selectedChannel.channel_id}/messages`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json" },
+                headers: buildAuthHeaders(),
             });
 
             if (messagesRes.ok) {

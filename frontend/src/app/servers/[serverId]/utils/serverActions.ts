@@ -1,10 +1,12 @@
+import { buildAuthHeaders } from "@/utils/authHeaders";
+
 export async function leaveServer(serverId: string, apiBase: string): Promise<void> {
     const userId = sessionStorage.getItem("user_id");
     if (!userId) throw new Error("Utilisateur non identifié");
 
     const res = await fetch(`${apiBase}/servers/${serverId}/leave`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: buildAuthHeaders(),
         body: JSON.stringify(userId),
     });
 
@@ -17,7 +19,7 @@ export async function leaveServer(serverId: string, apiBase: string): Promise<vo
 export async function deleteServer(serverId: string, apiBase: string): Promise<void> {
     const res = await fetch(`${apiBase}/servers/${serverId}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: buildAuthHeaders(),
     });
 
     if (!res.ok) {
@@ -50,7 +52,7 @@ export async function createOrGetDmChannel(
 
     const res = await fetch(`${apiBase}/servers/${serverId}/dm/${targetUserId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: buildAuthHeaders(),
         body: JSON.stringify({ user_id: currentUserId }),
     });
 
@@ -69,7 +71,7 @@ export async function listDmChannels(
 ): Promise<DmChannelResponse[]> {
     const res = await fetch(`${apiBase}/servers/${serverId}/dm/user/${userId}`, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: buildAuthHeaders(),
     });
 
     if (!res.ok) {

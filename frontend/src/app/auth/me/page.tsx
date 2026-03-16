@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import RequireAuth from "@/components/RequireAuth";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 import * as serverActions from "../../servers/[serverId]/utils/serverActions";
 
 type UserProfile = {
@@ -62,6 +64,36 @@ export default function DashboardPage() {
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
     const wsBase = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3000";
 
+    const forceLogin = () => {
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user_id");
+        sessionStorage.removeItem("username");
+        sessionStorage.removeItem("email");
+        router.replace("/auth/login");
+    };
+
+    useEffect(() => {
+        const checkAuth = () => {
+            const token = sessionStorage.getItem("token");
+            const userId = sessionStorage.getItem("user_id");
+            if (!token || !userId) {
+                setLoading(true);
+                forceLogin();
+            }
+        };
+
+        // Immediate check on mount.
+        checkAuth();
+
+        // Keep page locked even if token is removed during an active session.
+        const interval = window.setInterval(checkAuth, 1000);
+
+        return () => {
+            window.clearInterval(interval);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     useEffect(() => {
         notifOpenRef.current = isNotifOpen;
     }, [isNotifOpen]);
@@ -73,20 +105,17 @@ export default function DashboardPage() {
             try {
                 // Récupérer l'user_id du sessionStorage
                 const userId = sessionStorage.getItem("user_id");
-                const storedUsername = sessionStorage.getItem("username");
-                const storedEmail = sessionStorage.getItem("email");
+                const token = sessionStorage.getItem("token");
 
-                if (!userId) {
-                    router.push("/auth/login");
+                if (!userId || !token) {
+                    forceLogin();
                     return;
                 }
 
                 // Charger les informations utilisateur
                 const userRes = await fetch(`${apiBase}/me?user_id=${userId}`, {
                     method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: buildAuthHeaders(),
                 });
 
                 if (!isMounted) return;
@@ -100,20 +129,18 @@ export default function DashboardPage() {
                         create_at: userData.create_at,
                     });
                 } else {
-                    // Si l'API échoue, utiliser les données du localStorage
-                    setUser({
-                        username: storedUsername || "User",
-                        email: storedEmail || "user@nightcity.net",
-                        user_id: userId,
-                        create_at: new Date().toISOString(),
-                    });
+                    if (userRes.status === 401 || userRes.status === 403) {
+                        forceLogin();
+                        return;
+                    }
+                    throw new Error(`User fetch failed with status ${userRes.status}`);
                 }
 
                 // Charger les serveurs
                 console.log("🔵 [MOUNT] Chargement des serveurs pour user_id:", userId);
                 const serversRes = await fetch(`${apiBase}/servers?user_id=${userId}`, {
                     method: "GET",
-                    headers: { "Content-Type": "application/json" },
+                    headers: buildAuthHeaders(),
                 });
 
                 if (!isMounted) return;
@@ -147,6 +174,10 @@ export default function DashboardPage() {
 
                     setDmConversations(mergedDms);
                 } else {
+                    if (serversRes.status === 401 || serversRes.status === 403) {
+                        forceLogin();
+                        return;
+                    }
                     const errorText = await serversRes.text();
                     console.error("🔴 Erreur chargement serveurs:", errorText);
                     setServers([]);
@@ -156,6 +187,7 @@ export default function DashboardPage() {
             } catch (error) {
                 console.error("Erreur lors du chargement:", error);
                 if (isMounted) {
+                    forceLogin();
                     setLoading(false);
                 }
             }
@@ -172,11 +204,12 @@ export default function DashboardPage() {
     useEffect(() => {
         const userId = sessionStorage.getItem("user_id");
         const username = sessionStorage.getItem("username");
+        const token = sessionStorage.getItem("token");
 
         wsConnectionsRef.current.forEach((socket) => socket.close());
         wsConnectionsRef.current = [];
 
-        if (!userId || !username || servers.length === 0) {
+        if (!userId || !username || !token || servers.length === 0) {
             return;
         }
 
@@ -292,21 +325,23 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen" style={{ background: '#0a0a0a' }}>
-                <div className="text-center">
-                    <div className="text-yellow-400 text-2xl font-black mb-4" style={{ fontFamily: 'monospace' }}>
-                        {t.common.loading}
-                    </div>
-                    <div className="w-64 h-1 bg-gray-800 overflow-hidden">
-                        <div className="h-full bg-yellow-400 animate-pulse" style={{ width: '50%' }}></div>
+            <RequireAuth>
+                <div className="flex items-center justify-center min-h-screen" style={{ background: '#0a0a0a' }}>
+                    <div className="text-center">
+                        <div className="text-yellow-400 text-2xl font-black mb-4" style={{ fontFamily: 'monospace' }}>
+                            {t.common.loading}
+                        </div>
+                        <div className="w-64 h-1 bg-gray-800 overflow-hidden">
+                            <div className="h-full bg-yellow-400 animate-pulse" style={{ width: '50%' }}></div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </RequireAuth>
         );
     }
 
     return (
-        <>
+        <RequireAuth>
             <style dangerouslySetInnerHTML={{
                 __html: `
                     @keyframes glitch {
@@ -688,6 +723,6 @@ export default function DashboardPage() {
                     </div>
                 )}
             </div>
-        </>
+        </RequireAuth>
     );
 }

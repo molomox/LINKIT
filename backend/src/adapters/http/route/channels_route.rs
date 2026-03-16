@@ -1,8 +1,6 @@
+use axum::{middleware, Router, routing::{delete, get, post,put}};
 use crate::adapters::websocket::AppState;
-use axum::{
-    routing::{delete, get, post, put},
-    Router,
-};
+use crate::adapters::http::auth::middleware::require_auth;
 
 use crate::adapters::http::{
     channel::create_channel::create_channel_handler,
@@ -17,5 +15,6 @@ pub fn channels_routes(state: AppState) -> Router {
         .route("/channels/:channel_id", get(get_channel_handler))
         .route("/channels/:channel_id", put(update_channel_handler))
         .route("/channels/:channel_id", delete(delete_channel_handler))
+        .route_layer(middleware::from_fn(require_auth))
         .with_state(state)
 }

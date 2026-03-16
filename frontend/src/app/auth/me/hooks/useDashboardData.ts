@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import * as serverActions from "../../../servers/[serverId]/utils/serverActions";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 import type { DmConversation, Server, ServerApiResponse, UserProfile } from "../types";
 
 type UseDashboardDataArgs = {
@@ -17,25 +18,30 @@ export function useDashboardData({ apiBase }: UseDashboardDataArgs) {
     const [dmConversations, setDmConversations] = useState<DmConversation[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const forceLogin = () => {
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user_id");
+        sessionStorage.removeItem("username");
+        sessionStorage.removeItem("email");
+        router.replace("/auth/login");
+    };
+
     useEffect(() => {
         let isMounted = true;
 
         const loadUserData = async () => {
             try {
                 const userId = sessionStorage.getItem("user_id");
-                const storedUsername = sessionStorage.getItem("username");
-                const storedEmail = sessionStorage.getItem("email");
+                const token = sessionStorage.getItem("token");
 
-                if (!userId) {
-                    router.push("/auth/login");
+                if (!userId || !token) {
+                    forceLogin();
                     return;
                 }
 
                 const userRes = await fetch(`${apiBase}/me?user_id=${userId}`, {
                     method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: buildAuthHeaders(),
                 });
 
                 if (!isMounted) return;
@@ -49,17 +55,16 @@ export function useDashboardData({ apiBase }: UseDashboardDataArgs) {
                         create_at: userData.create_at,
                     });
                 } else {
-                    setUser({
-                        username: storedUsername || "User",
-                        email: storedEmail || "user@nightcity.net",
-                        user_id: userId,
-                        create_at: new Date().toISOString(),
-                    });
+                    if (userRes.status === 401 || userRes.status === 403) {
+                        forceLogin();
+                        return;
+                    }
+                    throw new Error(`User fetch failed with status ${userRes.status}`);
                 }
 
                 const serversRes = await fetch(`${apiBase}/servers?user_id=${userId}`, {
                     method: "GET",
-                    headers: { "Content-Type": "application/json" },
+                    headers: buildAuthHeaders(),
                 });
 
                 if (!isMounted) return;
@@ -90,12 +95,17 @@ export function useDashboardData({ apiBase }: UseDashboardDataArgs) {
 
                     setDmConversations(mergedDms);
                 } else {
-                    setServers([]);
+                    if (serversRes.status === 401 || serversRes.status === 403) {
+                        forceLogin();
+                        return;
+                    }
+                    throw new Error(`Servers fetch failed with status ${serversRes.status}`);
                 }
 
                 setLoading(false);
             } catch {
                 if (isMounted) {
+                    forceLogin();
                     setLoading(false);
                 }
             }

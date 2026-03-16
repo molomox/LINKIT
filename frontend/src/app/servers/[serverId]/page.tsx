@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslation } from "@/i18n";
+import RequireAuth from "@/components/RequireAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useServerWebSocket } from "@/hooks/useServerWebSocket";
 import type { Message, Member, Channel } from "./types";
@@ -23,6 +24,7 @@ import { useMessageReactions } from "./features/messages/hooks/useMessageReactio
 import { useMessageComposer } from "./features/messages/hooks/useMessageComposer";
 import * as serverActions from "./utils/serverActions";
 import * as messageActions from "./utils/messageActions";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 type DmHeaderNotification = {
     id: string;
@@ -286,9 +288,7 @@ export default function ServerPage() {
 
             const res = await fetch(`${apiBase}/channels/${channelId}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
+                headers: buildAuthHeaders(false),
             });
 
             if (!res.ok) {
@@ -333,20 +333,23 @@ export default function ServerPage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen" style={{ background: '#0a0a0a' }}>
-                <div className="text-center">
-                    <div className="text-yellow-400 text-2xl font-black mb-4" style={{ fontFamily: 'monospace' }}>
-                        {t.common.loading}
-                    </div>
-                    <div className="w-64 h-1 bg-gray-800 overflow-hidden">
-                        <div className="h-full bg-yellow-400 animate-pulse" style={{ width: '50%' }}></div>
+            <RequireAuth>
+                <div className="flex items-center justify-center min-h-screen" style={{ background: '#0a0a0a' }}>
+                    <div className="text-center">
+                        <div className="text-yellow-400 text-2xl font-black mb-4" style={{ fontFamily: 'monospace' }}>
+                            {t.common.loading}
+                        </div>
+                        <div className="w-64 h-1 bg-gray-800 overflow-hidden">
+                            <div className="h-full bg-yellow-400 animate-pulse" style={{ width: '50%' }}></div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </RequireAuth>
         );
     }
 
     return (
+        <RequireAuth>
         <div className="h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
             <style dangerouslySetInnerHTML={{
                 __html: `
@@ -485,5 +488,6 @@ export default function ServerPage() {
             />
 
         </div>
+        </RequireAuth>
     );
 }

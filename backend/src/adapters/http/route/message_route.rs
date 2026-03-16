@@ -1,8 +1,6 @@
+use axum::{middleware, Router, routing::{delete, get, post, put}};
 use crate::adapters::websocket::AppState;
-use axum::{
-    routing::{delete, get, post, put},
-    Router,
-};
+use crate::adapters::http::auth::middleware::require_auth;
 
 
 use crate::adapters::http::message::{
@@ -29,5 +27,6 @@ pub fn message_routes(state: AppState) -> Router {
         .route("/messages/:message_id", put(update_message_handler))
         .route("/reactions", get(get_reactions_handler))
         .route("/messages/:message_id/reactions/:reaction_id", put(toggle_reaction_handler))
+        .route_layer(middleware::from_fn(require_auth))
         .with_state(state)
 }

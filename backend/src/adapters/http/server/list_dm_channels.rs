@@ -6,11 +6,18 @@ use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::http::constants::db_url;
 use crate::adapters::http::error::ApiError;
 use crate::adapters::http::server::response::DmChannelResponse;
+use crate::domain::jwt::Claims;
 use crate::domain::ports::member_repository::MemberRepository;
+use axum::extract::Extension;
 
 pub async fn list_dm_channels_handler(
     Path((server_id, user_id)): Path<(String, String)>,
+    Extension(claims): Extension<Claims>,
 ) -> Result<Json<Vec<DmChannelResponse>>, ApiError> {
+    if claims.sub != user_id {
+        return Err(ApiError::Unauthorized("Cannot access DM channels for another user".to_string()));
+    }
+
     let result = tokio::task::spawn_blocking(move || {
         if user_id.is_empty() || server_id.is_empty() {
             return Err("Missing required identifiers".to_string());

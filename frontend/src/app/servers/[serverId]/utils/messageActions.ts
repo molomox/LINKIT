@@ -1,9 +1,11 @@
+import { buildAuthHeaders } from "@/utils/authHeaders";
+
 export async function deleteMessage(messageId: string, apiBase: string): Promise<void> {
     const currentUserId = sessionStorage.getItem("user_id");
 
     const res = await fetch(`${apiBase}/messages/${messageId}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: buildAuthHeaders(),
         body: JSON.stringify({ user_id: currentUserId }),
     });
 
@@ -18,7 +20,7 @@ export async function updateMessage(messageId: string, newContent: string, apiBa
 
     const res = await fetch(`${apiBase}/messages/${messageId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: buildAuthHeaders(),
         body: JSON.stringify({
             content: newContent,
             user_id: currentUserId,
@@ -40,7 +42,7 @@ export type ApiReaction = {
 export async function listAvailableReactions(apiBase: string): Promise<ApiReaction[]> {
     const res = await fetch(`${apiBase}/reactions`, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: buildAuthHeaders(),
     });
 
     if (!res.ok) {
@@ -60,7 +62,7 @@ export async function toggleMessageReaction(
 
     const res = await fetch(`${apiBase}/messages/${messageId}/reactions/${reactionId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: buildAuthHeaders(),
         body: JSON.stringify({ user_id: currentUserId }),
     });
 
