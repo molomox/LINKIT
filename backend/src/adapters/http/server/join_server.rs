@@ -5,14 +5,20 @@ use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::domain::entities::member::Member;
 use crate::adapters::http::error::ApiError;
 use crate::adapters::http::server::response::JoinServerRequest;
+use crate::domain::jwt::Claims;
 use crate::domain::usecases::server::join::JoinServer;
 use axum::Json;
-use axum::extract::Path;
+use axum::extract::{Extension, Path};
 
 pub async fn join_server_handler(
     Path(server_id): Path<String>,
+    Extension(claims): Extension<Claims>,
     Json(join_request): Json<JoinServerRequest>,
 ) -> Result<Json<Member>, ApiError> {
+    if join_request.user_id != claims.sub {
+        return Err(ApiError::Unauthorized("Cannot join server for another user".to_string()));
+    }
+
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;
         let repo2 = PostgresMemberRepo;

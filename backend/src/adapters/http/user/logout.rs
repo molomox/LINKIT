@@ -1,18 +1,13 @@
 use crate::domain::usecases::user::logout::LogoutUser;
 use crate::adapters::http::error::ApiError;
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
-use axum::extract::Query;
-use serde::Deserialize;
-
-#[derive(Deserialize)]
-pub struct UserIdQuery {
-    pub user_id: String,
-}
+use crate::domain::jwt::Claims;
+use axum::extract::Extension;
 
 pub async fn logout_user_handler(
-    Query(query): Query<UserIdQuery>,
+    Extension(claims): Extension<Claims>,
 ) -> Result<(), ApiError> {
-    let user_id = query.user_id;
+    let user_id = claims.sub;
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresUserRepo;
         let usecase = LogoutUser { repo: &repo };

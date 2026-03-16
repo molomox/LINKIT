@@ -7,12 +7,19 @@ use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::http::constants::db_url;
 use crate::adapters::http::error::ApiError;
 use crate::adapters::http::server::response::{CreateDmChannelRequest, DmChannelResponse};
+use crate::domain::jwt::Claims;
 use crate::domain::ports::member_repository::MemberRepository;
+use axum::extract::Extension;
 
 pub async fn create_or_get_dm_channel_handler(
     Path((server_id, target_user_id)): Path<(String, String)>,
+    Extension(claims): Extension<Claims>,
     Json(request): Json<CreateDmChannelRequest>,
 ) -> Result<Json<DmChannelResponse>, ApiError> {
+    if request.user_id != claims.sub {
+        return Err(ApiError::Unauthorized("Cannot create DM for another user".to_string()));
+    }
+
     let result = tokio::task::spawn_blocking(move || {
         if request.user_id.is_empty() || target_user_id.is_empty() || server_id.is_empty() {
             return Err("Missing required identifiers".to_string());

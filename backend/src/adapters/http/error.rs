@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub enum ApiError {
     BadRequest(String),
     NotFound(String),
+    Unauthorized(String),
     InternalError(String),
 }
 
@@ -13,6 +14,7 @@ impl IntoResponse for ApiError {
         match self {
             ApiError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg).into_response(),
             ApiError::NotFound(msg) => (StatusCode::NOT_FOUND, msg).into_response(),
+            ApiError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg).into_response(),
             ApiError::InternalError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg).into_response(),
         }
     }

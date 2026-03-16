@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import RequireAuth from "@/components/RequireAuth";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 export default function CreateChannelPage() {
     const params = useParams();
@@ -24,7 +26,7 @@ export default function CreateChannelPage() {
         try {
             const res = await fetch(`${apiBase}/servers/${serverId}/channels`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: buildAuthHeaders(),
                 body: JSON.stringify(name),
             });
 
@@ -50,6 +52,7 @@ export default function CreateChannelPage() {
     };
 
     return (
+        <RequireAuth>
         <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0a' }}>
             {/* Sélecteur de langue */}
             <div className="fixed top-4 right-4 z-50">
@@ -194,6 +197,7 @@ export default function CreateChannelPage() {
                 <div className="absolute top-2/3 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-20" />
             </div>
         </div>
+        </RequireAuth>
     );
 }
 

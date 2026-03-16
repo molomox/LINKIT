@@ -1,4 +1,4 @@
-use axum::{Router, routing::{delete, get, post,put}};
+use axum::{middleware, Router, routing::{delete, get, post,put}};
 
 use crate::adapters::http::server::{
     create_server::create_server_handler as create_server_handler, 
@@ -21,6 +21,7 @@ use crate::adapters::http::server::{
     list_dm_channels::list_dm_channels_handler as list_dm_channels_handler
 };
 use crate::adapters::websocket::AppState;
+use crate::adapters::http::auth::middleware::require_auth;
 
 pub fn server_routes(state: AppState) -> Router {
     Router::new()
@@ -46,5 +47,6 @@ pub fn server_routes(state: AppState) -> Router {
         .route("/servers/:server_id/dm/user/:user_id", get(list_dm_channels_handler))
 
         .route("/invite/:invite_code", post(join_server_by_invite_handler))
+        .route_layer(middleware::from_fn(require_auth))
         .with_state(state)
 }

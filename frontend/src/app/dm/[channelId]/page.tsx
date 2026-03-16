@@ -5,6 +5,8 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import { useWebSocket, type WsMessage } from "@/hooks/useWebSocket";
 import GifPicker from "@/components/GifPicker";
+import RequireAuth from "@/components/RequireAuth";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 type DmMessage = {
     message_id: string;
@@ -62,7 +64,7 @@ export default function DirectMessagePage() {
             try {
                 const res = await fetch(`${apiBase}/channels/${channelId}/messages`, {
                     method: "GET",
-                    headers: { "Content-Type": "application/json" },
+                    headers: buildAuthHeaders(),
                 });
 
                 if (!res.ok) return;
@@ -117,7 +119,7 @@ export default function DirectMessagePage() {
 
         await fetch(`${apiBase}/channels/${channelId}/messages`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: buildAuthHeaders(),
             body: JSON.stringify({ content, user_id: currentUser.userId, ...(isGif ? { is_gif: true } : {}) }),
         });
     };
@@ -162,6 +164,7 @@ export default function DirectMessagePage() {
     };
 
     return (
+        <RequireAuth>
         <div className="h-screen flex flex-col" style={{ background: "#0a0a0a" }}>
             <header className="border-b-2 border-yellow-400/30 bg-black/80 px-4 py-3">
                 <div className="mb-2 flex items-center gap-2">
@@ -239,5 +242,6 @@ export default function DirectMessagePage() {
                 />
             )}
         </div>
+        </RequireAuth>
     );
 }

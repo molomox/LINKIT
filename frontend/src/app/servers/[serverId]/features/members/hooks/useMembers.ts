@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Member, ApiMember } from "../../../types";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 interface UseMembersProps {
     serverId: string;
@@ -15,7 +16,7 @@ export function useMembers({ serverId, apiBase }: UseMembersProps) {
         try {
             const membersRes = await fetch(`${apiBase}/servers/${serverId}/members`, {
                 method: "GET",
-                headers: { "Content-Type": "application/json" },
+                headers: buildAuthHeaders(),
             });
 
             if (membersRes.ok) {

@@ -6,18 +6,18 @@ use std::env;
 fn get_jwt_secret() -> String {
     env::var("JWT_SECRET").expect(
         "❌ ERREUR CRITIQUE : JWT_SECRET n'est pas défini dans les variables d'environnement!\n\
-         Le serveur ne peut pas démarrer sans cette variable.\n\
-         \n\
-         Solution :\n\
-         1. Créez un fichier .env dans backend/ ou à la racine\n\
-         2. Ajoutez : JWT_SECRET=votre_clé_secrète_ici\n\
-         3. Générez une clé sécurisée avec : openssl rand -base64 64\n\
-         \n\
-         Pour Docker : Vérifiez que le fichier .env existe à la racine du projet."
+        Le serveur ne peut pas démarrer sans cette variable.\n\
+        \n\
+        Solution :\n\
+        1. Créez un fichier .env dans backend/ ou à la racine\n\
+        2. Ajoutez : JWT_SECRET=votre_clé_secrète_ici\n\
+        3. Générez une clé sécurisée avec : openssl rand -base64 64\n\
+        \n\
+        Pour Docker : Vérifiez que le fichier .env existe à la racine du projet."
     )
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
     pub sub: String,      // user_id
     pub username: String,

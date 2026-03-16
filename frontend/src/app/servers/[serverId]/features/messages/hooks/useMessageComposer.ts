@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import type { WsMessage } from "@/hooks/useWebSocket";
 import type { Channel } from "../../../types";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 interface UseMessageComposerProps {
     selectedChannel: Channel | null;
@@ -41,7 +42,7 @@ export function useMessageComposer({
 
             const res = await fetch(`${apiBase}/channels/${selectedChannel.channel_id}/messages`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: buildAuthHeaders(),
                 body: JSON.stringify(body),
             });
 

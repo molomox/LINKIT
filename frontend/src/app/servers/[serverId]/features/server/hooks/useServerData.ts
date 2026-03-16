@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Server, Channel } from "../../../types";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 interface UseServerDataProps {
     serverId: string;
@@ -19,7 +20,7 @@ export function useServerData({ serverId, apiBase, onLoadComplete }: UseServerDa
                 // Charger les infos du serveur
                 const serverRes = await fetch(`${apiBase}/servers/${serverId}`, {
                     method: "GET",
-                    headers: { "Content-Type": "application/json" },
+                    headers: buildAuthHeaders(),
                 });
 
                 if (serverRes.ok) {
@@ -34,7 +35,7 @@ export function useServerData({ serverId, apiBase, onLoadComplete }: UseServerDa
                         // Si all_channels est vide, essayer de charger directement
                         const channelsRes = await fetch(`${apiBase}/servers/${serverId}/channels`, {
                             method: "GET",
-                            headers: { "Content-Type": "application/json" },
+                            headers: buildAuthHeaders(),
                         });
 
                         if (channelsRes.ok) {

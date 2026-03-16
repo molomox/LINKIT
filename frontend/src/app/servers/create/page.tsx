@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import RequireAuth from "@/components/RequireAuth";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 type CreateServerResponse = {
     server_id: string;
@@ -37,7 +39,7 @@ export default function CreateServerPage() {
         try {
             const res = await fetch(`${apiBase}/servers`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: buildAuthHeaders(),
                 body: JSON.stringify({
                     name: serverName,
                     password: password,
@@ -70,6 +72,7 @@ export default function CreateServerPage() {
     };
 
     return (
+        <RequireAuth>
         <div className="relative flex items-center justify-center min-h-screen overflow-hidden" style={{ background: '#0a0a0a' }}>
             {/* Sélecteur de langue */}
             <div className="fixed top-4 right-4 z-50">
@@ -254,5 +257,6 @@ export default function CreateServerPage() {
                 )}
             </main>
         </div>
+        </RequireAuth>
     );
 }

@@ -2,18 +2,13 @@ use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
 use crate::domain::entities::user::User;
 use crate::domain::usecases::user::find_by_id::GetUserById;
 use crate::adapters::http::error::ApiError;
-use axum::extract::Query;
-use serde::Deserialize;
-
-#[derive(Deserialize)]
-pub struct UserIdQuery {
-    pub user_id: String,
-}
+use crate::domain::jwt::Claims;
+use axum::extract::Extension;
 
 pub async fn get_user_handler(
-    Query(query): Query<UserIdQuery>,
+    Extension(claims): Extension<Claims>,
 ) -> Result<axum::Json<User>, ApiError> {
-    let user_id = query.user_id;
+    let user_id = claims.sub;
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresUserRepo;
         let usecase = GetUserById { repo: &repo };

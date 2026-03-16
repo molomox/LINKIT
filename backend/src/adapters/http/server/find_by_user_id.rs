@@ -2,18 +2,13 @@ use crate::domain::entities::server::Server;
 use crate::domain::usecases::server::list::ListUserServers;
 use crate::adapters::http::error::ApiError;
 use crate::adapters::db::postgres_server_repository::PostgresServerRepo;
-use axum::{Json, extract::Query};
-use serde::Deserialize;
-
-#[derive(Deserialize)]
-pub struct UserIdQuery {
-    pub user_id: String,
-}
+use crate::domain::jwt::Claims;
+use axum::{Json, extract::Extension};
 
 pub async fn get_user_server_handler(
-    Query(query): Query<UserIdQuery>,
+    Extension(claims): Extension<Claims>,
 ) -> Result<Json<Vec<Server>>, ApiError> {
-    let user_id = query.user_id;
+    let user_id = claims.sub;
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;
         let usecase = ListUserServers { repo: &repo };
