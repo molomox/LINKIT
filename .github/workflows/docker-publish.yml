@@ -24,10 +24,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          context: ./backend
 
       - name: Run tests
+        working-directory: ./backend 
         run: checkout ./backend || cargo test --verbose
         
   build:
