@@ -57,8 +57,17 @@ pub async fn handle_socket(socket: WebSocket, channel_id: String, state: AppStat
                     .await;
                 }
                 Message::Close(_) => {
-                    println!("🔴 Client a fermé la connexion pour channel: {}", channel_id_for_recv);
-                    broadcast_user_left(&tx_clone, &user_id_clone, &username_clone, &channel_id_for_recv).await;
+                    println!(
+                        "🔴 Client a fermé la connexion pour channel: {}",
+                        channel_id_for_recv
+                    );
+                    broadcast_user_left(
+                        &tx_clone,
+                        &user_id_clone,
+                        &username_clone,
+                        &channel_id_for_recv,
+                    )
+                    .await;
                     break;
                 }
                 _ => {}
@@ -114,7 +123,10 @@ async fn handle_text_message(
             }
         },
         Err(e) => {
-            eprintln!("❌ Erreur parsing message WebSocket: {} - Message: {}", e, text);
+            eprintln!(
+                "❌ Erreur parsing message WebSocket: {} - Message: {}",
+                e, text
+            );
         }
     }
 }

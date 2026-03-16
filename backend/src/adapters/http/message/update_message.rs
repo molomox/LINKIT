@@ -1,12 +1,12 @@
-use crate::adapters::db::postgres_message_repository::PostgresMessageRepo;
 use crate::adapters::db::postgres_channel_repository::PostgresChannelRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
+use crate::adapters::db::postgres_message_repository::PostgresMessageRepo;
 use crate::adapters::http::error::ApiError;
+use crate::adapters::websocket::{AppState, WsMessage};
 use crate::domain::usecases::message::update_message::UpdateMessage;
 use axum::extract::{Path, State};
 use axum::Json;
 use serde::Deserialize;
-use crate::adapters::websocket::{AppState, WsMessage};
 
 #[derive(Deserialize)]
 pub struct UpdateMessageRequest {
@@ -28,13 +28,13 @@ pub async fn update_message_handler(
         let message_repo = PostgresMessageRepo;
         let channel_repo = PostgresChannelRepo;
         let member_repo = PostgresMemberRepo;
-        
+
         let usecase = UpdateMessage {
             message_repo: &message_repo,
             channel_repo: &channel_repo,
             member_repo: &member_repo,
         };
-        
+
         usecase.execute(message_id_clone, user_id, content)
     })
     .await

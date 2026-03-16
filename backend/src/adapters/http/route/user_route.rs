@@ -1,10 +1,8 @@
 use axum::{middleware, Router, routing::{delete, get, post}};
 
 use crate::adapters::http::user::{
-    create::create_user_handler as create_user_handler,
-    login::login_user_handler as login_user_handler,
-    logout::logout_user_handler as logout_user_handler,
-    get_by_id::get_user_handler as get_user_handler
+    create::create_user_handler, get_by_id::get_user_handler, login::login_user_handler,
+    logout::logout_user_handler,
 };
 use crate::adapters::http::auth::middleware::require_auth;
 

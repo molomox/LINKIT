@@ -8,7 +8,7 @@ use axum::extract::{Path, State};
 use axum::Json;
 use serde::Deserialize;
 
-#[derive(Deserialize)]  
+#[derive(Deserialize)]
 pub struct KickMemberRequest {
     pub kicker_user_id: String, // Celui qui kick
 }
@@ -77,7 +77,10 @@ pub async fn kick_member_handler(
 
     state.broadcast_to_server(&server_id, kicked_msg).await;
 
-    println!("👢 Membre kické: {} du serveur {}", target_user_id, server_id);
+    println!(
+        "👢 Membre kické: {} du serveur {}",
+        target_user_id, server_id
+    );
 
     Ok(Json(()))
 }

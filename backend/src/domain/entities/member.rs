@@ -1,8 +1,7 @@
 use crate::domain::entities::{role::Role, server::Server, user::User};
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
-#[derive(Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Member {
     pub user: User,
     pub server: Server,

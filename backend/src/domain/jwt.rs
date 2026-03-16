@@ -1,6 +1,6 @@
-use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
+use chrono::{Duration, Utc};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
-use chrono::{Utc, Duration};
 use std::env;
 
 fn get_jwt_secret() -> String {
@@ -19,9 +19,9 @@ fn get_jwt_secret() -> String {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
-    pub sub: String,      // user_id
+    pub sub: String, // user_id
     pub username: String,
-    pub exp: usize,       // Expiration timestamp
+    pub exp: usize, // Expiration timestamp
 }
 
 /// Génère un token JWT pour un utilisateur

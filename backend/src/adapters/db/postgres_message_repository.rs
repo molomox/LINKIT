@@ -1,12 +1,11 @@
+use crate::adapters::http::constants::db_url;
+use crate::domain::entities::message::Message;
+use crate::domain::ports::message_repository::MessageRepository;
 use postgres::Client;
 use postgres::NoTls;
-use crate::domain::entities::message::Message;
-use crate::adapters::http::constants::db_url;
-use crate::domain::ports::message_repository::MessageRepository;
 
 pub struct PostgresMessageRepo;
-impl MessageRepository for PostgresMessageRepo{
-    
+impl MessageRepository for PostgresMessageRepo {
     fn save(&self, message: Message) -> Result<Message, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
@@ -17,23 +16,24 @@ impl MessageRepository for PostgresMessageRepo{
 
         Ok(message)
     }
-    
+
     fn delete(&self, message_id: String) -> Result<String, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
-        client.execute(
-            "DELETE FROM messages WHERE message_id = $1", 
-            &[&message_id]
-        ).map_err(|e| format!("Failed to delete message: {}", e))?;
+        client
+            .execute("DELETE FROM messages WHERE message_id = $1", &[&message_id])
+            .map_err(|e| format!("Failed to delete message: {}", e))?;
         Ok(message_id)
     }
-    
+
     fn update(&self, message: Message) -> Result<Message, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
-        client.execute(
-            "UPDATE messages SET content = $2 WHERE message_id = $1",
-            &[&message.message_id, &message.content]
-        ).map_err(|e| e.to_string())?;
+        client
+            .execute(
+                "UPDATE messages SET content = $2 WHERE message_id = $1",
+                &[&message.message_id, &message.content],
+            )
+            .map_err(|e| e.to_string())?;
         Ok(message)
     }
     fn find_by_id(&self, message_id: String) -> Result<Message, String> {
@@ -66,7 +66,7 @@ impl MessageRepository for PostgresMessageRepo{
 
         Ok(message)
     }
-    
+
     fn find_by_channel(&self, channel_id: String) -> Result<Vec<Message>, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         let mut messages: Vec<Message> = Vec::new();

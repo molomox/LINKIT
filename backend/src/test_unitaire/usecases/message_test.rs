@@ -2,16 +2,14 @@ use crate::domain::entities::message::Message;
 use crate::domain::entities::user::User;
 use crate::domain::ports::user_repository::UserRepository;
 use crate::domain::usecases::message::{
-    send_message::SendMessage,
-    delete_message::DeleteMessage,
-    list_message::ListMessage,
+    delete_message::DeleteMessage, list_message::ListMessage, send_message::SendMessage,
     update_message::UpdateMessage,
 };
-use crate::test_unitaire::mock_repositories::MockUserRepository;
-use crate::test_unitaire::mock_repositories::MockMessageRepository;
 use crate::test_unitaire::mock_repositories::MockChannelRepository;
 use crate::test_unitaire::mock_repositories::MockMemberRepository;
+use crate::test_unitaire::mock_repositories::MockMessageRepository;
 use crate::test_unitaire::mock_repositories::MockRoleRepository;
+use crate::test_unitaire::mock_repositories::MockUserRepository;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -21,10 +19,13 @@ mod tests {
     #[test]
     fn test_send_message() {
         let repo = MockMessageRepository::new();
-        let repo_user = MockUserRepository::new(); 
+        let repo_user = MockUserRepository::new();
         repo_user.save(repo_user.create_test_user("user-1"));
 
-        let use_case = SendMessage { repo_message: &repo, repo_user: &repo_user };
+        let use_case = SendMessage {
+            repo_message: &repo,
+            repo_user: &repo_user,
+        };
 
         let result = use_case.execute(
             "channel-1".to_string(),
@@ -43,23 +44,25 @@ mod tests {
     #[test]
     fn test_send_message_empty() {
         let repo = MockMessageRepository::new();
-        let repo_user = MockUserRepository::new(); 
-        let use_case = SendMessage { repo_message: &repo, repo_user: &repo_user };
+        let repo_user = MockUserRepository::new();
+        let use_case = SendMessage {
+            repo_message: &repo,
+            repo_user: &repo_user,
+        };
 
-        let result = use_case.execute(
-            "".to_string(),
-            "".to_string(),
-            "".to_string(),
-        );
+        let result = use_case.execute("".to_string(), "".to_string(), "".to_string());
 
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Le contenu du message ne peut pas être vide");
+        assert_eq!(
+            result.unwrap_err(),
+            "Le contenu du message ne peut pas être vide"
+        );
     }
 
     #[test]
     fn test_list_message() {
         let repo = MockMessageRepository::new();
-        
+
         repo.add_message(repo.create_test_message("msg-1", "channel-1", "user-1", "Hello"));
         repo.add_message(repo.create_test_message("msg-2", "channel-1", "user-2", "Hi"));
         repo.add_message(repo.create_test_message("msg-3", "channel-2", "user-1", "Other"));
@@ -107,7 +110,11 @@ mod tests {
         let message = message_repo.create_test_message("msg-1", "channel-1", "user-1", "Hello");
         message_repo.add_message(message);
 
-        let use_case = DeleteMessage { message_repo: &message_repo, channel_repo: &channel_repo, member_repo: &member_repo };
+        let use_case = DeleteMessage {
+            message_repo: &message_repo,
+            channel_repo: &channel_repo,
+            member_repo: &member_repo,
+        };
         let result = use_case.execute("".to_string(), "user-1".to_string());
 
         assert!(result.is_err());
@@ -124,7 +131,11 @@ mod tests {
         let message = message_repo.create_test_message("msg-1", "channel-1", "user-1", "Hello");
         message_repo.add_message(message);
 
-        let use_case = DeleteMessage { message_repo: &message_repo, channel_repo: &channel_repo, member_repo: &member_repo };
+        let use_case = DeleteMessage {
+            message_repo: &message_repo,
+            channel_repo: &channel_repo,
+            member_repo: &member_repo,
+        };
         let result = use_case.execute("msg-1".to_string(), "user-1".to_string());
 
         assert!(result.is_ok());
@@ -144,7 +155,11 @@ mod tests {
         let member = member_repo.create_test_member("user-1", "server-123", "role04");
         member_repo.add_member(member);
 
-        let use_case = DeleteMessage { message_repo: &message_repo, channel_repo: &channel_repo, member_repo: &member_repo };
+        let use_case = DeleteMessage {
+            message_repo: &message_repo,
+            channel_repo: &channel_repo,
+            member_repo: &member_repo,
+        };
 
         let result = use_case.execute("".to_string(), "user-1".to_string());
 
@@ -164,7 +179,11 @@ mod tests {
         channel_repo.add_channel(channel);
         let member = member_repo.create_test_member("user-1", "server-123", "role04");
         member_repo.add_member(member);
-        let use_case = DeleteMessage { message_repo: &message_repo, channel_repo: &channel_repo, member_repo: &member_repo };
+        let use_case = DeleteMessage {
+            message_repo: &message_repo,
+            channel_repo: &channel_repo,
+            member_repo: &member_repo,
+        };
 
         let result = use_case.execute("non-existent".to_string(), "user-1".to_string());
 
@@ -185,7 +204,7 @@ mod tests {
 
         let member = member_repo.create_test_member("user-1", "server-123", "role02");
         member_repo.add_member(member);
-        
+
         let author = member_repo.create_test_member("user-1", "server-1", "role02");
         member_repo.add_member(author);
 
@@ -232,7 +251,10 @@ mod tests {
         let result = use_case.execute("msg-2".to_string(), "user-admin".to_string());
 
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Permission refusée: vous ne pouvez pas supprimer ce message");
+        assert_eq!(
+            result.unwrap_err(),
+            "Permission refusée: vous ne pouvez pas supprimer ce message"
+        );
     }
 
     #[test]
@@ -245,7 +267,6 @@ mod tests {
 
         let channel = channel_repo.create_test_channel("channel-1", "server-123", "general");
         channel_repo.add_channel(channel);
-
 
         let use_case = DeleteMessage {
             message_repo: &message_repo,
@@ -268,13 +289,14 @@ mod tests {
         let channel = channel_repo.create_test_channel("channel-1", "server-1", "general");
         channel_repo.add_channel(channel);
 
-        let message = message_repo.create_test_message("msg-1", "channel-1", "user-1", "Contenu original");
+        let message =
+            message_repo.create_test_message("msg-1", "channel-1", "user-1", "Contenu original");
         message_repo.add_message(message);
 
         let use_case = UpdateMessage {
-            message_repo : &message_repo,
-            channel_repo : &channel_repo,
-            member_repo : &member_repo,
+            message_repo: &message_repo,
+            channel_repo: &channel_repo,
+            member_repo: &member_repo,
         };
 
         let result = use_case.execute(
@@ -299,13 +321,14 @@ mod tests {
         let channel = channel_repo.create_test_channel("channel-1", "server-1", "general");
         channel_repo.add_channel(channel);
 
-        let message = message_repo.create_test_message("msg-1", "channel-1", "user-1", "Contenu original");
+        let message =
+            message_repo.create_test_message("msg-1", "channel-1", "user-1", "Contenu original");
         message_repo.add_message(message);
 
         let use_case = UpdateMessage {
-            message_repo : &message_repo,
-            channel_repo : &channel_repo,
-            member_repo : &member_repo,
+            message_repo: &message_repo,
+            channel_repo: &channel_repo,
+            member_repo: &member_repo,
         };
 
         let result = use_case.execute(
@@ -315,7 +338,10 @@ mod tests {
         );
 
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Vous ne pouvez modifier que vos propres messages");
+        assert_eq!(
+            result.unwrap_err(),
+            "Vous ne pouvez modifier que vos propres messages"
+        );
     }
 
     #[test]
@@ -327,13 +353,14 @@ mod tests {
         let channel = channel_repo.create_test_channel("channel-1", "server-1", "general");
         channel_repo.add_channel(channel);
 
-        let message = message_repo.create_test_message("msg-1", "channel-1", "user-1", "Contenu original");
+        let message =
+            message_repo.create_test_message("msg-1", "channel-1", "user-1", "Contenu original");
         message_repo.add_message(message);
 
         let use_case = UpdateMessage {
-            message_repo : &message_repo,
-            channel_repo : &channel_repo,
-            member_repo : &member_repo,
+            message_repo: &message_repo,
+            channel_repo: &channel_repo,
+            member_repo: &member_repo,
         };
 
         let result = use_case.execute(

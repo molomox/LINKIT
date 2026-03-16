@@ -1,5 +1,3 @@
-use crate::domain::usecases::user::logout::LogoutUser;
-use crate::adapters::http::error::ApiError;
 use crate::adapters::db::postgres_user_repository::PostgresUserRepo;
 use crate::domain::jwt::Claims;
 use axum::extract::Extension;
@@ -19,4 +17,3 @@ pub async fn logout_user_handler(
 
     Ok(result)
 }
-

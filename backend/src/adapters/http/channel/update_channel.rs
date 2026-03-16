@@ -1,10 +1,10 @@
 use crate::adapters::db::postgres_channel_repository::PostgresChannelRepo;
-use crate::domain::entities::channel::Channel;
 use crate::adapters::http::error::ApiError;
-use crate::domain::usecases::channel::update::UpdateChannel;
 use crate::adapters::websocket::{AppState, WsMessage};
-use axum::Json;
+use crate::domain::entities::channel::Channel;
+use crate::domain::usecases::channel::update::UpdateChannel;
 use axum::extract::{Path, State};
+use axum::Json;
 
 pub async fn update_channel_handler(
     Path(channel_id): Path<String>,
@@ -26,8 +26,13 @@ pub async fn update_channel_handler(
         name: result.name.clone(),
         server_id: result.server_id.clone(),
     };
-    state.broadcast_to_server(&result.server_id, ws_message).await;
-    println!("📢 Événement channel_updated broadcasted pour serveur: {}", result.server_id);
+    state
+        .broadcast_to_server(&result.server_id, ws_message)
+        .await;
+    println!(
+        "📢 Événement channel_updated broadcasted pour serveur: {}",
+        result.server_id
+    );
 
     Ok(Json(result))
 }

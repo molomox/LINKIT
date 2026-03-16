@@ -2,8 +2,8 @@ use crate::adapters::db::postgres_message_repository::PostgresMessageRepo;
 use crate::adapters::http::error::ApiError;
 use crate::domain::entities::message::Message;
 use crate::domain::usecases::message::list_message::ListMessage;
-use axum::Json;
 use axum::extract::Path;
+use axum::Json;
 
 pub async fn get_message_list_handler(
     Path(channel_id): Path<String>,

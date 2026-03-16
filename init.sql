@@ -13,11 +13,25 @@ CREATE TABLE IF NOT EXISTS users (
     token TEXT
 );
 
+CREATE TABLE IF NOT EXISTS roles (
+    role_id VARCHAR(36) PRIMARY KEY,
+    role_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS servers (
+    server_id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    create_at VARCHAR(255) NOT NULL,
+    invite_code VARCHAR(36) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS channels (
     channel_id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     server_id VARCHAR(36) NOT NULL,
-    create_at VARCHAR(255) NOT NULL 
+    create_at VARCHAR(255) NOT NULL,
+    FOREIGN KEY (server_id) REFERENCES servers(server_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS messages (
@@ -26,12 +40,8 @@ CREATE TABLE IF NOT EXISTS messages (
     channel_id VARCHAR(36) NOT NULL,
     user_id VARCHAR(36) NOT NULL,
     create_at VARCHAR(255) NOT NULL,
-    IS_GIF BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-CREATE TABLE IF NOT EXISTS roles (
-    role_id VARCHAR(36) PRIMARY KEY,
-    role_name VARCHAR(255) NOT NULL
+    IS_GIF BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS members (
@@ -39,26 +49,23 @@ CREATE TABLE IF NOT EXISTS members (
     role_id VARCHAR(36) NOT NULL,
     server_id VARCHAR(36) NOT NULL,
     join_at VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (server_id) REFERENCES servers(server_id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, server_id)
 );
 
 CREATE TABLE IF NOT EXISTS bans (
-    ban_id VARCHAR(36) NOT NULL,
+    ban_id VARCHAR(36) PRIMARY KEY,
     server_id VARCHAR(36) NOT NULL,
     bannished_user_id VARCHAR(36) NOT NULL,
     banned_by_user_id VARCHAR(36) NOT NULL,
     expired_at VARCHAR(255) NULL,
     reason TEXT NOT NULL,
     create_at VARCHAR(255) NOT NULL,
-    PRIMARY KEY (ban_id)
-);
-
-CREATE TABLE IF NOT EXISTS servers (
-    name VARCHAR(255) NOT NULL,
-    server_id VARCHAR(36) PRIMARY KEY,
-    password VARCHAR(255) NOT NULL,
-    create_at VARCHAR(255) NOT NULL,
-    invite_code VARCHAR(36) NOT NULL UNIQUE
+    FOREIGN KEY (server_id) REFERENCES servers(server_id),
+    FOREIGN KEY (bannished_user_id) REFERENCES users(user_id),
+    FOREIGN KEY (banned_by_user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE IF NOT EXISTS reaction (
@@ -71,26 +78,18 @@ CREATE TABLE IF NOT EXISTS reagi (
     reaction_id int NOT NULL,
     user_id VARCHAR(36) NOT NULL,
     message_id VARCHAR(36) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (message_id) REFERENCES messages(message_id),
-    FOREIGN KEY (reaction_id) REFERENCES reaction(reaction_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
+    FOREIGN KEY (reaction_id) REFERENCES reaction(reaction_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS channel_dm (
     channel_id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     user2_id VARCHAR(36) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (user2_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (user2_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
-
-INSERT INTO servers (name, server_id, password, create_at, invite_code) VALUES
-('Alice', 'ag5y8iplo04rf3c', 'alice_password', '2023-01-01', 'INVITE-ALICE-2023'),
-('Bob', 'po90kE34scz1bnH87', 'bob_password', '2023-01-01', 'INVITE-BOB-2023');
-
-INSERT INTO channels (channel_id, name, server_id, create_at) VALUES
-('channel1', 'Alice', 'ag5y8iplo04rf3c', '2023-01-01'),
-('channel2', 'Bob', 'po90kE34scz1bnH87', '2023-01-01');
 
 INSERT INTO users (user_id, username, password, email, create_at) VALUES
 ('idnum01','dimitri','blabla','d@d.d','2023-01-01'),
@@ -102,12 +101,13 @@ INSERT INTO roles (role_id, role_name) VALUES
 ('role03','Admin'),
 ('role04', 'Owner');
 
-INSERT INTO channel_dm (channel_id,user_id,user2_id) VALUES
-('channeldm4', 'idnum01', 'idnum02');
+INSERT INTO servers (name, server_id, password, create_at, invite_code) VALUES
+('Alice', 'ag5y8iplo04rf3c', 'alice_password', '2023-01-01', 'INVITE-ALICE-2023'),
+('Bob', 'po90kE34scz1bnH87', 'bob_password', '2023-01-01', 'INVITE-BOB-2023');
 
-INSERT INTO members (user_id, server_id, role_id,join_at) VALUES
-('idnum01', 'po90kE34scz1bnH87', 'role04', '2023-01-01'),
-('idnum01', 'ag5y8iplo04rf3c', 'role02', '2023-01-01');
+INSERT INTO channels (channel_id, name, server_id, create_at) VALUES
+('channel1', 'Alice', 'ag5y8iplo04rf3c', '2023-01-01'),
+('channel2', 'Bob', 'po90kE34scz1bnH87', '2023-01-01');
 
 INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GIF) VALUES
 ('message1', 'hello world', 'channel1','idnum01', '2023-01-01',false),
@@ -121,6 +121,15 @@ INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GI
 ('message9', 'hello world 9', 'channel1','idnum01', '2023-01-01',false),
 ('message10', 'hello world 10', 'channeldm4','idnum01', '2023-01-01',false);
 
+INSERT INTO members (user_id, server_id, role_id,join_at) VALUES
+('idnum01', 'po90kE34scz1bnH87', 'role04', '2023-01-01'),
+('idnum01', 'ag5y8iplo04rf3c', 'role02', '2023-01-01');
+
+INSERT INTO channel_dm (channel_id,user_id,user2_id) VALUES
+('channeldm4', 'idnum01', 'idnum02');
+
+INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GIF) VALUES
+('message11', 'hello world 10', 'channeldm4','idnum01', '2023-01-01',false);
 
 INSERT INTO reaction (reaction_id, emoji, nom_reaction) VALUES
 (1, '👍', 'like'),
@@ -153,9 +162,6 @@ INSERT INTO reaction (reaction_id, emoji, nom_reaction) VALUES
 (28, '🎁', 'gift'),
 (29, '🎈', 'balloon'),
 (30, '🎊', 'confetti');
-
-INSERT INTO messages (message_id, content, channel_id, user_id, create_at, IS_GIF) VALUES
-('message11', 'hello world 10', 'channeldm4','idnum01', '2023-01-01',false);
 
 INSERT INTO reagi (reaction_id,user_id,message_id) VALUES
 ('1', 'idnum01', 'message1'),

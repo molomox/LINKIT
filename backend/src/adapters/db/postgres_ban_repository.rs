@@ -1,12 +1,11 @@
-use postgres::{Client, NoTls};
+use crate::adapters::http::constants::db_url;
 use crate::domain::entities::ban::Ban;
 use crate::domain::ports::ban_repository::BanRepository;
-use crate::adapters::http::constants::db_url;
-
+use postgres::{Client, NoTls};
 
 pub struct PostgresBanRepo;
-impl BanRepository for PostgresBanRepo{
-    fn save(&self, ban: Ban)-> Result<Ban,String>{
+impl BanRepository for PostgresBanRepo {
+    fn save(&self, ban: Ban) -> Result<Ban, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
         client.execute(
@@ -17,7 +16,7 @@ impl BanRepository for PostgresBanRepo{
         return Ok(ban);
     }
 
-    fn find_by_user_and_server(&self, user_id: String, server_id: String) -> Result<Ban, String>{
+    fn find_by_user_and_server(&self, user_id: String, server_id: String) -> Result<Ban, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         let row = client
             .query_one(
@@ -39,7 +38,7 @@ impl BanRepository for PostgresBanRepo{
             banned_by_user_id,
             reason,
             expired_at,
-            create_at
+            create_at,
         };
         Ok(ban)
     }
@@ -68,14 +67,25 @@ impl BanRepository for PostgresBanRepo{
         Ok(bans)
     }
 
-    fn update_ban(&self, user_id: String, server_id: String, reason: String, expired_at: String,) -> Result<String,String>{
+    fn update_ban(
+        &self,
+        user_id: String,
+        server_id: String,
+        reason: String,
+        expired_at: String,
+    ) -> Result<String, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         client.execute("UPDATE bans SET reason = $3, expired_at = $4 WHERE bannished_user_id = $1 AND server_id = $2", &[&user_id, &server_id, &reason, &expired_at]).map_err(|e| e.to_string())?;
         Ok(user_id)
     }
     fn deban(&self, user_id: String, server_id: String) -> Result<String, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
-        client.execute("DELETE FROM bans WHERE bannished_user_id = $1 AND server_id = $2", &[&user_id, &server_id]).map_err(|e| e.to_string())?;
+        client
+            .execute(
+                "DELETE FROM bans WHERE bannished_user_id = $1 AND server_id = $2",
+                &[&user_id, &server_id],
+            )
+            .map_err(|e| e.to_string())?;
         Ok("deban successful".to_string())
     }
 }

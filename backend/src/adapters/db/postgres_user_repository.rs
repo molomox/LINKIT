@@ -1,13 +1,13 @@
-use postgres::Client;
-use postgres::NoTls;
-use crate::domain::entities::message::Message;
 use crate::adapters::http::constants::db_url;
+use crate::domain::entities::message::Message;
 use crate::domain::entities::user::User;
 use crate::domain::ports::message_repository::MessageRepository;
 use crate::domain::ports::user_repository::UserRepository;
+use postgres::Client;
+use postgres::NoTls;
 
 pub struct PostgresUserRepo;
-impl UserRepository for PostgresUserRepo{
+impl UserRepository for PostgresUserRepo {
     fn save(&self, user: User) -> Result<User, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
@@ -18,7 +18,7 @@ impl UserRepository for PostgresUserRepo{
         Ok(user)
     }
 
-    fn find_by_id(&self, id : String) -> Result<User, String> {
+    fn find_by_id(&self, id: String) -> Result<User, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
         let row = client
             .query_one(
@@ -38,7 +38,7 @@ impl UserRepository for PostgresUserRepo{
             password,
             email,
             create_at,
-            token
+            token,
         };
         Ok(user)
     }
@@ -63,20 +63,21 @@ impl UserRepository for PostgresUserRepo{
             password,
             email,
             create_at,
-            token
+            token,
         };
         Ok(user)
     }
 
-    
     fn update_token(&self, user_id: String, token: Option<String>) -> Result<(), String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
 
-        client.execute(
-            "UPDATE users SET token = $2 WHERE user_id = $1",
-            &[&user_id, &token]
-        ).map_err(|e| e.to_string())?;
-        
+        client
+            .execute(
+                "UPDATE users SET token = $2 WHERE user_id = $1",
+                &[&user_id, &token],
+            )
+            .map_err(|e| e.to_string())?;
+
         Ok(())
     }
 }

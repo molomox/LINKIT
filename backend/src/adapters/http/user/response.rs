@@ -1,21 +1,20 @@
-
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
-pub struct UserRequest{
+pub struct UserRequest {
     pub username: String,
     pub password: String,
     pub email: String,
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct LoginRequest{
+pub struct LoginRequest {
     pub username: String,
     pub password: String,
 }
 
 #[derive(Serialize)]
-pub struct CreateUserResponse{
+pub struct CreateUserResponse {
     pub user_id: String,
     pub username: String,
     pub email: String,

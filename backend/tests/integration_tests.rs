@@ -245,4 +245,3 @@ mod validation_tests {
         assert!(password.chars().any(|c| c.is_uppercase()));
     }
 }
-
