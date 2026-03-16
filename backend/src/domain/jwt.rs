@@ -3,7 +3,15 @@ use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, 
 use serde::{Deserialize, Serialize};
 use std::env;
 
+fn load_env_files() {
+    let _ = dotenvy::from_filename(".env");
+    let _ = dotenvy::from_filename("backend/.env");
+    let _ = dotenvy::from_filename("../.env");
+}
+
 fn get_jwt_secret() -> String {
+    load_env_files();
+
     env::var("JWT_SECRET").expect(
         "❌ ERREUR CRITIQUE : JWT_SECRET n'est pas défini dans les variables d'environnement!\n\
         Le serveur ne peut pas démarrer sans cette variable.\n\

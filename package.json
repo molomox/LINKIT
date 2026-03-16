@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "desktop:dev": "./scripts/desktop-dev.sh",
+    "desktop:up": "docker compose up --build -d db backend pgadmin",
+    "desktop:down": "docker compose down"
+  },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

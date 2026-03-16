@@ -17,8 +17,17 @@ use backend::adapters::http::route::server_route::server_routes;
 use backend::adapters::http::route::user_route::user_routes;
 use backend::adapters::websocket::{websocket_routes, AppState};
 
+fn load_env_files() {
+    // Load common paths so `cargo run` works from backend/ or repo root.
+    let _ = dotenvy::from_filename(".env");
+    let _ = dotenvy::from_filename("backend/.env");
+    let _ = dotenvy::from_filename("../.env");
+}
+
 #[tokio::main]
 async fn main() {
+    load_env_files();
+
     // 0. Charger les variables d'environnement
     let frontend_url = env::var("FRONTEND_URL")
         .expect("❌ FRONTEND_URL n'est pas défini - Vérifiez votre fichier .env");
