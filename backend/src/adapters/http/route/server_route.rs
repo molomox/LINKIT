@@ -8,9 +8,9 @@ use crate::adapters::http::server::{
     get_server::get_server_handler, join_by_invite::join_server_by_invite_handler,
     join_server::join_server_handler, kick_member::kick_member_handler,
     leave_server::delete_member_handler,
+    update_member::update_members_handler,
+    update_server::update_server_handler,
     update_ban_member::update_ban_member_handler as update_ban_handler,
-    find_ban_by_id::get_ban_handler as get_ban_handler,
-    cleanup_expired_bans::cleanup_expired_bans_handler as cleanup_expired_bans_handler,
     create_or_get_dm_channel::create_or_get_dm_channel_handler as create_or_get_dm_channel_handler,
     list_dm_channels::list_dm_channels_handler as list_dm_channels_handler
 };
