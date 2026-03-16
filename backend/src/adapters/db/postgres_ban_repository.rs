@@ -3,6 +3,7 @@ use crate::domain::entities::ban::Ban;
 use crate::domain::ports::ban_repository::BanRepository;
 use postgres::{Client, NoTls};
 
+
 pub struct PostgresBanRepo;
 impl BanRepository for PostgresBanRepo {
     fn save(&self, ban: Ban) -> Result<Ban, String> {
