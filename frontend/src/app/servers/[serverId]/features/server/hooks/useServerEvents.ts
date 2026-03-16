@@ -87,6 +87,12 @@ export function useServerEvents({
                 break;
             }
 
+            case 'server_deleted': {
+                alert('Ce serveur a ete supprime');
+                onRedirect('/auth/me');
+                break;
+            }
+
             case 'member_joined':
             case 'member_role_changed':
                 onMembersReload();

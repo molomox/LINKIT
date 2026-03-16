@@ -2,12 +2,12 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "L!nkyt",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.linkyt.desktop",
   "build": {
-    "frontendDist": "../out",
+    "frontendDist": "http://localhost:3001",
     "devUrl": "http://localhost:3001",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeBuildCommand": null
   },
   "app": {
     "windows": [

@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   // Configuration pour Docker (standalone output)
-  output: 'standalone',
+  output: "standalone",
 };
 
 export default nextConfig;

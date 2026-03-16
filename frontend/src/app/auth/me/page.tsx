@@ -312,11 +312,20 @@ export default function DashboardPage() {
     const handleJoinServer = async () => {
         if (!inviteLink.trim()) return;
 
-        // Extraire le server_id du lien d'invitation
-        const serverId = inviteLink.split('/').pop();
+        const normalizedInput = inviteLink.trim();
+        let inviteCode = normalizedInput;
 
-        if (serverId) {
-            router.push(`/servers/${serverId}`);
+        try {
+            const parsedUrl = new URL(normalizedInput);
+            const segments = parsedUrl.pathname.split('/').filter(Boolean);
+            inviteCode = segments[segments.length - 1] || "";
+        } catch {
+            const segments = normalizedInput.split('/').filter(Boolean);
+            inviteCode = segments[segments.length - 1] || normalizedInput;
+        }
+
+        if (inviteCode) {
+            router.push(`/invite/${encodeURIComponent(inviteCode)}`);
         }
 
         setShowJoinModal(false);
@@ -689,7 +698,7 @@ export default function DashboardPage() {
                                 type="text"
                                 value={inviteLink}
                                 onChange={(e) => setInviteLink(e.target.value)}
-                                placeholder="https://linkyt.com/invite/SERVER_ID"
+                                placeholder="https://linkyt.com/invite/INVITE_CODE"
                                 className="w-full px-4 py-3 border-l-4 bg-black/70 text-green-300 placeholder-gray-600 focus:border-l-green-400 focus:bg-black outline-none transition-all mb-6"
                                 style={{
                                     fontFamily: 'monospace',

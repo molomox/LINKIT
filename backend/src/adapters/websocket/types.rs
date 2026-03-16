@@ -64,6 +64,16 @@ pub enum WsMessage {
         message_id: String,
         channel_id: String,
     },
+    #[serde(rename = "reaction_toggled")]
+    ReactionToggled {
+        message_id: String,
+        channel_id: String,
+        user_id: String,
+        reaction_id: i32,
+        emoji: String,
+        reaction_name: String,
+        status: String,
+    },
     #[serde(rename = "user_joined")]
     UserJoined {
         user_id: String,
@@ -98,6 +108,10 @@ pub enum WsMessage {
     #[serde(rename = "channel_deleted")]
     ChannelDeleted {
         channel_id: String,
+        server_id: String,
+    },
+    #[serde(rename = "server_deleted")]
+    ServerDeleted {
         server_id: String,
     },
     #[serde(rename = "member_joined")]

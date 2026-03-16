@@ -1,4 +1,5 @@
 import type { Member } from "../../../types";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 interface UseMemberActionsProps {
     serverId: string;
@@ -23,7 +24,7 @@ export function useMemberActions({ serverId, onMemberUpdate }: UseMemberActionsP
                 `${apiBase}/servers/${serverId}/members/${member.user_id}`,
                 {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: buildAuthHeaders(),
                     body: JSON.stringify(newRoleId),
                 }
             );
@@ -76,7 +77,7 @@ export function useMemberActions({ serverId, onMemberUpdate }: UseMemberActionsP
         try {
             const response = await fetch(url, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+                headers: buildAuthHeaders(),
                 body: JSON.stringify({ kicker_user_id: kickerUserId }),
             });
 
@@ -105,7 +106,7 @@ export function useMemberActions({ serverId, onMemberUpdate }: UseMemberActionsP
                 `${apiBase}/servers/${serverId}/members/${member.user_id}/get_ban`,
                 {
                     method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: buildAuthHeaders(false),
                 }
             );
 
@@ -159,7 +160,7 @@ export function useMemberActions({ serverId, onMemberUpdate }: UseMemberActionsP
                 `${apiBase}/servers/${serverId}/members/${member.user_id}/deban`,
                 {
                     method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: buildAuthHeaders(false),
                 }
             );
 
@@ -232,7 +233,7 @@ export function useMemberActions({ serverId, onMemberUpdate }: UseMemberActionsP
                     `${apiBase}/servers/${serverId}/members/${member.user_id}/update_ban`,
                     {
                         method: "PUT",
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: buildAuthHeaders(),
                         body: JSON.stringify({
                             reason: reason,
                             expired_at: expiredAt.toISOString(),
@@ -244,7 +245,7 @@ export function useMemberActions({ serverId, onMemberUpdate }: UseMemberActionsP
                     `${apiBase}/servers/${serverId}/members/${member.user_id}/ban`,
                     {
                         method: "POST",
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: buildAuthHeaders(),
                         body: JSON.stringify({
                             banner_user_id: bannerUserId,
                             reason: reason,

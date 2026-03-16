@@ -11,7 +11,10 @@ export function useMessages({ selectedChannel, apiBase }: UseMessagesProps) {
     const [messages, setMessages] = useState<Message[]>([]);
 
     const loadMessages = useCallback(async () => {
-        if (!selectedChannel) return;
+        if (!selectedChannel) {
+            setMessages([]);
+            return;
+        }
 
         try {
             const messagesRes = await fetch(`${apiBase}/channels/${selectedChannel.channel_id}/messages`, {
@@ -42,9 +45,13 @@ export function useMessages({ selectedChannel, apiBase }: UseMessagesProps) {
     }, [selectedChannel, apiBase]);
 
     useEffect(() => {
-        if (selectedChannel) {
-            loadMessages();
+        if (!selectedChannel) {
+            setMessages([]);
+            return;
         }
+
+        setMessages([]);
+        loadMessages();
     }, [selectedChannel, loadMessages]);
 
     return {

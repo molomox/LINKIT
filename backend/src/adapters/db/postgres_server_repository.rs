@@ -104,9 +104,46 @@ impl ServerRepository for PostgresServerRepo {
 
     fn delete_server(&self, server_id: String) -> Result<String, String> {
         let mut client = Client::connect(&db_url(), NoTls).map_err(|e| e.to_string())?;
-        client
+
+        let mut transaction = client.transaction().map_err(|e| e.to_string())?;
+
+        // Clean records that are not fully protected by ON DELETE CASCADE in the schema.
+        transaction
+            .execute("DELETE FROM bans WHERE server_id = $1", &[&server_id])
+            .map_err(|e| e.to_string())?;
+
+        transaction
+            .execute(
+                "DELETE FROM reagi
+                WHERE message_id IN (
+                    SELECT m.message_id
+                    FROM messages m
+                    JOIN channels c ON c.channel_id = m.channel_id
+                    WHERE c.server_id = $1
+                )",
+                &[&server_id],
+            )
+            .map_err(|e| e.to_string())?;
+
+        transaction
+            .execute(
+                "DELETE FROM messages
+                WHERE channel_id IN (
+                    SELECT channel_id FROM channels WHERE server_id = $1
+                )",
+                &[&server_id],
+            )
+            .map_err(|e| e.to_string())?;
+
+        let deleted_rows = transaction
             .execute("DELETE FROM servers WHERE server_id = $1", &[&server_id])
             .map_err(|e| e.to_string())?;
+
+        if deleted_rows == 0 {
+            return Err("Serveur introuvable".to_string());
+        }
+
+        transaction.commit().map_err(|e| e.to_string())?;
 
         Ok(server_id)
     }

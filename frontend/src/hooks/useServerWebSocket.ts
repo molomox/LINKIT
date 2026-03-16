@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export type ServerWsMessage = {
-    type: 'channel_created' | 'channel_updated' | 'channel_deleted' | 'member_joined' | 'member_role_changed' | 'member_kicked' | 'member_banned' | 'user_online' | 'user_offline' | 'dm_message' | 'ping' | 'pong' | 'identify';
+    type: 'channel_created' | 'channel_updated' | 'channel_deleted' | 'server_deleted' | 'member_joined' | 'member_role_changed' | 'member_kicked' | 'member_banned' | 'user_online' | 'user_offline' | 'dm_message' | 'ping' | 'pong' | 'identify';
     channel_id?: string;
     name?: string;
     server_id?: string;
@@ -27,6 +27,7 @@ export const useServerWebSocket = (serverId: string | null) => {
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const reconnectAttemptsRef = useRef<number>(0);
     const serverIdRef = useRef<string | null>(serverId);
+    const manualCloseRef = useRef(false);
 
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3000';
 
@@ -46,6 +47,7 @@ export const useServerWebSocket = (serverId: string | null) => {
         if (!currentServerId) return;
 
         try {
+            manualCloseRef.current = false;
             setStatus('connecting');
             const ws = new WebSocket(`${wsUrl}/ws/servers/${currentServerId}`);
 
@@ -79,21 +81,35 @@ export const useServerWebSocket = (serverId: string | null) => {
                 }
             };
 
-            ws.onerror = (error) => {
-                console.error('❌ Erreur WebSocket serveur:', error);
+            ws.onerror = () => {
+                if (manualCloseRef.current || wsRef.current !== ws) {
+                    return;
+                }
+
+                console.warn('WebSocket serveur en erreur, tentative de reconnexion...');
                 setStatus('error');
             };
 
-            ws.onclose = () => {
+            ws.onclose = (event) => {
                 console.log('🔴 WebSocket serveur déconnecté');
-                setStatus('disconnected');
-                wsRef.current = null;
+                if (wsRef.current === ws) {
+                    setStatus('disconnected');
+                    wsRef.current = null;
+                }
+
+                if (wsRef.current !== ws) {
+                    return;
+                }
+
+                if (manualCloseRef.current) {
+                    return;
+                }
 
                 // Reconnexion automatique avec backoff exponentiel
                 const maxAttempts = 5;
                 if (reconnectAttemptsRef.current < maxAttempts) {
                     const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
-                    console.log(`🔄 Tentative de reconnexion dans ${delay}ms (tentative ${reconnectAttemptsRef.current + 1}/${maxAttempts})`);
+                    console.log(`🔄 Tentative de reconnexion dans ${delay}ms (tentative ${reconnectAttemptsRef.current + 1}/${maxAttempts}, code ${event.code})`);
 
                     reconnectTimeoutRef.current = setTimeout(() => {
                         reconnectAttemptsRef.current += 1;
@@ -106,7 +122,7 @@ export const useServerWebSocket = (serverId: string | null) => {
 
             wsRef.current = ws;
         } catch (error) {
-            console.error('❌ Erreur création WebSocket serveur:', error);
+            console.warn('Erreur creation WebSocket serveur:', error);
             setStatus('error');
         }
     }, [wsUrl]);
@@ -126,6 +142,7 @@ export const useServerWebSocket = (serverId: string | null) => {
         }
 
         if (wsRef.current) {
+            manualCloseRef.current = true;
             wsRef.current.close();
             wsRef.current = null;
         }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export type WsMessage = {
-    type: 'new_message' | 'user_joined' | 'user_left' | 'typing' | 'message_updated' | 'message_deleted' | 'ping' | 'pong';
+    type: 'new_message' | 'user_joined' | 'user_left' | 'typing' | 'message_updated' | 'message_deleted' | 'reaction_toggled' | 'ping' | 'pong';
     message_id?: string;
     content?: string;
     user_id?: string;
@@ -10,6 +10,10 @@ export type WsMessage = {
     server_id?: string;
     create_at?: string;
     is_gif?: boolean;
+    reaction_id?: number;
+    emoji?: string;
+    reaction_name?: string;
+    status?: string;
 };
 
 export type WebSocketStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
@@ -21,6 +25,7 @@ export const useWebSocket = (channelId: string | null) => {
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const reconnectAttemptsRef = useRef<number>(0);
     const channelIdRef = useRef<string | null>(channelId);
+    const manualCloseRef = useRef(false);
 
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3000';
 
@@ -40,6 +45,7 @@ export const useWebSocket = (channelId: string | null) => {
         if (!currentChannelId) return;
 
         try {
+            manualCloseRef.current = false;
             setStatus('connecting');
             const ws = new WebSocket(`${wsUrl}/ws/channels/${currentChannelId}`);
 
@@ -59,19 +65,34 @@ export const useWebSocket = (channelId: string | null) => {
                 }
             };
 
-            ws.onerror = (error) => {
-                console.error('❌ Erreur WebSocket:', error);
+            ws.onerror = () => {
+                if (manualCloseRef.current || wsRef.current !== ws) {
+                    return;
+                }
+
+                console.warn('WebSocket channel en erreur, tentative de reconnexion...');
                 setStatus('error');
             };
 
-            ws.onclose = () => {
+            ws.onclose = (event) => {
                 console.log(`🔴 WebSocket déconnecté du channel: ${currentChannelId}`);
-                setStatus('disconnected');
+                if (wsRef.current === ws) {
+                    setStatus('disconnected');
+                    wsRef.current = null;
+                }
+
+                if (wsRef.current !== ws) {
+                    return;
+                }
+
+                if (manualCloseRef.current) {
+                    return;
+                }
 
                 // Tentative de reconnexion exponentielle
                 if (reconnectAttemptsRef.current < 5) {
                     const timeout = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
-                    console.log(`🔄 Tentative de reconnexion dans ${timeout}ms...`);
+                    console.log(`🔄 Tentative de reconnexion dans ${timeout}ms... (code ${event.code})`);
 
                     reconnectTimeoutRef.current = setTimeout(() => {
                         reconnectAttemptsRef.current += 1;
@@ -82,7 +103,7 @@ export const useWebSocket = (channelId: string | null) => {
 
             wsRef.current = ws;
         } catch (error) {
-            console.error('❌ Erreur lors de la connexion WebSocket:', error);
+            console.warn('Erreur lors de la creation de la connexion WebSocket:', error);
             setStatus('error');
         }
     }, [wsUrl]);
@@ -98,9 +119,11 @@ export const useWebSocket = (channelId: string | null) => {
     const disconnect = useCallback(() => {
         if (reconnectTimeoutRef.current) {
             clearTimeout(reconnectTimeoutRef.current);
+            reconnectTimeoutRef.current = null;
         }
 
         if (wsRef.current) {
+            manualCloseRef.current = true;
             wsRef.current.close();
             wsRef.current = null;
         }

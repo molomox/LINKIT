@@ -3,6 +3,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "@/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { buildAuthHeaders } from "@/utils/authHeaders";
 
 export default function InvitePage() {
     const params = useParams();
@@ -28,7 +29,7 @@ export default function InvitePage() {
 
             const res = await fetch(`${apiBase}/invite/${inviteCode}`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: buildAuthHeaders(),
                 body: JSON.stringify({ user_id: userId }),
             });
 
