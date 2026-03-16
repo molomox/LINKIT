@@ -57,4 +57,12 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha 
           cache-to: type=gha,mode=max 
-
+  gate:
+    runs-on: ubuntu-latest
+    needs: [test, build]        
+    if: failure()                
+    steps:
+      - name: Block PR
+        run: |
+          echo "❌ Tests ou build en échec — PR bloquée"
+          exit 1
