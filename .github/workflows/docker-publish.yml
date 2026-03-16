@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./backend 
-        run: checkout ./backend || cargo test --verbose
+        run: cargo test --verbose
         
   build:
     runs-on: ubuntu-latest
