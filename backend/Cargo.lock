@@ -123,6 +123,7 @@ dependencies = [
  "axum",
  "axum-extra",
  "chrono",
+ "ctor",
  "dotenvy",
  "futures",
  "jsonwebtoken",
@@ -271,6 +272,16 @@ checksum = "58bcd97a54c7ca5ce2f6eb16f6bede5b0ab5f0055fedc17d2f0b4466e21671ca"
 dependencies = [
  "generic-array",
  "subtle",
+]
+
+[[package]]
+name = "ctor"
+version = "0.2.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32a2785755761f3ddc1492979ce1e48d2c00d09311c39e4466429188f3dd6501"
+dependencies = [
+ "quote",
+ "syn",
 ]
 
 [[package]]
