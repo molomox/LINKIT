@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import type { Message } from "../../../types";
 import type { WsMessage } from "@/hooks/useWebSocket";
+import { useDesktopNotifications } from "@/hooks/useDesktopNotifications";
+
 
 interface UseMessageEventsProps {
     lastMessage: WsMessage | null;
@@ -15,6 +17,7 @@ export function useMessageEvents({
 }: UseMessageEventsProps) {
     const onMessagesUpdateRef = useRef(onMessagesUpdate);
     const onTypingUpdateRef = useRef(onTypingUpdate);
+    const { notify } = useDesktopNotifications();
 
     useEffect(() => {
         onMessagesUpdateRef.current = onMessagesUpdate;
@@ -40,6 +43,15 @@ export function useMessageEvents({
                     create_at: lastMessage.create_at || new Date().toISOString(),
                     is_gif: ws.is_gif ?? ws.IS_GIF ?? ws.isGif ?? false,
                 };
+
+                const currentUserId = sessionStorage.getItem("user_id");
+                if (lastMessage.user_id && lastMessage.user_id !== currentUserId){
+                    notify({
+                        title: `Nouveau message de ${lastMessage.username}`,
+                        body: lastMessage.content,
+                        tag: lastMessage.channel_id,
+                    });
+                }
 
                 onMessagesUpdateRef.current(prevMessages => {
                     const exists = prevMessages.some(m => m.message_id === newMsg.message_id);

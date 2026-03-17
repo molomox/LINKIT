@@ -1,3 +1,4 @@
+use crate::domain::usecases::server::JoinServer;
 use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
@@ -20,7 +21,7 @@ pub async fn join_server_by_invite_handler(
     Path(invite_code): Path<String>,
     Json(request): Json<JoinByInviteRequest>,
 ) -> Result<Json<Member>, ApiError> {
-    let member = tokio::task::spawn_blocking(move || {
+    let member_result: Result<Result<Member, String>, tokio::task::JoinError> = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;
         let repo2 = PostgresMemberRepo;
         let repo3 = PostgresRoleRepo;
@@ -31,11 +32,17 @@ pub async fn join_server_by_invite_handler(
             repo3: &repo3,
             ban_repo: &ban_repo,
         };
-        usecase.execute(request.user_id, invite_code, "role02".to_string())
-    })
-    .await
-    .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
-    .map_err(|e| ApiError::BadRequest(format!("Server joining by invite failed: {}", e)))?;
+        let usecase = JoinServer{
+            repo: &repo,
+            repo2: &repo2,
+            repo3: &repo3,
+            ban_repo: &ban_repo,
+        };
+        usecase.execute(request.user_id, invite_code.clone(), "dummy_password".to_string(), "role02".to_string())
+    }).await;
+    let member = member_result
+        .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
+        .map_err(|e| ApiError::BadRequest(format!("Server joining by invite failed: {}", e)))?;
     state
         .broadcast_to_server(
             &member.server.server_id,

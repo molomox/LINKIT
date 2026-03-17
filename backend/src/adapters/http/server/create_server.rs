@@ -1,3 +1,5 @@
+use crate::domain::entities::Member;
+use crate::domain::usecases::server::JoinServerByInvite;
 use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
@@ -32,7 +34,7 @@ pub async fn create_server_handler(
     let server_id = result.server_id.clone();
     let password = result.password.clone();
 
-    tokio::task::spawn_blocking(move || {
+    let member_result: Result<Result<Member, String>, tokio::task::JoinError> = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;
         let repo2 = PostgresMemberRepo;
         let repo3 = PostgresRoleRepo;
@@ -43,11 +45,17 @@ pub async fn create_server_handler(
             repo3: &repo3,
             ban_repo: &ban_repo,
         };
-        usecase.execute(user_id, server_id, password, "role04".to_string())
-    })
-    .await
-    .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
-    .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
+        let usecase = JoinServerByInvite{
+            repo: &repo,
+            repo2: &repo2,
+            repo3: &repo3,
+            ban_repo: &ban_repo,
+        };
+        usecase.execute(user_id, server_id, "role04".to_string())
+    }).await;
+    let member = member_result
+        .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
+        .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
 
     Ok(Json(response))
 }

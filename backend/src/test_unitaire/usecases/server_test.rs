@@ -1,14 +1,20 @@
+use crate::test_unitaire::mock_ban_repository::MockBanRepository;
 use crate::domain::entities::{member::Member, role::Role, server::Server, user::User};
 use crate::domain::ports::{
     member_repository::MemberRepository, role_repository::RoleRepository,
     server_repository::ServerRepository,
 };
-use crate::domain::usecases::server::{
-    create::CreateServer, delete::DeleteServer, find_by_user_id::GetServerByUser,
-    get::GetServerDetails, join::JoinServer, join_by_invite::JoinServerByInvite,
-    leave::LeaveServer, list::ListUserServers, list_member::ListServerMembers,
-    update::UpdateServer, update_member::UpdateMemberRole,
-};
+use crate::domain::usecases::server::create::CreateServer;
+use crate::domain::usecases::server::delete::DeleteServer;
+use crate::domain::usecases::server::find_by_user_id::GetServerByUser;
+use crate::domain::usecases::server::get::GetServerDetails;
+use crate::domain::usecases::server::join::JoinServer;
+use crate::domain::usecases::server::join_by_invite::JoinServerByInvite;
+use crate::domain::usecases::server::leave::LeaveServer;
+use crate::domain::usecases::server::list::ListUserServers;
+use crate::domain::usecases::server::list_member::ListServerMembers;
+use crate::domain::usecases::server::update::UpdateServer;
+use crate::domain::usecases::server::update_member::UpdateMemberRole;
 use crate::test_unitaire::mock_repositories::{
     MockMemberRepository, MockRoleRepository, MockServerRepository,
 };
@@ -18,6 +24,8 @@ use std::sync::{Arc, Mutex};
 #[cfg(test)]
 mod tests {
     use super::*;
+    // Removed unused/conflicting imports
+    use crate::test_unitaire::mock_ban_repository::MockBanRepository;
     #[test]
     fn test_create_server() {
         let repo = MockServerRepository::new();
@@ -84,6 +92,7 @@ mod tests {
         let repo = MockServerRepository::new();
         let use_case = GetServerDetails { repo: &repo };
 
+            let ban_repo = MockBanRepository::new();
         let result = use_case.execute("non-existent".to_string());
 
         assert!(result.is_err());
@@ -235,10 +244,12 @@ mod tests {
         let server = server_repo.create_test_server("srv-1", "MyServer", "password123");
         server_repo.add_server(server);
 
+        let ban_repo = MockBanRepository::new();
         let use_case = JoinServer {
             repo: &server_repo,
             repo2: &member_repo,
             repo3: &role_repo,
+            ban_repo: &ban_repo,
         };
 
         let result = use_case.execute(
@@ -259,14 +270,17 @@ mod tests {
         let server_repo = MockServerRepository::new();
         let member_repo = MockMemberRepository::new();
         let role_repo = MockRoleRepository::new();
+        let ban_repo = MockBanRepository::new();
 
         let server = server_repo.create_test_server("srv-1", "MyServer", "password123");
         server_repo.add_server(server);
 
+        let ban_repo = MockBanRepository::new();
         let use_case = JoinServer {
             repo: &server_repo,
             repo2: &member_repo,
             repo3: &role_repo,
+            ban_repo: &ban_repo,
         };
 
         let result = use_case.execute(
@@ -285,11 +299,13 @@ mod tests {
         let server_repo = MockServerRepository::new();
         let member_repo = MockMemberRepository::new();
         let role_repo = MockRoleRepository::new();
+        let ban_repo = MockBanRepository::new();
 
         let use_case = JoinServer {
             repo: &server_repo,
             repo2: &member_repo,
             repo3: &role_repo,
+            ban_repo: &ban_repo,
         };
 
         let result = use_case.execute(
@@ -307,11 +323,13 @@ mod tests {
         let server_repo = MockServerRepository::new();
         let member_repo = MockMemberRepository::new();
         let role_repo = MockRoleRepository::new();
+        let ban_repo = MockBanRepository::new();
 
         let use_case = JoinServer {
             repo: &server_repo,
             repo2: &member_repo,
             repo3: &role_repo,
+            ban_repo: &ban_repo,
         };
 
         let result = use_case.execute(
@@ -330,6 +348,7 @@ mod tests {
         let server_repo = MockServerRepository::new();
         let member_repo = MockMemberRepository::new();
         let role_repo = MockRoleRepository::new();
+        let ban_repo = MockBanRepository::new();
 
         let server = server_repo.create_test_server("srv-1", "MyServer", "password123");
         server_repo.add_server(server);
@@ -337,6 +356,7 @@ mod tests {
             repo: &server_repo,
             repo2: &member_repo,
             repo3: &role_repo,
+            ban_repo: &ban_repo,
         };
 
         let result = use_case.execute(
@@ -358,10 +378,12 @@ mod tests {
         let member_repo = MockMemberRepository::new();
         let role_repo = MockRoleRepository::new();
 
+        let ban_repo = MockBanRepository::new();
         let use_case = JoinServerByInvite {
             repo: &server_repo,
             repo2: &member_repo,
             repo3: &role_repo,
+            ban_repo: &ban_repo,
         };
 
         let result = use_case.execute(
@@ -379,11 +401,13 @@ mod tests {
         let server_repo = MockServerRepository::new();
         let member_repo = MockMemberRepository::new();
         let role_repo = MockRoleRepository::new();
+        let ban_repo = MockBanRepository::new();
 
         let use_case = JoinServerByInvite {
             repo: &server_repo,
             repo2: &member_repo,
             repo3: &role_repo,
+            ban_repo: &ban_repo,
         };
 
         let result = use_case.execute("".to_string(), "".to_string(), "".to_string());

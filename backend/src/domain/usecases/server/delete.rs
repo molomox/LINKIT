@@ -5,7 +5,7 @@ pub struct DeleteServer<'a> {
 }
 
 impl<'a> DeleteServer<'a> {
-    pub fn execute(&self, server_id: String) -> Result<(String), String> {
+    pub fn execute(&self, server_id: String) -> Result<String, String> {
         if server_id.is_empty() {
             return Err("Besoin d'un id de server".to_string());
         }

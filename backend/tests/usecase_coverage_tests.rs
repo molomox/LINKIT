@@ -536,6 +536,8 @@ mod channel_delete_tests {
             content: "Message".to_string(),
             user: user,
             create_at: "2024-01-01".to_string(),
+            is_gif: false,
+            reactions: vec![],
         }];
 
         let remaining: Vec<_> = messages
@@ -571,6 +573,8 @@ mod message_send_tests {
             content: "Hello World!".to_string(),
             user: user,
             create_at: chrono::Utc::now().to_rfc3339(),
+            is_gif: false,
+            reactions: vec![],
         };
 
         assert_eq!(message.content, "Hello World!");
@@ -624,6 +628,8 @@ mod message_delete_tests {
             content: "Delete this".to_string(),
             user: user.clone(),
             create_at: "2024-01-01".to_string(),
+            is_gif: false,
+            reactions: vec![],
         };
 
         assert_eq!(message.user.user_id, author_id);
@@ -745,9 +751,11 @@ mod additional_coverage_tests {
         let messages = vec![Message {
             message_id: "m1".to_string(),
             channel_id: channel_id.to_string(),
-            content: "Message 1".to_string(),
-            user: user.clone(),
+            content: "Message".to_string(),
+            user: user,
             create_at: "2024-01-01".to_string(),
+            is_gif: false,
+            reactions: vec![],
         }];
 
         let channel_messages: Vec<_> = messages

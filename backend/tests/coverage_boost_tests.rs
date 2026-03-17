@@ -163,6 +163,8 @@ mod coverage_tests {
             content: "Hello!".to_string(),
             user: user.clone(),
             create_at: "2024-01-01".to_string(),
+            is_gif: false,
+            reactions: vec![],
         };
         assert_eq!(message.content, "Hello!");
     }
@@ -184,6 +186,8 @@ mod coverage_tests {
             content: "Test message".to_string(),
             user: user.clone(),
             create_at: "2024-01-01".to_string(),
+            is_gif: false,
+            reactions: vec![],
         };
         assert_eq!(message.user.username, "author");
     }
@@ -205,6 +209,8 @@ mod coverage_tests {
             content: "".to_string(),
             user: user,
             create_at: "2024-01-01".to_string(),
+            is_gif: false,
+            reactions: vec![],
         };
         assert_eq!(message.content.len(), 0);
     }

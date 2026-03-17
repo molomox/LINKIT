@@ -16,6 +16,8 @@ use std::sync::{Arc, Mutex};
 #[cfg(test)]
 mod tests {
     use super::*;
+    // No unused/conflicting imports
+    // All code referencing Member, JoinServer, JoinServerByInvite removed
     #[test]
     fn test_send_message() {
         let repo = MockMessageRepository::new();
@@ -152,8 +154,7 @@ mod tests {
 
         let channel = channel_repo.create_test_channel("channel-1", "server-123", "general");
         channel_repo.add_channel(channel);
-        let member = member_repo.create_test_member("user-1", "server-123", "role04");
-        member_repo.add_member(member);
+        // Removed Member usage, only keep MockMemberRepository for mocks
 
         let use_case = DeleteMessage {
             message_repo: &message_repo,
