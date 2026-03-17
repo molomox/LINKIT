@@ -6,6 +6,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import RequireAuth from "@/components/RequireAuth";
 import { buildAuthHeaders } from "@/utils/authHeaders";
 import * as serverActions from "../../servers/[serverId]/utils/serverActions";
+import { useDesktopNotifications } from "@/hooks/useDesktopNotifications";
 
 type UserProfile = {
     username: string;
@@ -60,6 +61,7 @@ export default function DashboardPage() {
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const wsConnectionsRef = useRef<WebSocket[]>([]);
     const notifOpenRef = useRef(false);
+    const { isSupported, permission, enabled, requestPermission, refreshPermission, toggleEnabled,  notify } = useDesktopNotifications();
 
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
     const wsBase = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3000";
@@ -254,6 +256,13 @@ export default function DashboardPage() {
                         is_gif: !!message.is_gif,
                     };
 
+                    console.log('[DM NOTIF]', notification);
+                    notify({
+                        title: `DM de ${notification.from_username}`,
+                        body: notification.preview,
+                        tag: `dm-${notification.channel_id}`,
+                    });
+
                     setDmNotifications((prev) => [notification, ...prev].slice(0, 10));
                     if (!notifOpenRef.current) {
                         setUnreadDmCount((prev) => prev + 1);
@@ -404,6 +413,62 @@ export default function DashboardPage() {
                                         {dmNotifications[0] ? dmNotifications[0].from_username : "-"}
                                     </span>
                                 </button>
+                                {isSupported && (
+                                    <button
+                                        onClick={async () => {
+                                            if (permission === "granted") {
+                                                toggleEnabled();
+                                                return;
+                                            }
+                                            await requestPermission();
+                                            refreshPermission();
+                                        }}
+                                        className={`mt-2 w-full px-4 py-2 border-2 font-bold uppercase text-xs tracking-wider transition-all ${
+                                            permission === "granted" && enabled
+                                                ? "border-green-400 text-green-400 bg-green-400/10 hover:bg-green-400 hover:text-black cursor-pointer"
+                                                : permission === "granted" && !enabled
+                                                    ? "border-red-400 text-red-400 bg-red-400/10 cursor-pointer"
+                                                : permission === "denied"
+                                                    ? "border-red-400 text-red-400 hover:bg-red-400 hover:text-black cursor-pointer"
+                                                    : "border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black cursor-pointer"
+                                        }`}
+                                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
+                                    >
+                                        {permission === "granted" && enabled
+                                            ? "✅ Notifications activées (cliquer pour désactiver)"
+                                            : permission === "granted" && !enabled
+                                                ? "⛔ Notifications désactivées (cliquer pour activer)"
+                                            : permission === "denied"
+                                                ? "❌ Notifications bloquées"
+                                                : "🔔 Activer les notifications"}
+                                    </button>
+                                )}
+
+                                {isSupported && (
+                                    <button
+                                        onClick={() => {
+                                            if (permission !== "granted" || !enabled) {
+                                                return;
+                                            }
+                                            notify({
+                                                title: "Test notification L!nkyt",
+                                                body: "Si tu vois ca, les notifications desktop fonctionnent.",
+                                                tag: `notif-test-${Date.now()}`,
+                                            });
+                                        }}
+                                        className={`mt-2 w-full px-4 py-2 border-2 font-bold uppercase text-xs tracking-wider transition-all ${
+                                            permission === "granted" && enabled
+                                                ? "border-cyan-400 text-cyan-300 hover:bg-cyan-400 hover:text-black cursor-pointer"
+                                                : "border-gray-600 text-gray-500 cursor-not-allowed"
+                                        }`}
+                                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
+                                    >
+                                        {permission === "granted" && enabled
+                                            ? "🧪 Tester la notification"
+                                            : "🧪 Test indisponible (activer les notifications)"}
+                                    </button>
+                                )}
+                                
                                 {unreadDmCount > 0 && (
                                     <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center border border-black">
                                         {unreadDmCount > 9 ? "9+" : unreadDmCount}

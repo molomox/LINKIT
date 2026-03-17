@@ -16,7 +16,7 @@ use serde::Deserialize;
 pub async fn deban_member_handler(
     State(state): State<AppState>,
     Path((server_id, target_user_id)): Path<(String, String)>,
-) -> Result<Json<(String)>, ApiError> {
+) -> Result<Json<String>, ApiError> {
     let target_user_id_clone = target_user_id.clone();
     let target_user_id_for_username = target_user_id.clone();
     let server_id_clone = server_id.clone();

@@ -1,3 +1,4 @@
+// Removed duplicate re-export of Member
 pub mod ban;
 pub mod channel;
 pub mod member;

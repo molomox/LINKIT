@@ -11,6 +11,8 @@ use std::sync::{Arc, Mutex};
 #[cfg(test)]
 mod tests {
     use super::*;
+    // No unused/conflicting imports
+    // All code referencing Member, JoinServer, JoinServerByInvite removed
     #[test]
     fn test_create_channel() {
         let repo = MockChannelRepository::new();
@@ -36,7 +38,7 @@ mod tests {
     #[test]
     fn test_get_channel() {
         let repo = MockChannelRepository::new();
-        let channel = Channel {
+        let channel = crate::domain::entities::channel::Channel {
             channel_id: "channel-123".to_string(),
             create_at: "2024-01-01".to_string(),
             name: "general".to_string(),
@@ -79,20 +81,20 @@ mod tests {
     fn test_get_server_channels() {
         let repo = MockChannelRepository::new();
 
-        repo.add_channel(Channel {
+        repo.add_channel(crate::domain::entities::channel::Channel {
             channel_id: "channel-1".to_string(),
             create_at: "2024-01-01".to_string(),
             name: "general".to_string(),
             server_id: "server-123".to_string(),
         });
-        repo.add_channel(Channel {
+        repo.add_channel(crate::domain::entities::channel::Channel {
             channel_id: "channel-2".to_string(),
             create_at: "2024-01-02".to_string(),
             name: "random".to_string(),
             server_id: "server-123".to_string(),
         });
 
-        repo.add_channel(Channel {
+        repo.add_channel(crate::domain::entities::channel::Channel {
             channel_id: "channel-3".to_string(),
             create_at: "2024-01-03".to_string(),
             name: "other".to_string(),
@@ -134,7 +136,7 @@ mod tests {
     #[test]
     fn test_update_channel() {
         let repo = MockChannelRepository::new();
-        let channel = Channel {
+        let channel = crate::domain::entities::channel::Channel {
             channel_id: "channel-123".to_string(),
             create_at: "2024-01-01".to_string(),
             name: "general".to_string(),
@@ -176,7 +178,7 @@ mod tests {
     #[test]
     fn test_delete_channel() {
         let repo = MockChannelRepository::new();
-        let channel = Channel {
+        let channel = crate::domain::entities::channel::Channel {
             channel_id: "channel-123".to_string(),
             create_at: "2024-01-01".to_string(),
             name: "general".to_string(),
