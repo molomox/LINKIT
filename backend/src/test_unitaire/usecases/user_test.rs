@@ -13,8 +13,18 @@ use std::sync::{Arc, Mutex};
 #[cfg(test)]
 mod tests {
     use super::*;
+    use dotenvy::from_filename;
+
+    #[ctor::ctor]
+    fn setup_env() {
+        let _ = from_filename(".env");
+        let _ = from_filename("backend/.env");
+        let _ = from_filename("../.env");
+    }
+
     #[test]
     fn test_create_user() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = CreateUser { repo: &repo };
 
@@ -36,6 +46,7 @@ mod tests {
 
     #[test]
     fn test_create_user_empty() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = CreateUser { repo: &repo };
 
@@ -47,6 +58,7 @@ mod tests {
 
     #[test]
     fn test_get_user_by_id_success() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = GetUserById { repo: &repo };
 
@@ -59,6 +71,7 @@ mod tests {
 
     #[test]
     fn test_get_user_by_id_empty() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = GetUserById { repo: &repo };
 
@@ -70,6 +83,7 @@ mod tests {
 
     #[test]
     fn test_get_user_by_id_not_found() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = GetUserById { repo: &repo };
 
@@ -81,6 +95,7 @@ mod tests {
 
     #[test]
     fn test_get_user_by_username_success() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = GetUserByUsername { repo: &repo };
 
@@ -93,6 +108,7 @@ mod tests {
 
     #[test]
     fn test_get_user_by_username_empty() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = GetUserByUsername { repo: &repo };
 
@@ -104,6 +120,7 @@ mod tests {
 
     #[test]
     fn test_login_user_success() {
+        setup_env();
         let repo = MockUserRepository::new();
         // "user-test" / "password" pré-chargé dans MockUserRepository::new()
         let use_case = LoginUser { repo: &repo };
@@ -118,6 +135,7 @@ mod tests {
 
     #[test]
     fn test_login_user_empty() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = LoginUser { repo: &repo };
 
@@ -132,6 +150,7 @@ mod tests {
 
     #[test]
     fn test_login_user_not_found() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = LoginUser { repo: &repo };
 
@@ -143,6 +162,7 @@ mod tests {
 
     #[test]
     fn test_login_user_wrong_password() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = LoginUser { repo: &repo };
 
@@ -154,6 +174,7 @@ mod tests {
 
     #[test]
     fn test_logout_user_success() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = LogoutUser { repo: &repo };
 
@@ -164,6 +185,7 @@ mod tests {
 
     #[test]
     fn test_logout_user_empty_id() {
+        setup_env();
         let repo = MockUserRepository::new();
         let use_case = LogoutUser { repo: &repo };
 
