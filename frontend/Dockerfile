@@ -9,6 +9,9 @@ RUN npm ci
 
 FROM node:20-slim AS builder
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libatomic1 && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 ARG NEXT_PUBLIC_GIPHY_API_KEY
