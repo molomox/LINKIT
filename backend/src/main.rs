@@ -11,11 +11,11 @@ pub mod adapters;
 pub mod domain;
 
 // Importation des routes
-use backend::adapters::http::route::channels_route::channels_routes;
-use backend::adapters::http::route::message_route::message_routes;
-use backend::adapters::http::route::server_route::server_routes;
-use backend::adapters::http::route::user_route::user_routes;
-use backend::adapters::websocket::{websocket_routes, AppState};
+use crate::adapters::http::route::channels_route::channels_routes;
+use crate::adapters::http::route::message_route::message_routes;
+use crate::adapters::http::route::server_route::server_routes;
+use crate::adapters::http::route::user_route::user_routes;
+use crate::adapters::websocket::{websocket_routes, AppState};
 
 fn load_env_files() {
     // Load common paths so `cargo run` works from backend/ or repo root.

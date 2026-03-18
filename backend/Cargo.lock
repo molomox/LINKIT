@@ -12,6 +12,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "app"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "axum-extra",
+ "chrono",
+ "ctor",
+ "dotenvy",
+ "futures",
+ "jsonwebtoken",
+ "postgres",
+ "serde",
+ "serde_json",
+ "time",
+ "tokio 1.49.0",
+ "tokio-stream",
+ "tower 0.4.13",
+ "tower-http",
+ "uuid",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -114,28 +136,6 @@ dependencies = [
  "tower 0.5.3",
  "tower-layer",
  "tower-service",
-]
-
-[[package]]
-name = "backend"
-version = "0.1.0"
-dependencies = [
- "axum",
- "axum-extra",
- "chrono",
- "ctor",
- "dotenvy",
- "futures",
- "jsonwebtoken",
- "postgres",
- "serde",
- "serde_json",
- "time",
- "tokio 1.49.0",
- "tokio-stream",
- "tower 0.4.13",
- "tower-http",
- "uuid",
 ]
 
 [[package]]

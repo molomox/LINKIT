@@ -26,6 +26,3 @@ tauri-plugin-log = "2"
 tauri-plugin-notification = "2"
 
 
-[[bin]]
-name = "test-notification"
-path = "test-notification.rs"

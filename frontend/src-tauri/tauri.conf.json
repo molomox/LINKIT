@@ -9,6 +9,7 @@
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": null
   },
+  "mainBinaryName": "app",
   "app": {
     "windows": [
       {
