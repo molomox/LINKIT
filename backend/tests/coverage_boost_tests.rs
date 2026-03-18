@@ -3,12 +3,12 @@
 
 #[cfg(test)]
 mod coverage_tests {
-    use backend::domain::entities::channel::Channel;
-    use backend::domain::entities::member::Member;
-    use backend::domain::entities::message::Message;
-    use backend::domain::entities::role::Role;
-    use backend::domain::entities::server::Server;
-    use backend::domain::entities::user::User;
+    use app::domain::entities::channel::Channel;
+    use app::domain::entities::member::Member;
+    use app::domain::entities::message::Message;
+    use app::domain::entities::role::Role;
+    use app::domain::entities::server::Server;
+    use app::domain::entities::user::User;
 
     // ═══════════════════════════════════════════════════════════════
     // TESTS USER
