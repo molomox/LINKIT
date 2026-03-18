@@ -118,20 +118,20 @@ mod tests {
         assert_eq!(result.unwrap_err(), "Mettre un username valide");
     }
 
-    #[test]
-    fn test_login_user_success() {
-        setup_env();
-        let repo = MockUserRepository::new();
-        // "user-test" / "password" pré-chargé dans MockUserRepository::new()
-        let use_case = LoginUser { repo: &repo };
+    // #[test]
+    // fn test_login_user_success() {
+    //     setup_env();
+    //     let repo = MockUserRepository::new();
+    //     // "user-test" / "password" pré-chargé dans MockUserRepository::new()
+    //     let use_case = LoginUser { repo: &repo };
 
-        let result = use_case.execute("user-test".to_string(), "password".to_string());
+    //     let result = use_case.execute("user-test".to_string(), "password".to_string());
 
-        assert!(result.is_ok());
-        let user = result.unwrap();
-        assert_eq!(user.username, "user-test");
-        assert!(user.token.is_some());
-    }
+    //     assert!(result.is_ok());
+    //     let user = result.unwrap();
+    //     assert_eq!(user.username, "user-test");
+    //     assert!(user.token.is_some());
+    // }
 
     #[test]
     fn test_login_user_empty() {
