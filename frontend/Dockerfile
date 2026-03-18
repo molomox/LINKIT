@@ -3,6 +3,7 @@
 # Étape 1 : Dependencies - Installation des dépendances
 FROM node:20-alpine AS deps
 
+RUN apk add --no-cache libc6-compat libatomic 
 # Installer les dépendances système nécessaires
 RUN apk add --no-cache libc6-compat
 
