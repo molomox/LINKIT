@@ -1,8 +1,3 @@
-use mongodb::{ 
-    bson::{Document, doc},
-    Client,
-    Collection 
-};
 use axum::http::{
     header::{AUTHORIZATION, CONTENT_TYPE},
     HeaderValue, Method,
