@@ -101,13 +101,3 @@ Toutes les pages utilisent un thème cohérent inspiré de **Cyberpunk 2077** :
 
 ---
 
-## 🚧 TODO / Améliorations Futures
-
-- [ ] Système de tokens JWT persistant
-- [ ] Gestion des sessions
-- [ ] Chat en temps réel (WebSocket)
-- [ ] Upload d'avatar
-- [ ] Notifications
-- [ ] Dark/Light mode toggle
-- [ ] Tests unitaires et d'intégration
-- [ ] Déploiement (Docker, CI/CD)
