@@ -44,7 +44,7 @@ RUN useradd -m -u 1000 appuser
 WORKDIR /app
 
 # Copier le binaire compilé depuis l'étape builder
-COPY --from=builder /app/target/release/backend /app/backend
+COPY --from=builder /app/target/release/app /app/app
 
 # Changer le propriétaire
 RUN chown -R appuser:appuser /app
@@ -60,4 +60,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3000/ || exit 1
 
 # Commande de démarrage
-CMD ["./backend"]
+CMD ["./app"]
