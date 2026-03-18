@@ -1,10 +1,10 @@
 // Tests pour augmenter la couverture des use cases
 // Objectif : atteindre 70%+ de couverture
 
-use backend::domain::entities::channel::Channel;
-use backend::domain::entities::message::Message;
-use backend::domain::entities::server::Server;
-use backend::domain::entities::user::User;
+use app::domain::entities::channel::Channel;
+use app::domain::entities::message::Message;
+use app::domain::entities::server::Server;
+use app::domain::entities::user::User;
 
 // ═══════════════════════════════════════════════════════════════
 // TESTS USE CASE: USER CREATE

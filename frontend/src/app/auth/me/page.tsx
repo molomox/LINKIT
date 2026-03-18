@@ -427,7 +427,7 @@ export default function DashboardPage() {
                                             permission === "granted" && enabled
                                                 ? "border-green-400 text-green-400 bg-green-400/10 hover:bg-green-400 hover:text-black cursor-pointer"
                                                 : permission === "granted" && !enabled
-                                                    ? "border-red-400 text-red-400 bg-red-400/10 cursor-pointer"
+                                                    ? "border-green-400 text-green-400 bg-green-400/10 cursor-pointer"
                                                 : permission === "denied"
                                                     ? "border-red-400 text-red-400 hover:bg-red-400 hover:text-black cursor-pointer"
                                                     : "border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black cursor-pointer"
@@ -435,9 +435,9 @@ export default function DashboardPage() {
                                         style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
                                     >
                                         {permission === "granted" && enabled
-                                            ? "✅ Notifications activées (cliquer pour désactiver)"
+                                            ? "Notifications activées"
                                             : permission === "granted" && !enabled
-                                                ? "⛔ Notifications désactivées (cliquer pour activer)"
+                                                ? "Notifications désactivées"
                                             : permission === "denied"
                                                 ? "❌ Notifications bloquées"
                                                 : "🔔 Activer les notifications"}
