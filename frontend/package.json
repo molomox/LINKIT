@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.3",
     "next": "16.1.5",
     "next-auth": "^4.24.13",
+    "node": "^25.8.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
