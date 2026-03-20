@@ -87,3 +87,15 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.DOKPLOY_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{"applicationId": "${{ secrets.DOKPLOY_FRONTEND_ID }}"}'
+      
+      - name: Reconnect containers to app-network
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 46.224.236.78
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sleep 15
+            for container in $(docker ps --format "{{.Names}}" | grep -E "linkyt|pgadmin"); do
+              docker network connect app-network $container 2>/dev/null || true
+            done
