@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BACKEND: epitechmscpropromo2028/t-dev-600-nan_6-backend
-  IMAGE_FRONTEND: epitechmscpropromo2028/t-dev-600-nan_6-frontend
+  IMAGE_BACKEND: molomox/LINKIT-backend
+  IMAGE_FRONTEND: molomox/LINKIT-frontend
 
 jobs:
   test:
