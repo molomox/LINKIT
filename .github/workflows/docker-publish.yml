@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BACKEND: linkit/backend
-  IMAGE_FRONTEND: linkit/frontend
+  IMAGE_BACKEND: molomox/linkit-backend
+  IMAGE_FRONTEND: molomox/linkit-frontend
 
 jobs:
   test:
