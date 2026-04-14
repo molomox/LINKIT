@@ -100,4 +100,5 @@ jobs:
           username: root
           key: ${{ secrets.DOCKPLOY_SSH }}
           script: |
+            ssh root@46.224.236.78 -i "${{ secrets.DOCKPLOY_SSH }}"
             docker network connect app-network $(docker ps --filter "ancestor=linkyt-backend-fqz7hu:latest" --format "{{.Names}}")
