@@ -98,6 +98,7 @@ jobs:
         with:
           host: 46.224.236.78
           username: root
+          port: 22
           key: ${{ secrets.DOCKPLOY_SSH }}
           script: |
             whoami
