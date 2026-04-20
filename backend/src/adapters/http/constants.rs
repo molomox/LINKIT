@@ -5,7 +5,11 @@ pub const INTERNAL_ERROR: &str = "HTTP/1.1 500 INTERNAL ERROR\r\n\r\n";
 pub const BAD_REQUEST: &str = "HTTP/1.1 400 BAD REQUEST\r\n\r\n";
 
 pub fn db_url() -> String {
+<<<<<<< HEAD
     let url = std::env::var("DATABASE_URL")
+=======
+    let url = std::env::var("DATABASE_URL")        
+>>>>>>> origin/main
         .unwrap_or_else(|_| "${DATABASE_URL}".to_string());
     url
 
