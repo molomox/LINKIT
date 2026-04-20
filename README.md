@@ -45,7 +45,7 @@ docker-compose up
 
 ## 📍 URLs de l'Application
 
-- **Backend API** : http://localhost:3000
+- **Backend API** : http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me
 - **Frontend** : http://localhost:3001
 
 

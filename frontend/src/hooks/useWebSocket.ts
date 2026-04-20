@@ -26,8 +26,8 @@ export const useWebSocket = (channelId: string | null) => {
     const reconnectAttemptsRef = useRef<number>(0);
     const channelIdRef = useRef<string | null>(channelId);
     const manualCloseRef = useRef(false);
-
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3000';
+    
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL ?? 'ws://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/';
 
     // Mettre à jour la ref du channelId
     useEffect(() => {

@@ -20,7 +20,7 @@ export const useSignupController = () => {
     const [result, setResult] = useState<SignupResponse | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL ??  "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/";
 
     useEffect(() => {
         if (result) {
