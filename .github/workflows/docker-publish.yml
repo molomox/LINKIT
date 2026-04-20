@@ -72,28 +72,15 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONTEND }}:latest
           
-  mirror:
+  deploy:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
     needs: [build-backend, build-frontend]
-=======
-    needs: deploy
-    if: github.event_name != 'pull_request'
->>>>>>> origin/main
     steps:
       - uses: actions/checkout@v4
         with:
-<<<<<<< HEAD
           host: 46.224.236.78
           username: root
           port: 22
           key: ${{ secrets.DOCKPLOY_SSH }}
           script: |
             docker network connect app-network $(docker ps --filter "ancestor=linkyt-backend-fqz7hu:latest" --format "{{.Names}}")
-=======
-          fetch-depth: 0  
-
-      - name: Mirror to other repo
-        run: |
-          git push --mirror https://github.com/molomox/LINKIT.git
->>>>>>> origin/main
