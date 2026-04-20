@@ -4,7 +4,8 @@
 FROM node:20-slim AS deps
 
 # Installer les dépendances système nécessaires
-RUN apt update && apt install -y libc6-compat
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libatomic1 libc6 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -16,6 +17,9 @@ RUN npm ci
 
 # Étape 2 : Builder - Build de l'application Next.js
 FROM node:20-slim AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libatomic1 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
