@@ -4,7 +4,7 @@
 FROM node:20-slim AS deps
 
 # Installer les dépendances système nécessaires
-RUN apk add --no-cache libc6-compat
+RUN apt update && apt install -y libc6-compat
 
 WORKDIR /app
 
@@ -44,7 +44,7 @@ FROM node:20-slim AS runner
 WORKDIR /app
 
 # Installer netcat pour le healthcheck
-RUN apk add --no-cache netcat-openbsd
+RUN apt update && apt install -y netcat-openbsd
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
