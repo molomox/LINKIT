@@ -48,7 +48,7 @@ async fn main() {
     let allowed_origins = vec![
         "http://localhost:3001".parse::<HeaderValue>().unwrap(),
         "http://127.0.0.1:3001".parse::<HeaderValue>().unwrap(),
-        "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/".parse::<HeaderValue>().unwrap(),
+        "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me".parse::<HeaderValue>().unwrap(),
         frontend_url
             .parse::<HeaderValue>()
             .expect("FRONTEND_URL doit être une URL valide"),

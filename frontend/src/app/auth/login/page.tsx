@@ -20,7 +20,7 @@ export default function LoginPage() {
     const [status, setStatus] = useState<string | null>(null);
     const [result, setResult] = useState<LoginResponse | null>(null);
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me";
 
     useEffect(() => {
         if (result) {

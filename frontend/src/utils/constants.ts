@@ -13,8 +13,8 @@ export const STORAGE_KEYS = {
 
 // URLs par défaut (fallbacks si les variables d'environnement ne sont pas définies)
 
-export const DEFAULT_API_URL =  "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/";
-export const DEFAULT_WS_URL = 'ws://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/';
+export const DEFAULT_API_URL =  "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me";
+export const DEFAULT_WS_URL = 'ws://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me';
 
 // Configuration API
 export const API_CONFIG = {

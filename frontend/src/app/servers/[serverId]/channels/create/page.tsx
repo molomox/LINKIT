@@ -16,7 +16,7 @@ export default function CreateChannelPage() {
     const [status, setStatus] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me";
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
