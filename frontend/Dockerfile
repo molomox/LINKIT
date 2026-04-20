@@ -1,7 +1,7 @@
 # Dockerfile Frontend Next.js
 
 # Étape 1 : Dependencies - Installation des dépendances
-FROM node:20-alpine AS deps
+FROM node:20-slim AS deps
 
 # Installer les dépendances système nécessaires
 RUN apk add --no-cache libc6-compat
@@ -15,7 +15,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci
 
 # Étape 2 : Builder - Build de l'application Next.js
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
@@ -39,7 +39,7 @@ ENV NODE_ENV production
 RUN npm run build
 
 # Étape 3 : Runner - Image légère pour l'exécution
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 
 WORKDIR /app
 
