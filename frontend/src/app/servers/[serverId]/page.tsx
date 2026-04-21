@@ -41,7 +41,7 @@ export default function ServerPage() {
     const params = useParams();
     const { t } = useTranslation();
     const serverId = params.serverId as string;
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
 
     // Custom hooks
     const { server, channels, selectedChannel, loading, setChannels, setSelectedChannel } = useServerData({

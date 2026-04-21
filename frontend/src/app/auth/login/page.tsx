@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -18,22 +19,12 @@ export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState<string | null>(null);
-    const [result, setResult] = useState<LoginResponse | null>(null);
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
-
-    useEffect(() => {
-        if (result) {
-            setTimeout(() => {
-                router.push("/auth/me");
-            }, 2000);
-        }
-    }, [result, router]);
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus(t.auth.loading);
-        setResult(null);
 
         console.log("🔵 Envoi de la requête à:", `${apiBase}/user/login`);
         console.log("🔵 Données:", { username, password: "***", email: "" });
@@ -65,16 +56,21 @@ export default function LoginPage() {
             const data = (await res.json()) as LoginResponse;
             console.log("✅ Connexion réussie:", data);
 
+            if (!data.token || data.token.trim().length === 0) {
+                setStatus("❌ Token manquant dans la réponse de connexion");
+                return;
+            }
+
             // Stocker les informations utilisateur dans sessionStorage (isolé par onglet)
             sessionStorage.setItem("user_id", data.user_id);
             sessionStorage.setItem("username", data.username);
             sessionStorage.setItem("email", data.email);
-            sessionStorage.setItem("token", data.token || "");
+            sessionStorage.setItem("token", data.token);
 
-            setResult(data);
-            setStatus(t.auth.loginSuccess);
+            setStatus(`${t.auth.loginSuccess} - redirection...`);
             setUsername("");
             setPassword("");
+            window.location.href = "/auth/me";
         } catch (error) {
             console.error("🔴 Erreur réseau:", error);
             setStatus(t.error.network.replace('{message}', error instanceof Error ? error.message : 'Unknown'));
@@ -224,7 +220,7 @@ export default function LoginPage() {
 
                         <button
                             type="submit"
-                            className="w-full py-4 mt-8 font-black uppercase transition-all border-2 tracking-widest hover:bg-yellow-400 hover:text-black active:scale-95"
+                            className="w-full py-4 mt-8 font-black uppercase transition-all border-2 tracking-widest hover:bg-yellow-400 hover:bg-yellow-400 hover:text-black transition-all"
                             style={{
                                 fontFamily: 'monospace',
                                 backgroundColor: '#000000',
@@ -232,6 +228,7 @@ export default function LoginPage() {
                                 color: '#FFD700',
                                 boxShadow: '0 0 20px rgba(255, 215, 0, 0.4)',
                                 clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
+                                textShadow: "0 0 2px #000000, 0 0 5px yellow, 0 0 1px yellow, 0 0 10px yellow",
                             }}
                         >
                             {t.auth.loginButton}

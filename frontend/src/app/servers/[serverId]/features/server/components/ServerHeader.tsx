@@ -59,7 +59,9 @@ export default function ServerHeader({
                 <button
                     onClick={() => router.push('/auth/me')}
                     className="px-3 py-1 border-2 border-yellow-400/50 text-yellow-400 font-bold uppercase text-xs hover:bg-yellow-400 hover:text-black transition-all"
-                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
+                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+                    textShadow: "0 0 2px #000000, 0 0 5px yellow, 0 0 1px yellow, 0 0 10px yellow"
+                     }}
                 >
                     {t.nav.back}
                 </button>
@@ -78,7 +80,9 @@ export default function ServerHeader({
                     <button
                         onClick={onToggleDmNotifications}
                         className="px-3 py-1 border-2 border-cyan-400/60 text-cyan-300 font-bold uppercase text-xs hover:bg-cyan-400 hover:text-black transition-all flex items-center gap-2"
-                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
+                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+                        textShadow: "0 0 2px #000000, 0 0 5px cyan, 0 0 1px cyan, 0 0 10px cyan"
+                         }}
                     >
                         <span>DM</span>
                         <span className="text-[10px] opacity-80">
@@ -124,7 +128,9 @@ export default function ServerHeader({
                 <button
                     onClick={onCopyInvite}
                     className="px-3 py-1 border-2 border-yellow-400/50 text-yellow-400 font-bold uppercase text-xs hover:bg-yellow-400 hover:text-black transition-all"
-                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
+                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+                    textShadow: "0 0 2px #000000, 0 0 5px yellow, 0 0 1px yellow, 0 0 10px yellow"
+                     }}
                     title={t.server.copyInviteTooltip}
                 >
                     {copied ? t.server.inviteCopied : t.server.copyInvite}
@@ -135,7 +141,9 @@ export default function ServerHeader({
                     <button
                         onClick={onShowLeaveModal}
                         className="px-3 py-1 border-2 border-orange-400/50 text-orange-400 font-bold uppercase text-xs hover:bg-orange-400 hover:text-black transition-all"
-                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
+                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+                        textShadow: "0 0 2px #000000, 0 0 5px orange, 0 0 1px orange, 0 0 10px orange"
+                        }}
                         title={t.server.leaveTooltip}
                     >
                         {t.server.quitButton}
@@ -147,7 +155,9 @@ export default function ServerHeader({
                     <button
                         onClick={onShowDeleteModal}
                         className="px-3 py-1 border-2 border-red-400/50 text-red-400 font-bold uppercase text-xs hover:bg-red-400 hover:text-black transition-all"
-                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
+                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+                        textShadow: "0 0 2px #000000, 0 0 5px red, 0 0 1px red, 0 0 10px red"
+                         }}
                         title={t.server.deleteTooltip}
                     >
                         {t.server.deleteButtonShort}

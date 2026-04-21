@@ -10,7 +10,7 @@ export default function LogoutPage() {
     const { t } = useTranslation();
     const [status, setStatus] = useState<string>(t.auth.logout);
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
 
     useEffect(() => {
         const handleLogout = async () => {

@@ -16,7 +16,7 @@ interface BanInfo {
 }
 
 export function useMemberActions({ serverId, onMemberUpdate }: UseMemberActionsProps) {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
 
     const handleRoleChange = async (member: Member, newRoleId: string): Promise<boolean> => {
         try {

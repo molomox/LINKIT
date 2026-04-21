@@ -16,7 +16,7 @@ export default function CreateChannelPage() {
     const [status, setStatus] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -164,7 +164,9 @@ export default function CreateChannelPage() {
                                 type="submit"
                                 disabled={loading || !name.trim()}
                                 className="flex-1 px-6 py-4 border-2 border-yellow-400 bg-yellow-400 text-black font-bold uppercase text-sm tracking-wider hover:bg-yellow-500 hover:border-yellow-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}
+                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
+                                textShadow: "0 0 2px #000000, 0 0 5px yellow, 0 0 1px yellow, 0 0 10px yellow"
+                                 }}
                             >
                                 {loading ? t.common.loading : t.channel.createButton}
                             </button>
@@ -174,7 +176,9 @@ export default function CreateChannelPage() {
                                 onClick={() => router.back()}
                                 disabled={loading}
                                 className="flex-1 px-6 py-4 border-2 border-red-500 text-red-500 font-bold uppercase text-sm tracking-wider hover:bg-red-500 hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)" }}
+                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
+                                    textShadow: "0 0 2px #000000, 0 0 5px red, 0 0 1px red, 0 0 10px red"
+                                 }}
                             >
                                 ← {t.common.cancel}
                             </button>
