@@ -1,5 +1,4 @@
 use crate::domain::entities::Member;
-use crate::domain::usecases::server::JoinServerByInvite;
 use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
@@ -18,8 +17,8 @@ pub async fn create_server_handler(
     // Créer le serveur
     let result = tokio::task::spawn_blocking(move || {
         let repo = PostgresServerRepo;
-        let usecase = CreateServer { repo: &repo };
-        usecase.execute(payload.name, payload.password)
+        let usecase0 = CreateServer { repo: &repo };
+        usecase0.execute(payload.name, payload.password)
     })
     .await
     .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
@@ -39,13 +38,13 @@ pub async fn create_server_handler(
         let repo2 = PostgresMemberRepo;
         let repo3 = PostgresRoleRepo;
         let ban_repo = PostgresBanRepo;
-        let usecase = JoinServer {
+        let usecase1 = JoinServer {
             repo: &repo,
             repo2: &repo2,
             repo3: &repo3,
             ban_repo: &ban_repo,
         };
-        usecase.execute(user_id, server_id, password, "role04".to_string())
+        usecase1.execute(user_id, server_id, password, "role04".to_string())
     }).await;
     let member = member_result
         .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
