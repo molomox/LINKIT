@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export type ServerWsMessage = {
-    type: 'channel_created' | 'channel_updated' | 'channel_deleted' | 'server_deleted' | 'member_joined' | 'member_role_changed' | 'member_kicked' | 'member_banned' | 'user_online' | 'user_offline' | 'dm_message' | 'ping' | 'pong' | 'identify';
+    type: 'channel_created' | 'channel_updated' | 'channel_deleted' | 'server_deleted' | 'member_joined' | 'member_role_changed' | 'member_kicked' | 'member_banned' | 'user_left' | 'user_online' | 'user_offline' | 'dm_message' | 'ping' | 'pong' | 'identify';
     channel_id?: string;
     name?: string;
     server_id?: string;

@@ -41,7 +41,7 @@ export default function ServerPage() {
     const params = useParams();
     const { t } = useTranslation();
     const serverId = params.serverId as string;
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
 
     // Custom hooks
     const { server, channels, selectedChannel, loading, setChannels, setSelectedChannel } = useServerData({

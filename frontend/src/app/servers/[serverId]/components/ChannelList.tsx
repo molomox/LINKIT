@@ -77,7 +77,9 @@ export default function ChannelList({
                 <button
                     onClick={() => router.push(`/servers/${serverId}/channels/create`)}
                     className="w-full px-3 py-2 border-2 border-yellow-400/50 text-yellow-400 font-bold uppercase text-xs hover:bg-yellow-400 hover:text-black transition-all"
-                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)" }}
+                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)",
+                    textShadow: "0 0 2px #000000, 0 0 5px yellow, 0 0 1px yellow, 0 0 10px yellow"
+                     }}
                 >
                     {t.channel.createButton}
                 </button>

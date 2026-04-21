@@ -111,7 +111,9 @@ export default function ServerModals({
                                 onClick={onCloseDeleteModal}
                                 disabled={actionLoading}
                                 className="flex-1 px-4 py-2 border-2 border-gray-500 text-gray-400 font-bold uppercase text-sm hover:bg-gray-500 hover:text-black transition-all disabled:opacity-50"
-                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
+                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)",
+                                    textShadow: "0 0 2px #000000, 0 0 5px gray, 0 0 1px gray, 0 0 10px gray"
+                                 }}
                             >
                                 {t.common.cancel}
                             </button>
@@ -119,7 +121,9 @@ export default function ServerModals({
                                 onClick={onDeleteServer}
                                 disabled={actionLoading || deleteConfirmName !== server?.name}
                                 className="flex-1 px-4 py-2 border-2 border-red-400 bg-red-400 text-black font-bold uppercase text-sm hover:bg-red-500 hover:border-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
+                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)",
+                                    textShadow: "0 0 2px #000000, 0 0 5px red, 0 0 1px red, 0 0 10px red"
+                                 }}
                             >
                                 {actionLoading ? t.common.loading : t.server.deleteButton}
                             </button>

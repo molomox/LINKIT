@@ -98,6 +98,25 @@ export function useServerEvents({
                 onMembersReload();
                 break;
 
+            case 'user_left': {
+                const currentUserId = sessionStorage.getItem('user_id');
+                if (lastServerMessage.user_id === currentUserId) {
+                    onRedirect('/auth/me');
+                    break;
+                }
+
+                onMembersReload();
+                onOnlineMembersUpdate(prev => {
+                    if (!lastServerMessage.user_id || !prev.has(lastServerMessage.user_id)) {
+                        return prev;
+                    }
+                    const newSet = new Set(prev);
+                    newSet.delete(lastServerMessage.user_id);
+                    return newSet;
+                });
+                break;
+            }
+
             case 'member_kicked': {
                 const currentUserId = sessionStorage.getItem('user_id');
                 console.log('🔍 member_kicked event:', {
