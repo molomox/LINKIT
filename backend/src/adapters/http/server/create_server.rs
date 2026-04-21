@@ -45,13 +45,7 @@ pub async fn create_server_handler(
             repo3: &repo3,
             ban_repo: &ban_repo,
         };
-        let usecase = JoinServerByInvite{
-            repo: &repo,
-            repo2: &repo2,
-            repo3: &repo3,
-            ban_repo: &ban_repo,
-        };
-        usecase.execute(user_id, server_id, "role04".to_string())
+        usecase.execute(user_id, server_id, password, "role04".to_string())
     }).await;
     let member = member_result
         .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
