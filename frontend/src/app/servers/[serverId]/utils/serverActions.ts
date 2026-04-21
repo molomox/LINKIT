@@ -30,17 +30,18 @@ export async function deleteServer(serverId: string, apiBase: string): Promise<v
 
 export function copyInviteLink(inviteCode: string): void {
     const inviteLink = `${window.location.origin}/invite/${inviteCode}`;
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(inviteLink);
-    } else {
-        // Fallback pour HTTP
+    try {
         const textarea = document.createElement("textarea");
         textarea.value = inviteLink;
-        textarea.style.display = "none";
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
         document.body.appendChild(textarea);
+        textarea.focus();
         textarea.select();
         document.execCommand("copy");
         document.body.removeChild(textarea);
+    } catch (e) {
+        console.error("Copie échouée", e);
     }
 }
 
