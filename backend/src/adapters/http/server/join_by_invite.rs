@@ -25,13 +25,13 @@ pub async fn join_server_by_invite_handler(
         let repo2 = PostgresMemberRepo;
         let repo3 = PostgresRoleRepo;
         let ban_repo = PostgresBanRepo;
-        let usecase = JoinServerByInvite {
+        let usecase1 = JoinServerByInvite {
             repo: &repo,
             repo2: &repo2,
             repo3: &repo3,
             ban_repo: &ban_repo,
         };
-        usecase.execute(request.user_id, invite_code.clone(), "role02".to_string())
+        usecase1.execute(request.user_id, invite_code.clone(), "role02".to_string())
     }).await;
     let member = member_result
         .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
