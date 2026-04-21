@@ -1,5 +1,4 @@
 use crate::domain::entities::Member;
-use crate::domain::usecases::server::JoinServerByInvite;
 use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;
@@ -45,13 +44,7 @@ pub async fn create_server_handler(
             repo3: &repo3,
             ban_repo: &ban_repo,
         };
-        let usecase2 = JoinServerByInvite{
-            repo: &repo,
-            repo2: &repo2,
-            repo3: &repo3,
-            ban_repo: &ban_repo,
-        };
-        usecase1.execute(user_id, server_id, "role04".to_string())
+        usecase1.execute(user_id, server_id, password, "role04".to_string())
     }).await;
     let member = member_result
         .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
