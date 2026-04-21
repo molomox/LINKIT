@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BACKEND: epitechmscpropromo2028/t-dev-600-nan_6-backend
-  IMAGE_FRONTEND: epitechmscpropromo2028/t-dev-600-nan_6-frontend
+  IMAGE_BACKEND: molomox/linkit-backend
+  IMAGE_FRONTEND: molomox/linkit-frontend
 
 jobs:
   test:
@@ -26,7 +26,10 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
       - name: Log into registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
@@ -42,7 +45,8 @@ jobs:
           context: ./backend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}:latest
-          
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -50,6 +54,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+  
       - name: Log into registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
@@ -65,16 +72,5 @@ jobs:
           context: ./frontend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_FRONTEND }}:latest
-          
-  mirror:
-    runs-on: ubuntu-latest
-    needs: deploy
-    if: github.event_name != 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  
-
-      - name: Mirror to other repo
-        run: |
-          git push --mirror https://github.com/molomox/LINKIT.git
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -19,8 +19,8 @@ export default function CreateServerPage() {
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/";
+
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -237,6 +237,8 @@ export default function CreateServerPage() {
                             color: '#FFD700',
                             boxShadow: '0 0 20px rgba(255, 215, 0, 0.4)',
                             clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%)",
+                            textShadow: "0 0 2px #000000, 0 0 5px yellow, 0 0 1px yellow, 0 0 10px yellow"
+                            
                         }}
                     >
                         {loading ? t.common.loading : t.server.createButton}

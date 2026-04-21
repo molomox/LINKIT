@@ -16,7 +16,7 @@ interface BanInfo {
 }
 
 export function useMemberActions({ serverId, onMemberUpdate }: UseMemberActionsProps) {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
 
     const handleRoleChange = async (member: Member, newRoleId: string): Promise<boolean> => {
         try {

@@ -40,7 +40,7 @@ export default function DirectMessagePage() {
     const channelId = params.channelId as string;
     const targetUsername = searchParams.get("username") || "Unknown";
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me/";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
     const [messages, setMessages] = useState<DmMessage[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const [sending, setSending] = useState(false);
