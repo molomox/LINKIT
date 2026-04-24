@@ -26,7 +26,7 @@ export default function DashboardPage() {
     const { isSupported, permission, enabled, requestPermission, refreshPermission, toggleEnabled,  notify } = useDesktopNotifications();
 
     const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
-    const wsBase = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3000";
+    const wsBase = process.env.NEXT_PUBLIC_WS_URL ?? "ws://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me";
 
     const forceLogin = () => {
         sessionStorage.removeItem("token");
