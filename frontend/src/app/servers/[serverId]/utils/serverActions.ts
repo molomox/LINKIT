@@ -41,7 +41,18 @@ export function copyInviteLink(inviteCode: string): void {
         document.execCommand("copy");
         document.body.removeChild(textarea);
     } catch (e) {
-        console.error("Copie échouée", e);
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(inviteLink);
+        } else {
+            // Fallback pour HTTP
+            const textarea = document.createElement("textarea");
+            textarea.value = inviteLink;
+            textarea.style.display = "none";
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+        }
     }
 }
 
