@@ -362,7 +362,6 @@ warning: `backend` (lib) generated 46 warnings (run `cargo fix --lib -p backend`
 warning: `backend` (bin "backend") generated 46 warnings (46 duplicates)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.12s
      Running `target/debug/backend`
-🚀 Backend Rust lancé sur http://localhost:3000
 📋 Routes disponibles:
   === USERS ===
   POST   /auth/signup
