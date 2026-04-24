@@ -29,7 +29,8 @@ pub async fn create_server_handler(
         name: result.name.clone(),
     };
 
-    // Ajouter automatiquement le créateur comme membre avec le rôle admin
+    // Ajouter automatiquement le créateur comme membre avec le rôle owner.
+    // Use server_id + password directly to avoid a second lookup by invite code.
     let server_id = result.server_id.clone();
     let password = result.password.clone();
 
@@ -46,7 +47,7 @@ pub async fn create_server_handler(
         };
         usecase1.execute(user_id, server_id, password, "role04".to_string())
     }).await;
-    let member = member_result
+    let _member = member_result
         .map_err(|e| ApiError::InternalError(format!("Task failed: {}", e)))?
         .map_err(|e| ApiError::BadRequest(format!("Failed to add creator as member: {}", e)))?;
 

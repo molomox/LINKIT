@@ -1,5 +1,21 @@
 import { buildAuthHeaders } from "@/utils/authHeaders";
 
+function getFrontendBaseUrl(): string {
+    const configuredBase = process.env.NEXT_PUBLIC_FRONTEND_URL?.trim().replace(/\/$/, "");
+    if (configuredBase) {
+        return configuredBase;
+    }
+
+    if (typeof window !== "undefined") {
+        const { origin, protocol } = window.location;
+        if (protocol === "http:" || protocol === "https:") {
+            return origin.replace(/\/$/, "");
+        }
+    }
+
+    return "http://localhost:3001";
+}
+
 export async function leaveServer(serverId: string, apiBase: string): Promise<void> {
     const userId = sessionStorage.getItem("user_id");
     if (!userId) throw new Error("Utilisateur non identifié");

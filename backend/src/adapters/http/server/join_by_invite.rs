@@ -1,4 +1,3 @@
-use crate::domain::usecases::server::JoinServer;
 use crate::adapters::db::postgres_ban_repository::PostgresBanRepo;
 use crate::adapters::db::postgres_member_repository::PostgresMemberRepo;
 use crate::adapters::db::postgres_role_repository::PostgresRoleRepo;

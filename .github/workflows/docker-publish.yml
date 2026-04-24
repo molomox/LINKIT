@@ -45,7 +45,8 @@ jobs:
           context: ./backend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_BACKEND }}:latest
-          
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   build-frontend:
     runs-on: ubuntu-latest

@@ -2,50 +2,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import RequireAuth from "@/components/RequireAuth";
 import { buildAuthHeaders } from "@/utils/authHeaders";
 import * as serverActions from "../../servers/[serverId]/utils/serverActions";
 import { useDesktopNotifications } from "@/hooks/useDesktopNotifications";
-
-type UserProfile = {
-    username: string;
-    email: string;
-    user_id: string;
-    create_at: string;
-};
-
-type Server = {
-    id: string;
-    name: string;
-    memberCount: number;
-};
-
-type ServerApiResponse = {
-    server_id: string;
-    name: string;
-    password: string;
-    create_at: string;
-    all_channels: unknown[];
-};
-
-type DmConversation = {
-    channel_id: string;
-    user_id: string;
-    username: string;
-    server_id: string;
-    server_name: string;
-};
-
-type DmRealtimeNotification = {
-    id: string;
-    channel_id: string;
-    server_id: string;
-    from_user_id: string;
-    from_username: string;
-    preview: string;
-    is_gif: boolean;
-};
+import DashboardHeader from "./components/DashboardHeader";
+import type { DmConversation, DmRealtimeNotification, Server, ServerApiResponse, UserProfile } from "./types";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -63,9 +25,9 @@ export default function DashboardPage() {
     const notifOpenRef = useRef(false);
     const { isSupported, permission, enabled, requestPermission, refreshPermission, toggleEnabled,  notify } = useDesktopNotifications();
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me";
-    const wsBase = process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:3000';
-    
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
+    const wsBase = process.env.NEXT_PUBLIC_WS_URL ?? "ws://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me";
+
     const forceLogin = () => {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("user_id");
@@ -341,6 +303,18 @@ export default function DashboardPage() {
         setInviteLink("");
     };
 
+    const handleTestNotification = () => {
+        if (permission !== "granted" || !enabled) {
+            return;
+        }
+
+        notify({
+            title: "Test notification L!nkyt",
+            body: "Si tu vois ca, les notifications desktop fonctionnent.",
+            tag: `notif-test-${Date.now()}`,
+        });
+    };
+
     if (loading) {
         return (
             <RequireAuth>
@@ -392,145 +366,27 @@ export default function DashboardPage() {
                     }}
                 />
 
-                {/* Header */}
-                <header className="relative z-10 border-b-2 border-yellow-400/30 bg-black/80 backdrop-blur-sm">
-                    <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="w-2 h-8 bg-yellow-400"></div>
-                            <h1 className="text-3xl font-black text-yellow-400 tracking-tight uppercase" style={{ fontFamily: 'monospace' }}>
-                                L!NKYT
-                            </h1>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="relative">
-                                <button
-                                    onClick={toggleNotifications}
-                                    className="px-4 py-2 border-2 border-cyan-400 text-cyan-300 font-bold uppercase text-xs tracking-wider hover:bg-cyan-400 hover:text-black transition-all flex items-center gap-2"
-                                    style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
-                                >
-                                    <span>DM</span>
-                                    <span className="text-[10px] opacity-80">
-                                        {dmNotifications[0] ? dmNotifications[0].from_username : "-"}
-                                    </span>
-                                </button>
-                                {isSupported && (
-                                    <button
-                                        onClick={async () => {
-                                            if (permission === "granted") {
-                                                toggleEnabled();
-                                                return;
-                                            }
-                                            await requestPermission();
-                                            refreshPermission();
-                                        }}
-                                        className={`mt-2 w-full px-4 py-2 border-2 font-bold uppercase text-xs tracking-wider transition-all ${
-                                            permission === "granted" && enabled
-                                                ? "border-green-400 text-green-400 bg-green-400/10 hover:bg-green-400 hover:text-black cursor-pointer"
-                                                : permission === "granted" && !enabled
-                                                    ? "border-green-400 text-green-400 bg-green-400/10 cursor-pointer"
-                                                : permission === "denied"
-                                                    ? "border-red-400 text-red-400 hover:bg-red-400 hover:text-black cursor-pointer"
-                                                    : "border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black cursor-pointer"
-                                        }`}
-                                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
-                                    >
-                                        {permission === "granted" && enabled
-                                            ? "Notifications activées"
-                                            : permission === "granted" && !enabled
-                                                ? "Notifications désactivées"
-                                            : permission === "denied"
-                                                ? "❌ Notifications bloquées"
-                                                : "🔔 Activer les notifications"}
-                                    </button>
-                                )}
-
-                                {isSupported && (
-                                    <button
-                                        onClick={() => {
-                                            if (permission !== "granted" || !enabled) {
-                                                return;
-                                            }
-                                            notify({
-                                                title: "Test notification L!nkyt",
-                                                body: "Si tu vois ca, les notifications desktop fonctionnent.",
-                                                tag: `notif-test-${Date.now()}`,
-                                            });
-                                        }}
-                                        className={`mt-2 w-full px-4 py-2 border-2 font-bold uppercase text-xs tracking-wider transition-all ${
-                                            permission === "granted" && enabled
-                                                ? "border-cyan-400 text-cyan-300 hover:bg-cyan-400 hover:text-black cursor-pointer"
-                                                : "border-gray-600 text-gray-500 cursor-not-allowed"
-                                        }`}
-                                        style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
-                                    >
-                                        {permission === "granted" && enabled
-                                            ? "🧪 Tester la notification"
-                                            : "🧪 Test indisponible (activer les notifications)"}
-                                    </button>
-                                )}
-                                
-                                {unreadDmCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center border border-black">
-                                        {unreadDmCount > 9 ? "9+" : unreadDmCount}
-                                    </span>
-                                )}
-
-                                {isNotifOpen && (
-                                    <div className="absolute right-0 mt-2 w-80 border-2 border-cyan-400/60 bg-black/95 z-30">
-                                        <div className="px-3 py-2 border-b border-cyan-400/30 text-cyan-300 text-xs font-bold uppercase" style={{ fontFamily: 'monospace' }}>
-                                            Notifications DM
-                                        </div>
-                                        {dmNotifications.length === 0 ? (
-                                            <div className="px-3 py-3 text-gray-500 text-xs" style={{ fontFamily: 'monospace' }}>
-                                                Aucune notification.
-                                            </div>
-                                        ) : (
-                                            <div className="max-h-72 overflow-y-auto">
-                                                {dmNotifications.map((notif) => (
-                                                    <button
-                                                        key={notif.id}
-                                                        onClick={() => {
-                                                            setIsNotifOpen(false);
-                                                            router.push(`/dm/${notif.channel_id}?serverId=${encodeURIComponent(notif.server_id)}&username=${encodeURIComponent(notif.from_username)}&userId=${encodeURIComponent(notif.from_user_id)}`);
-                                                        }}
-                                                        className="w-full text-left px-3 py-3 border-b border-cyan-400/20 hover:bg-cyan-400/10 transition-colors"
-                                                        style={{ fontFamily: 'monospace' }}
-                                                    >
-                                                        <div className="text-cyan-300 text-xs font-bold">{notif.from_username}</div>
-                                                        <div className="text-gray-300 text-xs truncate">{notif.preview}</div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            <button
-                                onClick={handleCreateServer}
-                                className="px-4 py-2 border-2 border-yellow-400 text-yellow-400 font-bold uppercase text-xs tracking-wider hover:bg-yellow-400 hover:text-black transition-all"
-                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
-                            >
-                                {t.server.createButton}
-                            </button>
-                            <button
-                                onClick={() => setShowJoinModal(true)}
-                                className="px-4 py-2 border-2 border-green-400 text-green-400 font-bold uppercase text-xs tracking-wider hover:bg-green-400 hover:text-black transition-all"
-                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
-                            >
-                                {t.server.joinButton}
-                            </button>
-                            <button
-                                onClick={handleLogout}
-                                className="px-4 py-2 border-2 border-red-500 text-red-500 font-bold uppercase text-xs tracking-wider hover:bg-red-500 hover:text-black transition-all"
-                                style={{ fontFamily: 'monospace', clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
-                            >
-                                {t.auth.logoutButton}
-                            </button>
-                            <LanguageSwitcher />
-                        </div>
-                    </div>
-                </header>
+                <DashboardHeader
+                    t={t}
+                    dmNotifications={dmNotifications}
+                    unreadDmCount={unreadDmCount}
+                    isNotifOpen={isNotifOpen}
+                    isSupported={isSupported}
+                    permission={permission}
+                    enabled={enabled}
+                    onToggleNotifications={toggleNotifications}
+                    onCloseNotifications={() => setIsNotifOpen(false)}
+                    onOpenDm={(notif) => {
+                        router.push(`/dm/${notif.channel_id}?serverId=${encodeURIComponent(notif.server_id)}&username=${encodeURIComponent(notif.from_username)}&userId=${encodeURIComponent(notif.from_user_id)}`);
+                    }}
+                    onCreateServer={handleCreateServer}
+                    onOpenJoinModal={() => setShowJoinModal(true)}
+                    onLogout={handleLogout}
+                    onToggleEnabled={toggleEnabled}
+                    onRequestPermission={requestPermission}
+                    onRefreshPermission={refreshPermission}
+                    onTestNotification={handleTestNotification}
+                />
 
                 {/* Main Content */}
                 <div className="container mx-auto px-6 py-8">
@@ -554,13 +410,6 @@ export default function DashboardPage() {
                                     <div className="text-gray-500 font-bold uppercase text-sm mb-4" style={{ fontFamily: 'monospace' }}>
                                         {t.dashboard.noServers}
                                     </div>
-                                    <button
-                                        onClick={handleCreateServer}
-                                        className="px-6 py-3 border-2 border-yellow-400 text-yellow-400 font-black uppercase hover:bg-yellow-400 hover:text-black transition-all"
-                                        style={{ fontFamily: 'monospace' }}
-                                    >
-                                        {t.server.createButton}
-                                    </button>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

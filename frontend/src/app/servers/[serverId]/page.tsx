@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import RequireAuth from "@/components/RequireAuth";
@@ -41,7 +41,7 @@ export default function ServerPage() {
     const params = useParams();
     const { t } = useTranslation();
     const serverId = params.serverId as string;
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://linkyt-backend-fqz7hu-60dfe2-46-224-236-78.traefik.me";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL as string;
 
     // Custom hooks
     const { server, channels, selectedChannel, loading, setChannels, setSelectedChannel } = useServerData({
@@ -70,10 +70,13 @@ export default function ServerPage() {
         selectedChannel?.channel_id || null
     );
     const { lastMessage: lastServerMessage } = useServerWebSocket(serverId);
+    const handleBannedRedirect = useCallback(() => {
+        router.push('/auth/me');
+    }, [router]);
 
     // Custom hooks for side effects
     useBanCleanup({ serverId, apiBase, onMembersUpdate: loadMembers });
-    useBanCheck({ members, onBanned: () => router.push('/auth/me') });
+    useBanCheck({ members, onBanned: handleBannedRedirect });
 
     useServerEvents({
         lastServerMessage,
