@@ -1,7 +1,8 @@
 use crate::domain::entities::{
-    channel::Channel, member::Member, message::Message, role::Role, server::Server, user::User,
+    channel::Channel, member::Member, message::Message, role::Role, server::Server, user::User, reaction::Reaction
 };
 use crate::domain::ports::{
+    reaction_repository::ReactionRepository,
     channel_repository::ChannelRepository, member_repository::MemberRepository,
     message_repository::MessageRepository, role_repository::RoleRepository,
     server_repository::ServerRepository, user_repository::UserRepository,
@@ -376,32 +377,14 @@ impl MockMemberRepository {
     }
 
     pub fn create_test_member(&self, user_id: &str, server_id: &str, role_id: &str) -> Member {
-        if role_id == "role04" {
-            return Member {
-                user: User {
-                    user_id: user_id.to_string(),
-                    username: format!("User{}", user_id),
-                    email: format!("user{}@example.com", user_id),
-                    create_at: "2024-01-01T00:00:00Z".to_string(),
-                    password: "password".to_string(),
-                    token: None,
-                },
-                server: Server {
-                    server_id: server_id.to_string(),
-                    name: format!("Server{}", server_id),
-                    invite_code: format!("invite-{}", server_id),
-                    password: "".to_string(),
-                    all_channels: Vec::new(),
-                    create_at: "2024-01-01T00:00:00Z".to_string(),
-                },
-                role: Role {
-                    role_id: "role04".to_string(),
-                    role_name: "Owner".to_string(),
-                },
-                join_at: "2024-01-01T00:00:00Z".to_string(),
-            };
-        }
-        return Member {
+        let (role_id, role_name) = match role_id {
+            "role01" => ("role01", "Ban"),
+            "role02" => ("role02", "Membre"),
+            "role03" => ("role03", "Admin"),
+            "role04" => ("role04", "Owner"),
+            _ => ("role-default", "Member"),
+        };
+        Member {
             user: User {
                 user_id: user_id.to_string(),
                 username: format!("User{}", user_id),
@@ -419,11 +402,11 @@ impl MockMemberRepository {
                 create_at: "2024-01-01T00:00:00Z".to_string(),
             },
             role: Role {
-                role_id: "role-default".to_string(),
-                role_name: "Member".to_string(),
+                role_id: role_id.to_string(),
+                role_name: role_name.to_string(),
             },
             join_at: "2024-01-01T00:00:00Z".to_string(),
-        };
+        }
     }
     pub fn add_member(&self, member: Member) {
         self.members.lock().unwrap().push(member);
@@ -544,3 +527,5 @@ impl RoleRepository for MockRoleRepository {
             .ok_or_else(|| "Role not found".to_string())
     }
 }
+
+
