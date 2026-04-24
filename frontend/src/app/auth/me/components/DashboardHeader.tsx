@@ -101,6 +101,12 @@ export default function DashboardHeader({
                             </div>
                         )}
 
+
+
+                    </div>
+                    <div className="flex items-center gap-3">
+                    <div className="relative">
+
                         {isSupported && (
                             <button
                                 onClick={async () => {
@@ -111,11 +117,11 @@ export default function DashboardHeader({
                                     await onRequestPermission();
                                     onRefreshPermission();
                                 }}
-                                className={`mt-2 w-full px-4 py-2 border-2 font-bold uppercase text-xs tracking-wider transition-all ${
+                                className={`œ w-full px-4 py-2 border-2 font-bold uppercase text-xs tracking-wider transition-all ${
                                     permission === "granted" && enabled
                                         ? "border-green-400 text-green-400 bg-green-400/10 hover:bg-green-400 hover:text-black cursor-pointer"
                                         : permission === "granted" && !enabled
-                                            ? "border-green-400 text-green-400 bg-green-400/10 cursor-pointer"
+                                            ? "border-red-400 text-red-400 bg-red-400/10 cursor-pointer"
                                             : permission === "denied"
                                                 ? "border-red-400 text-red-400 hover:bg-red-400 hover:text-black cursor-pointer"
                                                 : "border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black cursor-pointer"
@@ -131,22 +137,7 @@ export default function DashboardHeader({
                                             : "🔔 Activer les notifications"}
                             </button>
                         )}
-
-                        {isSupported && (
-                            <button
-                                onClick={onTestNotification}
-                                className={`mt-2 w-full px-4 py-2 border-2 font-bold uppercase text-xs tracking-wider transition-all ${
-                                    permission === "granted" && enabled
-                                        ? "border-cyan-400 text-cyan-300 hover:bg-cyan-400 hover:text-black cursor-pointer"
-                                        : "border-gray-600 text-gray-500 cursor-not-allowed"
-                                }`}
-                                style={{ fontFamily: "monospace", clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
-                            >
-                                {permission === "granted" && enabled
-                                    ? "🧪 Tester la notification"
-                                    : "🧪 Test indisponible (activer les notifications)"}
-                            </button>
-                        )}
+                        </div>
                     </div>
 
                     <button
