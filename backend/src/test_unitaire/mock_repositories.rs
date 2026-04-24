@@ -1,8 +1,9 @@
 use crate::domain::entities::{
     channel::Channel, member::Member, message::Message, role::Role, server::Server, user::User, reaction::Reaction
 };
+use crate::domain::entities::reagi::Reagi;
 use crate::domain::ports::{
-    reaction_repository::ReactionRepository,
+    reaction_repository::ReactionRepository, reagi_repository::ReagiRepository,
     channel_repository::ChannelRepository, member_repository::MemberRepository,
     message_repository::MessageRepository, role_repository::RoleRepository,
     server_repository::ServerRepository, user_repository::UserRepository,
@@ -525,6 +526,140 @@ impl RoleRepository for MockRoleRepository {
             .find(|r| r.role_name == name)
             .cloned()
             .ok_or_else(|| "Role not found".to_string())
+    }
+}
+
+pub struct MockReactionRepository {
+    reactions: Arc<Mutex<HashMap<String, Reaction>>>,
+}
+
+impl MockReactionRepository {
+
+    pub fn add_reaction(&self, reaction: Reaction) {
+        self.reactions
+            .lock()
+            .unwrap()
+            .insert(reaction.reaction_id.to_string(), reaction);
+    }
+
+    pub fn new() -> Self {
+        let repo = Self {
+            reactions: Arc::new(Mutex::new(HashMap::new())),
+        };
+        repo.add_reaction(Reaction {
+            reaction_id: 1,
+            emoji: "👍".to_string(),
+            reaction_name: "Like".to_string(),
+        });
+        repo.add_reaction(Reaction {
+            reaction_id: 2,
+            emoji: "👎".to_string(),
+            reaction_name: "Dislike".to_string(),
+        });
+        repo.add_reaction(Reaction {
+            reaction_id: 3,
+            emoji: "❤️".to_string(),
+            reaction_name: "Love".to_string(),
+        });
+        repo.add_reaction(Reaction {
+            reaction_id: 4,
+            emoji: "🎉".to_string(),
+            reaction_name: "Celebrate".to_string(),
+        });
+        repo
+    }
+}
+
+impl ReactionRepository for MockReactionRepository {
+    fn save(&self, reaction: Reaction) -> Result<Reaction, String> {
+        self.reactions
+            .lock()
+            .unwrap()
+            .insert(format!("{}", reaction.reaction_id), reaction.clone());
+        Ok(reaction)
+    }
+    fn exists(&self, reaction_id: i32) -> Result<bool, String> {
+        let exists = self
+            .reactions
+            .lock()
+            .unwrap()
+            .contains_key(&reaction_id.to_string());
+        if exists {
+            Ok(exists)
+        } else {
+            Err("Reaction not found".to_string())
+        }
+    }
+    fn find_by_id(&self, reaction_id: i32) -> Result<Reaction, String> {
+        self.reactions
+            .lock()
+            .unwrap()
+            .get(&reaction_id.to_string())
+            .cloned()
+            .ok_or_else(|| "Reaction not found".to_string())
+    }
+    fn find_all(&self) -> Result<Vec<Reaction>, String> {
+        let reactions: Vec<Reaction> = self
+            .reactions
+            .lock()
+            .unwrap()
+            .values()
+            .cloned()
+            .collect();
+        Ok(reactions)
+    }
+}
+
+pub struct MockReagiRepository {
+    reagis: Arc<Mutex<HashMap<String, Reagi>>>,
+}
+impl MockReagiRepository {
+    pub fn new() -> Self {
+        Self {
+            reagis: Arc::new(Mutex::new(HashMap::new())),
+        }
+    }
+
+    pub fn add_reagi(&self, reagi: Reagi) {
+        let key = format!("{}-{}-{}", reagi.user.user_id, reagi.message.message_id, reagi.reaction.reaction_id);
+        self.reagis.lock().unwrap().insert(key, reagi);
+    }
+}
+
+impl ReagiRepository for MockReagiRepository {
+    fn save(&self, reagi: Reagi) -> Result<Reagi, String> {
+        let key = format!("{}-{}-{}", reagi.user.user_id, reagi.message.message_id, reagi.reaction.reaction_id);
+        self.reagis.lock().unwrap().insert(key, reagi.clone());
+        Ok(reagi)
+    }
+
+    fn exists(&self, user_id: String, message_id: String, reaction_id: i32) -> Result<bool, String> {
+        let key = format!("{}-{}-{}", user_id, message_id, reaction_id);
+        let exists = self.reagis.lock().unwrap().contains_key(&key);
+        if exists {
+            Ok(exists)
+        } else {
+            Err("Reagi not found".to_string())
+        }
+    }
+
+    fn find_by_message_id(&self, message_id: String) -> Result<Vec<Reagi>, String> {
+        let result: Vec<Reagi> = self.reagis.lock().unwrap()
+            .values()
+            .filter(|r| r.message.message_id == message_id)
+            .cloned()
+            .collect();
+        Ok(result)
+    }
+
+    fn delete_reaction(&self, user_id: String, message_id: String, reaction_id: i32) -> Result<String, String> {
+        let key = format!("{}-{}-{}", user_id, message_id, reaction_id);
+        let mut reagis = self.reagis.lock().unwrap();
+        if reagis.remove(&key).is_some() {
+            Ok("removed".to_string())
+        } else {
+            Err("Reagi not found".to_string())
+        }
     }
 }
 
